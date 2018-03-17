@@ -1,0 +1,67 @@
+[config]
+ws type = 1080
+day end hour = 9
+gnuplot encoding = iso_8859_1
+language = en
+logdata sync = 1
+rain day threshold = 0.2
+usb activity margin = 3.0
+pressure offset = 9.9
+frequent writes = False
+template encoding = iso-8859-1
+gnuplot version = 4.2
+
+[fixed]
+station clock = 1365620624.45
+sensor clock = 1365620436.04
+pressure offset = -7.1
+
+[paths]
+templates = /home/pi/weather/templates/
+graph_templates = /home/pi/weather/templates/
+work = /home/pi/weather/temp
+local_files = /home/pi/weather/results/
+
+[live]
+services = []
+twitter = []
+text = []
+plot = []
+
+[logged]
+services = []
+twitter = []
+text = ['6hrs.txt']
+plot = []
+
+[hourly]
+services = []
+twitter = []
+text = ['24hrs.txt', '7days.txt', 'feed_hourly.xml', 'allmonths.txt']
+plot = ['7days.png.xml', '24hrs.png.xml', 'rose_24hrs.png.xml' ,'24hrs_full_features.png.xml']
+
+[12 hourly]
+services = []
+twitter = []
+text = []
+plot = []
+
+[daily]
+services = []
+twitter = []
+text = ['feed_daily.xml']
+plot = ['28days.png.xml']
+
+[ftp]
+local site = false
+secure = False
+site = 192.168.1.151
+user = weather
+password = weather
+directory = ./pywws 
+
+[Zambretti]
+north = True
+baro upper = 1050.0
+baro lower = 950.0
+

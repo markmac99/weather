@@ -1,0 +1,2 @@
+#daily#
+#wind_gust "%.0f mph" "" "wind_mph(x)"#

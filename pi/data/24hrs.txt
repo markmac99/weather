@@ -1,0 +1,33 @@
+<table border="1" rules="all">
+  <tr>
+    <th colspan="2" class="left">
+       
+    </th>
+    <th colspan="2">Date &amp; time</th>
+  </tr>
+  <tr>
+    <th class="right">Daytime max temp</th>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <th class="right">Night min temp</th>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <th class="right">Total rainfall</th>
+    <td></td>
+    <td colspan="2"></td>
+  </tr>
+  <tr>
+    <th class="right">Average wind speed</th>
+    <td></td>
+    <td colspan="2"></td>
+  </tr>
+  <tr>
+    <th class="right">Highest gust speed</th>
+    <td></td>
+    <td></td>
+  </tr>
+</table>

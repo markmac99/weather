@@ -1,0 +1,2 @@
+#daily#
+#temp_out_min#

@@ -1,0 +1,8 @@
+#timezone local#
+#roundtime True#
+#hourly#
+#loop 24#
+#idx "%H:%M"#,#temp_out#,#wind_gust#,#rain#
+
+#jump -1#
+#endloop#

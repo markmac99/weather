@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+  <channel>
+    <title>Tackley Weather - Hourly Reports</title>
+    <link>http://www.themcintyres.dnsalias.net/weather/pywws/</link>
+    <atom:link href="http://www.themcintyres/dnsalias.net/weather/pywws/feed_hourly.xml" rel="self" type="application/rss+xml" />
+    <description>Hourly reports from an amateur weather station in Tackley, Oxfordshire, UK</description>
+    <ttl>60</ttl>
+    <item>
+      <title>Saturday 22:53 UTC</title>
+      <geo:lat>51.88</geo:lat>
+      <geo:long>-1.30</geo:long>
+      <link>http://www.themcintyres.dnsalias.net/weather/24hrs/</link>
+      <description>Temperature: 4.8°C, Wind: E, 3 mph (ave), 5 mph (gust), Humidity: 81%, Rainfall (hourly) 0.0 mm, Pressure: 1019 hPa, rising slowly</description>
+      <guid isPermaLink="false">hourly_2018_01_13_22_53_UTC</guid>
+      <pubDate>Sat, 13 Jan 2018 22:52:48 +0000</pubDate>
+    </item>
+  </channel>
+</rss>
