@@ -2,10 +2,6 @@ $(function() {
 Morris.Bar({
  element: 'dragontail-12month-rainfall',
  data: [
-    {time: '2017/01',
-    rain: 0.3    },
-    {time: '2017/02',
-    rain: 26.7    },
     {time: '2017/03',
     rain: 19.8    },
     {time: '2017/04',
@@ -27,7 +23,11 @@ Morris.Bar({
     {time: '2017/12',
     rain: 45.3    },
     {time: '2018/01',
-    rain: 81.3    }],
+    rain: 81.3    },
+    {time: '2018/02',
+    rain: 62.1    },
+    {time: '2018/03',
+    rain: 22.2    }],
         xkey: 'time',
         ykeys: ['rain'],
         labels: ['Rain'],

@@ -285,21 +285,63 @@ $(function() {
     var cell = row.insertCell(0);
     cell.innerHTML = "January 2018";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "11.5 &deg;C";
+    cell.innerHTML = "14.1 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "7.6 &deg;C";
+    cell.innerHTML = "8.7 &deg;C";
 	var cell = row.insertCell(3);
     cell.innerHTML = "3.0 &deg;C";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "6.0 &deg;C";
+    cell.innerHTML = "9.6 &deg;C";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "2.4 &deg;C";
+    cell.innerHTML = "2.8 &deg;C";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "-2.8 &deg;C";
+    cell.innerHTML = "-3.2 &deg;C";
 	var cell = row.insertCell(7);
-    cell.innerHTML = "49.8 mm";
+    cell.innerHTML = "62.1 mm";
 	var cell = row.insertCell(8);
-    cell.innerHTML = "16";	
+    cell.innerHTML = "23";	
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "February 2018";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "11.6 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "6.8 &deg;C";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "-1.2 &deg;C";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "6.7 &deg;C";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "-0.6 &deg;C";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "-5.9 &deg;C";
+	var cell = row.insertCell(7);
+    cell.innerHTML = "22.2 mm";
+	var cell = row.insertCell(8);
+    cell.innerHTML = "11";	
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "March 2018";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "15.1 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "8.9 &deg;C";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "-2.0 &deg;C";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "8.3 &deg;C";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "1.8 &deg;C";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "-3.1 &deg;C";
+	var cell = row.insertCell(7);
+    cell.innerHTML = "30.0 mm";
+	var cell = row.insertCell(8);
+    cell.innerHTML = "12";	
 
 
 	var row = header.insertRow(0);

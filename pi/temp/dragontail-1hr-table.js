@@ -10,181 +10,147 @@ $(function() {
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "00:55";	
+    cell.innerHTML = "15:55";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "8.5 &deg;C";
+    cell.innerHTML = "0.4 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "75%";
+    cell.innerHTML = "53%";
 	var cell = row.insertCell(3);
-    cell.innerHTML = "5 mph";
+    cell.innerHTML = "11 mph";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "9 mph";
+    cell.innerHTML = "15 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "6.0 mm";
+    cell.innerHTML = "-0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "989.1 hPa";
+    cell.innerHTML = "1007.3 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "01:25";	
+    cell.innerHTML = "16:25";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.9 &deg;C";
+    cell.innerHTML = "0.0 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "81%";
-	var cell = row.insertCell(3);
-    cell.innerHTML = "5 mph";
-	var cell = row.insertCell(4);
-    cell.innerHTML = "10 mph";
-	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.3 mm";
-	var cell = row.insertCell(6);
-    cell.innerHTML = "988.6 hPa";
-
-
-	var row = table.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "01:55";	
-    var cell = row.insertCell(1);
-    cell.innerHTML = "7.7 &deg;C";
-	var cell = row.insertCell(2);
-    cell.innerHTML = "86%";
-	var cell = row.insertCell(3);
-    cell.innerHTML = "6 mph";
-	var cell = row.insertCell(4);
-    cell.innerHTML = "9 mph";
-	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.6 mm";
-	var cell = row.insertCell(6);
-    cell.innerHTML = "988.0 hPa";
-
-
-	var row = table.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "02:25";	
-    var cell = row.insertCell(1);
-    cell.innerHTML = "7.6 &deg;C";
-	var cell = row.insertCell(2);
-    cell.innerHTML = "87%";
-	var cell = row.insertCell(3);
-    cell.innerHTML = "6 mph";
-	var cell = row.insertCell(4);
-    cell.innerHTML = "8 mph";
-	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.3 mm";
-	var cell = row.insertCell(6);
-    cell.innerHTML = "987.4 hPa";
-
-
-	var row = table.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "02:55";	
-    var cell = row.insertCell(1);
-    cell.innerHTML = "7.6 &deg;C";
-	var cell = row.insertCell(2);
-    cell.innerHTML = "89%";
-	var cell = row.insertCell(3);
-    cell.innerHTML = "4 mph";
-	var cell = row.insertCell(4);
-    cell.innerHTML = "6 mph";
-	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.6 mm";
-	var cell = row.insertCell(6);
-    cell.innerHTML = "986.6 hPa";
-
-
-	var row = table.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "03:25";	
-    var cell = row.insertCell(1);
-    cell.innerHTML = "7.7 &deg;C";
-	var cell = row.insertCell(2);
-    cell.innerHTML = "90%";
+    cell.innerHTML = "58%";
 	var cell = row.insertCell(3);
     cell.innerHTML = "8 mph";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "10 mph";
+    cell.innerHTML = "14 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.6 mm";
+    cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.5 hPa";
+    cell.innerHTML = "1007.5 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "03:55";	
+    cell.innerHTML = "16:55";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.7 &deg;C";
+    cell.innerHTML = "-0.9 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "92%";
+    cell.innerHTML = "68%";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "5 mph";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "11 mph";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "0.0 mm";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "1007.5 hPa";
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "17:25";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "-1.2 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "73%";
 	var cell = row.insertCell(3);
     cell.innerHTML = "7 mph";
 	var cell = row.insertCell(4);
     cell.innerHTML = "10 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.9 mm";
+    cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.4 hPa";
+    cell.innerHTML = "1007.7 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "04:25";	
+    cell.innerHTML = "17:55";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.7 &deg;C";
+    cell.innerHTML = "-1.1 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "93%";
+    cell.innerHTML = "73%";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "11 mph";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "15 mph";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "0.0 mm";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "1007.8 hPa";
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "18:25";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "-1.4 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "75%";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "11 mph";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "14 mph";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "0.0 mm";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "1007.7 hPa";
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "18:55";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "-1.6 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "81%";
 	var cell = row.insertCell(3);
     cell.innerHTML = "4 mph";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "6 mph";
+    cell.innerHTML = "8 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.9 mm";
+    cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.4 hPa";
+    cell.innerHTML = "1007.8 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "04:55";	
+    cell.innerHTML = "19:25";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.7 &deg;C";
+    cell.innerHTML = "-1.8 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "95%";
+    cell.innerHTML = "84%";
 	var cell = row.insertCell(3);
-    cell.innerHTML = "4 mph";
+    cell.innerHTML = "8 mph";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "5 mph";
+    cell.innerHTML = "11 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.6 mm";
+    cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.2 hPa";
+    cell.innerHTML = "1007.7 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "05:25";	
+    cell.innerHTML = "19:55";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.8 &deg;C";
+    cell.innerHTML = "-1.9 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "96%";
-	var cell = row.insertCell(3);
-    cell.innerHTML = "3 mph";
-	var cell = row.insertCell(4);
-    cell.innerHTML = "5 mph";
-	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.9 mm";
-	var cell = row.insertCell(6);
-    cell.innerHTML = "986.1 hPa";
-
-
-	var row = table.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "05:55";	
-    var cell = row.insertCell(1);
-    cell.innerHTML = "7.8 &deg;C";
-	var cell = row.insertCell(2);
-    cell.innerHTML = "97%";
+    cell.innerHTML = "86%";
 	var cell = row.insertCell(3);
     cell.innerHTML = "4 mph";
 	var cell = row.insertCell(4);
@@ -192,24 +158,58 @@ $(function() {
 	var cell = row.insertCell(5);
     cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.1 hPa";
+    cell.innerHTML = "1007.6 hPa";
 
 
 	var row = table.insertRow(0);
     var cell = row.insertCell(0);
-    cell.innerHTML = "06:25";	
+    cell.innerHTML = "20:25";	
     var cell = row.insertCell(1);
-    cell.innerHTML = "7.8 &deg;C";
+    cell.innerHTML = "-1.9 &deg;C";
 	var cell = row.insertCell(2);
-    cell.innerHTML = "97%";
+    cell.innerHTML = "88%";
 	var cell = row.insertCell(3);
-    cell.innerHTML = "2 mph";
+    cell.innerHTML = "6 mph";
 	var cell = row.insertCell(4);
-    cell.innerHTML = "2 mph";
+    cell.innerHTML = "8 mph";
 	var cell = row.insertCell(5);
-    cell.innerHTML = "-0.3 mm";
+    cell.innerHTML = "0.0 mm";
 	var cell = row.insertCell(6);
-    cell.innerHTML = "986.4 hPa";
+    cell.innerHTML = "1007.5 hPa";
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "20:55";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "-2.0 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "89%";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "6 mph";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "11 mph";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "0.0 mm";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "1007.5 hPa";
+
+
+	var row = table.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerHTML = "21:25";	
+    var cell = row.insertCell(1);
+    cell.innerHTML = "-2.0 &deg;C";
+	var cell = row.insertCell(2);
+    cell.innerHTML = "90%";
+	var cell = row.insertCell(3);
+    cell.innerHTML = "5 mph";
+	var cell = row.insertCell(4);
+    cell.innerHTML = "9 mph";
+	var cell = row.insertCell(5);
+    cell.innerHTML = "0.0 mm";
+	var cell = row.insertCell(6);
+    cell.innerHTML = "1007.5 hPa";
 
 
 	var row = header.insertRow(0);
