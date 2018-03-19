@@ -1,7 +1,7 @@
 #hourly#
 #timezone local#
 #roundtime True#
-Tackley Weather #idx "%H:%M %Z:"# Temp: #temp_out "%.1f°C" "-"#
+Tackley Weather #idx "%H:%M %Z:"# Temp: #temp_out "%.1f C" "-"#
 , Wind: #wind_dir "%s, " "" "winddir_text(x)"#
 #wind_ave "%.0f mph (ave), " "" "wind_mph(x)"#
 #wind_gust "%.0f mph (gust)" "" "wind_mph(x)"#

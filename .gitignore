@@ -1,2 +1,3 @@
-**/data
+**/data/**
+website/data/**
 !weather.ini
