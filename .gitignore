@@ -1,3 +1,4 @@
 **/data/**
 website/data/**
 !weather.ini
+website/raw/**

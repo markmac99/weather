@@ -10,7 +10,7 @@ do
   fi
 done
 
-tail -20 /home/pi/weather.log | grep error | while read i ;
+tail -20 /home/pi/log/weather.log | grep error | while read i ;
 do 
   echo $i;
     echo "piwws error $i on $(hostname) as on $(date)" |
