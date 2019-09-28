@@ -1,0 +1,8 @@
+
+python -m pywws.logdata -vvv ~/weather/data
+python -m pywws.process ~/weather/data
+python -m pywws.reprocess ~/weather/data
+
+
+pywws-livelog-daemon -v ~/weather/data ~/log/weather.log start
+

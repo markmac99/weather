@@ -136,3 +136,89 @@ exit
 exit
 exit
 exit
+ls
+cd .ssh
+ls
+ls -ltr
+cat authorized_keys 
+ls -ltr
+ls -ltr
+pwd
+cd ..
+ls -ltra
+cd .ssh
+ls -ltr
+cat authorized_keeys
+cat authorized_keys
+exit
+ls -ltrd .
+pwd
+chmod 755 .
+exit
+ls -ltr
+rm mark.pub
+sudo su
+exit
+exit
+pwd
+cd .ssh
+cd
+cd .ssh
+ls
+openssl rsa -in id_rsa -outform  pem > weather.pem
+ls -ltr
+ssh-copy-id
+which ssh-copy-id
+type /usr/bin/ssh-copy-id 
+file /usr/bin/ssh-copy-id 
+more /usr/bin/ssh-copy-id
+ ls
+cd ..
+ls -ltr
+cat mark.pub >> .ssh/authorized_keys 
+cd .ssh
+ls -ltr
+cat authorized_keys 
+vi authorized_keys 
+exit
+ls -ltr
+cd .ssh
+ls -ltr
+cat authorized_keys 
+vi authorized_keys 
+exit
+cd .ssh
+ls -ltr
+cat authorized_keys 
+exit
+exit
+cd .ssh
+vi authorized_keys 
+exit
+vi .ssh/authorized_keys 
+exit
+ls -ltr
+cd .ssh
+ls -ltrd .
+ls -ltr
+cat authorized_keys 
+exit
+ls -ltr
+ls -ltrd .
+ls -ltrd .ssh
+scp mark@thelinux:.ssh/authorized_keys .ssh
+exit
+cd .ssh
+ls -ltr
+ls -ltrd .
+pwd
+ls -ltrd ..
+pwd
+ls -ltr
+cd ..
+ls -ltrd .
+chown weather:weather .
+sudo su
+pwd -P
+vi /etc/passwd
+exit

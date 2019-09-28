@@ -2,3 +2,5 @@
 website/data/**
 !weather.ini
 website/raw/**
+pywws-src/**
+pi/temp/**

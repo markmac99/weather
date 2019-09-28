@@ -1,10 +1,10 @@
 #!/bin/sh
 export PATH=$PATH:/usr/local/bin
 # exit if NTP hasn't set computer clock
-[ `ntpdc -c sysinfo | awk '/stratum:/ {print $2}'` -ge 10 ] && exit
+#[ `ntpdc -c sysinfo | awk '/stratum:/ {print $2}'` -ge 10 ] && exit
 pidfile=/var/run/pywws.pid
 datadir=/home/pi/weather/data
-logfile=/home/pi/logs/live_logger.log
+logfile=/home/pi/log/livelog.log
 # exit if process is running
 [ -f $pidfile ] && kill -0 `cat $pidfile` && exit
 # email last few lines of the logfile to see why it died
