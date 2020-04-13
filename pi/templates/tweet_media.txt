@@ -3,7 +3,7 @@ media /home/jim/weather/results/tweet.png
 #timezone local#
 #roundtime True#
 #idx "%H:%M %Z: "#
-#temp_out "%.1f°C, " "-, "#
+#temp_out "%.1fï¿½C, " "-, "#
 #hum_out "%d%%, " "-, "#
 #wind_ave "%.1f / " "- / " "wind_mph(x)"#
 #wind_gust "%.1f mph " "- mph " "wind_mph(x)"#

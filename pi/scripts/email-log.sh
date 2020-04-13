@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mailx -s $2 -r weather@raspberrypi  mark.jm.mcintyre@cesmail.net < $1
+mailx -s $2 -r weather@raspberrypi  mark@themcintyres.dnsalias.net < $1
 
