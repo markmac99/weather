@@ -1,0 +1,19 @@
+---
+- hosts: www.markmcintyreastro.co.uk
+  vars:
+    srcdir: /mnt/e/dev/weather/website
+    destdir: /home/bitnami/weather
+  tasks:
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+      - {src: '{{srcdir}}/leftmenu.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/wind_direction.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/wind_graphs.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/rainfall_graphs.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/pressure_graphs.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/temperature_graphs.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/tables.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/index.shtml', dest: '{{destdir}}', mode: '755', backup: no }
+      - {src: '{{srcdir}}/map_rain.php', dest: '{{destdir}}', mode: '755', backup: no }
+
