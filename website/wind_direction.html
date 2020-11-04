@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Planetary Observability Data.">
-    <meta name="author" content="Mark McIntyre">
+    <meta name="description" content="Raspberry Pi tutorial on connection to weather station. Local weather in ******.">
+    <meta name="author" content="dragontail">
 	<meta name="keywords" content="******"/>
 
-    <title>Planetary Observability Calculations</title>
+    <title>Tackley Weather</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -47,7 +47,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="https://www.markmcintyreastro.co.uk/"><img src="images/maryslogo.png" alt="Mary McIntyre, Logo"/></a>
+                <a class="navbar-brand" href="index.html"><img src="images/maryslogo.png" alt="Mary McIntyre, Logo"/></a>
             </div>
             <!-- /.navbar-header -->
 
@@ -81,13 +81,49 @@
                 <!-- /.dropdown -->
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> Coldest in last 12 hrs
+                                    <span class="pull-right text-muted small" id = lowest_temp></span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> Warmest in last 12 hrs
+                                    <span class="pull-right text-muted small" id = highest_temp></span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> Last Update
+                                    <span class="pull-right text-muted small"id = lastupdated></span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li><a href="#"><i class="fa fa-upload fa-fw"></i> Link *****</a>
                         </li>
                         <li class="divider"></li>
-						<li><a href="aboutthis.html"><i class="fa fa-user fa-fw"></i> About</a>
+						<li><a href="about.html"><i class="fa fa-user fa-fw"></i> About</a>
                         </li>
 
                     </ul>
@@ -101,31 +137,34 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
+                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="MercuryGraphs.html">Mercury</a>
+                                    <a href="temperature_graphs.html">Temperature</a>
                                 </li>
                                 <li>
-                                    <a href="VenusGraphs.html">Venus</a>
+                                    <a href="rainfall_graphs.html">Rainfall</a>
                                 </li>
                                 <li>
-                                    <a href="MarsGraphs.html">Mars</a>
+                                    <a href="wind_graphs.html">Wind</a>
                                 </li>
                                 <li>
-                                    <a href="JupiterGraphs.html">Jupiter</a>
+                                    <a href="wind_direction.html">Wind Direction</a>
                                 </li>
                                 <li>
-                                    <a href="SaturnGraphs.html">Saturn</a>
-                                </li>
-                                <li>
-                                    <a href="UranusGraphs.html">Uranus</a>
-                                </li>
-                                <li>
-                                    <a href="NeptuneGraphs.html">Neptune</a>
+                                    <a href="pressure_graphs.html">Pressure</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="tables.html"><i class="fa fa-table fa-fw"></i> Tables</a>
+                        </li>
+                        <li>
+                        	<a href="map_rain.php">Rain/Lightning Map</a>
                         </li>
                     </ul>
                 </div>
@@ -133,98 +172,48 @@
             </div>
             <!-- /.navbar-static-side -->
         </nav>
-        <!-- Page Content -->
+
         <div id="page-wrapper">
-            <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            About These Calculations
-                        </div>
-                        <div class="panel-body">
-                            <p>
-                            <b>Basis of Calculations</b><br>
-                            These pages calculate approximate observability of the planets for an observer in
-                            the southern UK. Calculations are based on Paul Schulyter's excellent web tutorial of how to
-                            calculate the positions of the planets
-                            (<a href=http://www.stjarnhimlen.se/comp/ppcomp.html>available here</a>). Corrections for
-                            atmospheric refraction are after Saemundsson et al, for example as shown <a href=http://www.jgiesen.de/refract/index.html>here</a>.
-
-                            <br><br>
-                            <b>What the Graphs Show</b>
-                            <li> <b>Best Visual Altitude</b> - the highest altitude (culmination) of the planet on that particular day, if
-                            its observable at all (zero means unobservable).
-                            Note that if the planet culminates in daylight, then the higher of dawn
-                            or dusk altitude is used. Hover your mouse over the graph to see the actual best time. See note below for what
-                            'observable' means exactly.
-                            <br>
-                            <font color="red">NB: When observing at dawn, please take care that sunrise does not happen in the field of
-                            view of your scope or camera.</font>
-
-
-                            <li> <b>Size and Magnitude</b> - The approximate size and magnitude on the date shown.
-							The brightness of inner planets takes into account their phase as well as distances.
-							The brightness of Saturn's rings and their tilt is not modelled yet.
-
-                            <li> <b>Download raw data</b> - the raw data that went into the graphs is available to download.
-                            Although I publish the data to many decimals, its really only accurate to two or three.
-                            <br><br>
-                            <b>Observability, and Visual vs Imaging</b><br>
-							To be 'observable', I have assumed the sun must be below the horizon and the planet at least 5&deg; above.
-							A value of zero means the planet is unobservable, either too close to the Sun or
-							not above the horizon during darkness. A non-zero value does not mean it will be easy to see !
-							Generally a planet will be unobservable if less
-							than 10&deg; from the Sun, and dangerous if less than 20&deg; away. Thats why I made
-							sure the Sun was below the horizon.
-
-                            <br><br>
-                            The graphs show when the planet will be <em>visible</em>, for astro-imaging
-							you really want the sun more than 15&deg; below the horizon and the planet more than 25&deg; above. I have
-							also modelled this and will add it as a feature when I have time but for now you can estimate it by
-                            ignoring all data at dawn, dusk or where altitude is less than 25&deg;.
-                            <br><br>
-                            <b>Adjusting for Other UK Locations</b>
-							<li> Increase(decrease) best altitude by approx 1 degree for every degree south (north) you live.
-
-							<li>Adjust the time later for more western locations and earlier for more eastern locations.
-							Its not easy to say how much I'm afraid, but around 15 mins per degree should be about right.
-
-                            <br>
-							<br>
-							<b>How I Calculated the Data</b><br>
-							I modelled the orbits in Excel VBA for a fixed location (mine!) and exported the
-							required numbers into javascript suitable for
-							the graphing tool.
-							<br><br>
-                            <b>Accuracy</b><br>
-							This data will not be very useful outside mainland UK as it was calculated for a central UK location. <br>
-                            Additionally please do not expect sub-degree accuracy! There are many detailed perturbations which affect planetary positions, notably
-                            resonances between planets, the Sun and the Moon, which cause small deviations. I've modelled the biggest of these for Jupiter
-                            Saturn, Uranus and Neptune (and the Moon) as well as adjusting from geo to topcentric coordinates,
-                            but I'm not modelling things like wobbles of the Earth's
-                            axis, Earth's movement around the Earth-Moon barycentre, resonances between the inner planets and so on. I've
-                            spot-checked the numbers for all the planets at random dates out to 2026 and am generally within a degree or so
-                            altitude and 5-10 minutes time, but there are some larger errors.
-							<br><br>
-							<b>Coming Soon</b><br>
-							I hope to add the following shortly:
-							<li> move the calculations into AWS Lambda and make them dynamic
-							<li> create dynamic webpages to allow people to calculate data for their own location.
-							<li> add Pluto and a few minor planets or asteroids.
-							<li> model the effect of the Moon on observability.
-                            </p>
-                        </div>
-                        <div class="panel-footer">
-                            Good luck and may the weather be with you.
-                        </div>
-                    </div>
+                <div class="col-lg-12">
+                    <h1 class="page-header">Wind Direction Rose</h1>
                 </div>
-                <!-- /.col-lg-4 -->
+                <!-- /.col-lg-12 -->
             </div>
-                <!-- /.row -->
+            <!-- /.row -->
+            <div class="row">
+
+                <!-- /.col-lg-6 -->
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                           Wind Direction and Speed - last 24 hours
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <img src="data/rose_24hrs.png">
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-6 -->
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            7 Day Average Wind Direction and Speed
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <img src="data/rose_7days_nights.png" width="90%">
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-6 -->
             </div>
-            <!-- /.container-fluid -->
+            <!-- /.row -->
         </div>
         <!-- /#page-wrapper -->
 
@@ -240,6 +229,12 @@
     <!-- Metis Menu Plugin JavaScript -->
     <script src="js/plugins/metisMenu/metisMenu.min.js"></script>
 
+    <!-- Morris Charts JavaScript -->
+    <script src="js/plugins/morris/raphael.min.js"></script>
+    <script src="js/plugins/morris/morris.min.js"></script>
+	<script src="data/dragontail-7day-wind.js"></script>
+	<script src="data/dragontail-24hr-wind.js"></script>
+	<script src="data/dragontail-28day-wind.js"></script>
     <!-- Custom Theme JavaScript -->
     <script src="js/sb-admin-2.js"></script>
 	<script>
