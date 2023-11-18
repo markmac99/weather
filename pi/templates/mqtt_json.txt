@@ -30,5 +30,6 @@
 	"hum_in_perc": "#hum_in '%0.0d'#",
 	"temp_in_c": "#temp_in '%0.1f'#",
 	"rel_pressure_hpa": "#rel_pressure '%0.2f'#",
-	"rain_mm": "#calc 'data["rain"]-prevdata["rain"]' '%0.1f'#"
+	"rain_mm": "#calc 'data["rain"]-prevdata["rain"]' '%0.1f'#",
+	"press_trend": "#pressure_trend '%s' '' 'pressure_trend_text(x)'#"
 }
