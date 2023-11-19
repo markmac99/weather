@@ -4,3 +4,6 @@ website/data/**
 website/raw/**
 pywws-src/**
 pi/temp/**
+pywws/**
+__pycache__/**
+dummyUsbDevice/__pycache__/**
