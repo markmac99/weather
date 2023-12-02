@@ -303,7 +303,7 @@ class CUSBDrive(object):
     WriteCommandWord = 0xA2
 
     def __init__(self):
-        for module_name in ('device_libusb1', 'device_pyusb1', 'device_pyusb',
+        for module_name in ('dummyUsbReader','device_libusb1', 'device_pyusb1', 'device_pyusb',
                             'device_ctypes_hidapi', 'device_cython_hidapi'):
             logger.debug('trying USB module %s', module_name)
             try:
@@ -512,6 +512,7 @@ Your station is probably a '{:s}' type.
         live_interval = 48.0
         old_ptr = self.current_pos()
         old_data = self.get_data(old_ptr, unbuffered=True)
+        logger.debug('old_data delay %d', old_data['delay'])
         now = time.time()
         next_live = self._sensor_clock.before(now + live_interval)
         if next_live:
@@ -520,6 +521,9 @@ Your station is probably a '{:s}' type.
             now -= live_interval
         last_log = now - (old_data['delay'] * 60.0)
         next_log = self._station_clock.before(last_log + log_interval)
+        logger.debug('last_log %f', last_log)
+        if next_log:
+            logger.debug('next_log %f', next_log)
         ptr_time = 0
         data_time = 0
         not_logging = False
@@ -746,7 +750,7 @@ Your station is probably a '{:s}' type.
             logger.debug('avoid %s', str(pause))
             time.sleep(pause)
 
-    def _read_block(self, ptr, retry=True):
+    def _read_block(self, ptr, retry=False):
         # Read block repeatedly until it's stable. This avoids getting corrupt
         # data when the block is read as the station is updating it.
         old_block = None
