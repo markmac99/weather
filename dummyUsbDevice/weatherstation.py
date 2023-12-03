@@ -462,6 +462,9 @@ class WeatherStation(object):
         """Connect to weather station and prepare to read data."""
         # create basic IO object
         self.cusb = CUSBDrive()
+        if hasattr(self.cusb.dev, 'min_pause'):
+            logger.debug('setting min_pause')
+            self.min_pause = self.cusb.dev.min_pause
         # init variables
         if context:
             self.status = context.status
