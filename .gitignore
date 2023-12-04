@@ -7,3 +7,4 @@ pi/temp/**
 pywws/**
 __pycache__/**
 dummyUsbDevice/__pycache__/**
+mmwws/dragontail*
