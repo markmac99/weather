@@ -144,37 +144,11 @@
 		$( "#current_temp" ).load( "data/dragontailcurrenttemp.txt" );
 		$( "#forecastbbc" ).load( "data/dragontailforecastbbc.txt" );
 		$( "#lastupdated" ).load( "data/dragontail-updatetime.txt" );
-		$.get( "data/dragontail-last24hr-table.txt", ReadMinMax);
-
-		function ReadMinMax( data ) {
-			var datums = data.split(/\n/);
-			var min24 = 200;
-			var min12 = 200;
-			var max12 = 0;
-			var maxgust = 0;
-			var num_rows = 24;
-			var rain24 = 0;
-			if (datums.length-1<num_rows)
-				num_rows=datums.length
-				for(i=0;i<num_rows-1;i++){
-					min24 = Math.min(min24, Number(datums[i].split(",")[1]))
-					//added rain totals for 24 hours
-					rain24 = rain24 + Number(datums[i].split(",")[3])
-					if (i<12)
-						min12 = Math.min(min12, Number(datums[i].split(",")[1]))
-						max12 = Math.max(max12, Number(datums[i].split(",")[1]))
-						//added for wind gust
-						maxgust = Math.max(maxgust, Number(datums[i].split(",")[2]))
-				}
-
-				$( "#night_temp" ).html( parseFloat(Math.round(min24 * 10) / 10).toFixed(1) );
-				$( "#lowest_temp" ).html( parseFloat(Math.round(min12 * 10) / 10).toFixed(1) );
-				$( "#highest_temp" ).html( parseFloat(Math.round(max12 * 10) / 10).toFixed(1) );
-				//added for wind gust
-				$( "#recent_wind" ).html(parseFloat(Math.round(maxgust * 10) / 10).toFixed(1) );
-				//added recent rain
-				$( "#recent_rain" ).html(parseFloat(Math.round(rain24 * 10) / 10).toFixed(1) );
-		}
+		$( "#lowest_temp" ).load( "data/dragontailmintemp.txt" );
+		$( "#lowest_temp2" ).load( "data/dragontailmintemp.txt" );
+		$( "#recent_wind" ).load( "data/dragontailrecentwind.txt" );
+		$( "#recent_rain" ).load( "data/dragontailrecentrain.txt" );
+        $( "#highest_temp").load( "data/dragontailmaxtemp.txt" );
 	</script>
 </body>
 
