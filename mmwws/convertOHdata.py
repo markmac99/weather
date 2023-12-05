@@ -75,3 +75,12 @@ if __name__ == '__main__':
     startdt = datetime.datetime(2023,10,27)
     enddt = datetime.datetime(2023,11,23)
     createMergeData(outdir, startdt, enddt)
+
+"""
+yr=2023
+df = pd.read_parquet(f'raw-{yr}.parquet')
+df.rain_mm.mask((df.rain_mm > 8.0) & (df.rain_mm < 13.3) & (df.timestamp >= pd.Timestamp(datetime.datetime(2023,12,4), tz='UTC')) &
+                (df.timestamp < pd.Timestamp(datetime.datetime(2023,12,5), tz='UTC')), inplace=True)
+df.rain_mm.ffill(inplace=True)
+df.to_parquet(f'raw-{yr}-new.parquet')
+"""

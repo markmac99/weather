@@ -49,11 +49,14 @@ def recentTable(df, outdir, period=1):
         avgs = True # get averages 
         back1hr = now + datetime.timedelta(hours=-period)
     elif period < 25:
-        freq = 60 # hourly, if period is 6 or 24
+        freq = 60
         window = 60
+        if period == 6:
+            freq = 30
+            window = 30
         avgs = True
         back1hr = now + datetime.timedelta(hours=-period)
-        back1hr = back1hr.replace(minute=0, second=59, microsecond=0) #  - datetime.timedelta(minutes=1)
+        back1hr = back1hr.replace(minute=0, second=59, microsecond=0)
     else:
         tfmt = '%Y/%m/%d %H:%M GMT'
         freq = 60 * 24 # daily if period is longer than a day
@@ -203,6 +206,14 @@ def periodTemps(df, outdir, period,
             of.write("       ymax: 1050, ymin: 950, \n")
         of.write("       postUnits: '" + units + "',\n        resize: true\n")
         of.write("});\n});\n")
+
+    if period == 24:
+        outfname = os.path.join(outdir, 'dragontailmintemp.txt')
+        with open(outfname, 'w') as of:
+            of.write(f'{seldf.temperature_C.min()} &deg;C')
+        outfname = os.path.join(outdir, 'dragontailmaxtemp.txt')
+        with open(outfname, 'w') as of:
+            of.write(f'{seldf.temperature_C.max()} &deg;C')
 
     return 
 

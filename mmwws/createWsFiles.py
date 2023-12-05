@@ -10,6 +10,7 @@ import datetime
 
 from windData import minmaxWind
 from tempPressData import recentTable, recentTemps, minmaxTemps, periodTemps
+from rainData import recentRain, last24hRain, periodRain
 
 
 if __name__ == '__main__':
@@ -44,3 +45,12 @@ if __name__ == '__main__':
     minmaxWind(df, outdir, period=24)
     minmaxWind(df, outdir, period=24*7)
     minmaxWind(df, outdir, period=24*28)
+
+    recentRain(df, outdir)
+    last24hRain(df, outdir)
+    periodRain(df, outdir, '7day')
+    periodRain(df, outdir, '28day')
+
+    # run only once, on 1st of the month
+    periodRain(df, outdir, '12month')
+    
