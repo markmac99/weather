@@ -10,6 +10,8 @@
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
     - {src: '{{srcdir}}/createWsFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/tableData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/tableHeaders.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/windData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/tempPressData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/rainData.py', dest: '{{targdir}}/', mode: '644', backup: yes }

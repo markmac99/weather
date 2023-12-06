@@ -9,8 +9,9 @@ import platform
 import datetime
 
 from windData import minmaxWind
-from tempPressData import recentTable, recentTemps, minmaxTemps, periodTemps
+from tempPressData import recentTemps, minmaxTemps, periodTemps
 from rainData import recentRain, last24hRain, periodRain
+from tableData import monthlySummary, recentTable
 
 
 if __name__ == '__main__':
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
 
-    # run only once, on 1st of the month
+    # maybe run only once, on 1st of the month
     periodRain(df, outdir, '12month')
-    
+
+    monthlySummary(df, outdir)
