@@ -2,4 +2,7 @@
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
 source $HOME/venvs/openhabstuff/bin/activate
-python $here/createMthlyFiles.py $HOME/weather/data
+active=$(ps -ef | grep createMthlyFiles | grep -v grep | awk '{print $2}')
+if [ "$active" == "" ] ; then 
+    python $here/createMthlyFiles.py $HOME/weather/data
+fi
