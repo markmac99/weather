@@ -13,6 +13,7 @@ from windData import minmaxWind
 from tempPressData import recentTemps, minmaxTemps, periodTemps
 from rainData import recentRain, last24hRain, periodRain
 from tableData import recentTable
+from windRose import makeRose
 
 
 if __name__ == '__main__':
@@ -74,4 +75,7 @@ if __name__ == '__main__':
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
 
+    print('creating wind roses')
+    makeRose(df, outdir, 1)
+    makeRose(df, outdir, 7)
     print('done')
