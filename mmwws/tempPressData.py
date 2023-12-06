@@ -55,7 +55,7 @@ def recentTemps(df, outdir):
 
     outfname = os.path.join(outdir, 'dragontailcurrenttemp.txt')
     with open(outfname, 'w') as of:
-        of.write(f'{df.iloc[-1].temperature_C} &deg;C')
+        of.write(f'{round(df.iloc[-1].temperature_C, 1)} &deg;C')
     return 
 
 
@@ -104,10 +104,10 @@ def periodTemps(df, outdir, period,
     if period == 24:
         outfname = os.path.join(outdir, 'dragontailmintemp.txt')
         with open(outfname, 'w') as of:
-            of.write(f'{seldf.temperature_C.min()} &deg;C')
+            of.write(f'{round(seldf.temperature_C.min(),1)} &deg;C')
         outfname = os.path.join(outdir, 'dragontailmaxtemp.txt')
         with open(outfname, 'w') as of:
-            of.write(f'{seldf.temperature_C.max()} &deg;C')
+            of.write(f'{round(seldf.temperature_C.max(),1)} &deg;C')
 
     return 
 
