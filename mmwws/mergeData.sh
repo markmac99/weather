@@ -9,3 +9,4 @@ yr=2023
 cp $outdir/raw-$yr.parquet $outdir/bkp/raw-$yr.parquet.$(date +%Y%m%d-%h%m%s)
 python -c "from convertOHdata import mergeDataIn;mergeDataIn('$outdir', '$tmpdir', $yr);"
 sudo systemctl start getweatherdata
+mv $tmpdir/alldata.parquet $outdir/bkp/extradata.parquet.$(date +%Y%m%d-%h%m%s)
