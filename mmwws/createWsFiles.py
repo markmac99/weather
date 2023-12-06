@@ -11,7 +11,7 @@ import datetime
 from windData import minmaxWind
 from tempPressData import recentTemps, minmaxTemps, periodTemps
 from rainData import recentRain, last24hRain, periodRain
-from tableData import monthlySummary, recentTable
+from tableData import recentTable
 
 
 if __name__ == '__main__':
@@ -28,31 +28,32 @@ if __name__ == '__main__':
         df1 = pd.read_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr}.parquet'))
         df2 = pd.read_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr-1}.parquet'))
     df = pd.concat([df2,df1])
+    print('creating temperature graphs')
     recentTemps(df, outdir)
     periodTemps(df, outdir, period=24) 
     periodTemps(df, outdir, period=24*7) 
     minmaxTemps(df, outdir, '28day')
-    minmaxTemps(df, outdir, '12month')
 
+    print('creating tables')
     recentTable(df, outdir, period=1) # last hour of data
     recentTable(df, outdir, period=6) # last six hours
     recentTable(df, outdir, period=24) # last day
     recentTable(df, outdir, period=24*31) # last day
 
+    print('creating pressure graphs')
     periodTemps(df, outdir, period=24, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
     periodTemps(df, outdir, period=24*7, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
     periodTemps(df, outdir, period=24*28, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
+    print('creating wind graphs')
     minmaxWind(df, outdir, period=24)
     minmaxWind(df, outdir, period=24*7)
     minmaxWind(df, outdir, period=24*28)
 
+    print('creating rainfall graphs')
     recentRain(df, outdir)
     last24hRain(df, outdir)
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
 
-    # maybe run only once, on 1st of the month
-    periodRain(df, outdir, '12month')
-
-    monthlySummary(df, outdir)
+    print('done')
