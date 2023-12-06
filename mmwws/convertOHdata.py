@@ -5,10 +5,12 @@
 import pandas as pd
 import os
 import datetime
+import sys
 
 
 def convertData(outdir):
-    fn = '/mnt/c/temp/historic_bresser_data.txt'
+    fn = os.path.join(outdir, 'historic_bresser_data.txt')
+    print('reading and separating the file')
     lis = open(fn, 'r').readlines()
     df = None
     for li in lis:
@@ -36,7 +38,8 @@ def convertData(outdir):
     return
 
 
-def createMergeData(outdir, startdt, enddt):
+def createMergeData(outdir, startdt, enddt, t_adj=0, r_adj=0):
+    print('merging the separated data')
     tempdf = pd.read_csv(os.path.join(outdir, 'temperature_C.csv'), names=['timeval','temperature_C'],skiprows=1)
     humdf = pd.read_csv(os.path.join(outdir, 'humidity.csv'), names=['timeval','humidity'],skiprows=1)
     pressdf = pd.read_csv(os.path.join(outdir, 'pressure.csv'), names=['timeval','press_rel'],skiprows=1)
@@ -58,29 +61,45 @@ def createMergeData(outdir, startdt, enddt):
     seldf = fulldf[fulldf.timestamp >= pd.Timestamp(startdt,tz='UTC')]
     seldf = seldf[seldf.timestamp < pd.Timestamp(enddt,tz='UTC')]
 
-    seldf.rain_mm.mask(seldf.rain_mm > 2000, inplace=True) # remove bad data
-    seldf.rain_mm.ffill(inplace=True) # and backfill 
     seldf['wind_max_km_h'] = seldf.wind_max_km_h * 3.6 # convert to km/h
     seldf['wind_avg_km_h'] = seldf.wind_avg_km_h * 3.6 # convert to km/h
+
     seldf['press_rel'] = seldf.press_rel - 10 # variance between bresser and bme280
+    seldf['temperature_C'] = seldf.temperature_C + t_adj # variance between bresser and wh1080
+    seldf['rain_mm'] = seldf.rain_mm + r_adj # variance between bresser and wh1080
+
+    seldf.rain_mm.mask(seldf.rain_mm > 2000, inplace=True) # remove bad data
+    seldf.rain_mm.mask(seldf.rain_mm < 0, inplace=True) # remove bad data
+    seldf.rain_mm.ffill(inplace=True) # and backfill 
+    seldf.rain_mm.bfill(inplace=True) # and forward fill
 
     seldf.to_parquet(os.path.join(outdir,'alldata.parquet'))
     return 
 
 
-if __name__ == '__main__':
-    outdir = 'c:/temp/bresserdata'
-    os.makedirs(outdir, exist_ok=True)
-    #convertData(outdir)
-    startdt = datetime.datetime(2023,10,27)
-    enddt = datetime.datetime(2023,11,23)
-    createMergeData(outdir, startdt, enddt)
+def mergeDataIn(outdir, tmpdir, yr):
+    df = pd.read_parquet(os.path.join(outdir, f'raw-{yr}.parquet'))
+    df2 = pd.read_parquet(os.path.join(tmpdir, 'alldata.parquet'))
+    df3 = pd.concat([df, df2])
+    df3 = df3.sort_index()
+    df3.to_parquet(os.path.join(outdir, f'raw-{yr}.parquet'))
 
-"""
-yr=2023
-df = pd.read_parquet(f'raw-{yr}.parquet')
-df.rain_mm.mask((df.rain_mm > 8.0) & (df.rain_mm < 13.3) & (df.timestamp >= pd.Timestamp(datetime.datetime(2023,12,4), tz='UTC')) &
-                (df.timestamp < pd.Timestamp(datetime.datetime(2023,12,5), tz='UTC')), inplace=True)
-df.rain_mm.ffill(inplace=True)
-df.to_parquet(f'raw-{yr}-new.parquet')
-"""
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        tmpdir = os.path.expanduser('~/weather/tmp')
+    else:
+        tmpdir = os.path.expanduser(sys.argv[1])
+    os.makedirs(tmpdir, exist_ok=True)
+
+    # adjust these for each processing run
+    t_adj = 1.2 # adjustment to handle the different locations of the stations
+    r_adj = 17.4 - 1184.4 # adjust rain gauge to balance 
+    startdt = datetime.datetime(2023,12,6,6,16,25)
+    enddt = datetime.datetime(2023,12,6,9,7,30)
+
+    print('starting')
+    convertData(tmpdir)
+    createMergeData(tmpdir, startdt, enddt, t_adj, r_adj)
+    print('done')
