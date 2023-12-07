@@ -12,29 +12,29 @@ data from the WH1080. However over time the unit developed a problem with its US
 An implementation of the dragontail weather website, consuming data initially from pywws, but later from other sources. 
 
 ## dummyusb
-When the USB port on the WH1080 malfunctioned, i realised i could recover data from the outside sensors using an RTL-433 dongle. To replace the indoor sensors i am using a BME280 breakbout board in a Raspberry pi.  So i wrote some software to capture the data to file, and then created a dummy USB driver for pywws that reads the file and feeds the data to pywws. 
+When the USB port on the WH1080 malfunctioned, i realised i can read data from the outside sensors using an RTL-433 dongle. To replace the indoor sensors i am using a BME280 breakbout board in a Raspberry pi.  So i wrote some software to capture the data to file (see services below), and then created a dummy USB driver for pywws that reads the file and feeds the data to pywws. 
 
-The RTL433 and BME280 data are being published to MQ Series along with data from my Bresser weatherstation. 
+The RTL433 and BME280 data are being published to MQ Series along with data from my Bresser weatherstation (see below). 
 
 ## mmwws
-A replacement for pywws. Instead of using the dummy usb driver, i decided to simply read the data from MQ and directly generate the javascript required by the dragontail website. 
+A replacement for pywws. Instead of using the dummy usb driver, i decided to simply read the data directly and generate the javascript required by the dragontail website. 
 
 ## apis_services
 Various APIs and services to manage weather data
 
-### getwu
+### getbresser
 Retrieve my bresser data from Weather Underground. Data can't be directly retrieved from the Bresser so i run this service on an AWS EC2 instance to retrive data from Weather Underground and publish it to my MQ server on a topic sensors/bresser_wu
 
-In addition, I'm running a vanilla instance of RTL433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic sensors/rtl_433/P172/C0. The config file for this is in this folder. 
+In addition, I'm running a vanilla instance of RTL433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic sensors/rtl_433/P172/C0. The config file for this is in this folder. I use both routes because WU can acess some of the internal sensor data. 
 
 ### readBmp280
-This service runs on a Pi and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic sensors/bmp280 and saved to file on a Pi3. 
+This service runs on a Pi3 and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic sensors/bmp280 and saved to file. 
 
 ### rtl433ToMQ
 A second instance of RTL433 runs on the same Pi3 as the BME280 to retrieve the WH1080 outdoor sensor data at 433 MHz. For some reason this insance isn't able to directly publish to MQ, so i have a second process that reads the data from file and publishes it to MQ in topic sensors/wh1080. I need to revisit this klunky process. 
 
 ### weatherapi
-This reads the data files created by readBmp280 and rtl433ToMQ and exposes it via a REST API so that i can consume the data on my webserver which is running on AWS. 
+This runs on the same Pi3 and reads the data files created by readBmp280 and rtl433ToMQ and exposes it via a REST API so that i can consume the data on my webserver which is running on AWS. 
 
 ### getDataAws
 Reads data from the above API and adds it to a datafile on my AWS server. The data are then consumed by mmwws. 

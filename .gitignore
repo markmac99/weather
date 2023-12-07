@@ -4,9 +4,13 @@ website/data/**
 website/raw/**
 pywws-src/**
 pi/temp/**
-pywws/**
 __pycache__/**
 dummyUsbDevice/__pycache__/**
 mmwws/sampledata/
 mmwws/__pycache__/
 mmwws/testdata/
+**/*.log
+mmwws/weathersites.ini
+**/__pycache__
+**/weather.ini
+**/*.pyc
