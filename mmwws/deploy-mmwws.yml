@@ -9,6 +9,8 @@
   - name: Copy files
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
+    - {src: '{{srcdir}}/sendToServices.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/serviceUploader.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/windRose.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/createWsFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/createMthlyFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }

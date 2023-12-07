@@ -33,7 +33,7 @@ def recentRain(df, outdir):
 
     outfname = os.path.join(outdir, 'dragontailrecentrain.txt')
     with open(outfname, 'w') as of:
-        of.write(f'{max(df1hr.rain_mm.max() - initialrain,0)}')
+        of.write(f'{max(round(df1hr.rain_mm.max() - initialrain,0),1)} mm')
     return 
 
 
