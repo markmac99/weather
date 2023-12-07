@@ -43,12 +43,14 @@ def cleanData(yr):
 
     df.temperature_C.mask(df.temperature_C > 48, inplace=True) # mask bad outdoor temperatures as NaN
     df.temperature_C.mask(df.temperature_C == -22.4, inplace=True) # mask bad outdoor temperatures as NaN
+    df.temperature_C.mask(df.temperature_C == -14.7, inplace=True) # mask bad outdoor temperatures as NaN
     df.temperature_C.bfill(inplace=True)
     df.temperature_C.ffill(inplace=True)
 
     df.humidity.mask(df.humidity < 10, inplace=True) # mask bad outdoor humidity
     df.humidity.bfill(inplace=True)
     df.humidity.ffill(inplace=True)
+
     df.humidity_in.mask(df.humidity_in < 20, inplace=True) # mask bad indoor humidity
     df.humidity_in.bfill(inplace=True)
     df.humidity_in.ffill(inplace=True)
@@ -56,7 +58,20 @@ def cleanData(yr):
     df.press_rel.mask(df.press_rel < 900, inplace=True) # mask bad pressure
     df.press_rel.bfill(inplace=True)
     df.press_rel.ffill(inplace=True)
-    df.to_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr}-adj.parquet'))
+
+    df.wind_avg_km_h.mask(df.wind_avg_km_h > 50, inplace=True) # mask bad pressure
+    df.wind_avg_km_h.bfill(inplace=True)
+    df.wind_avg_km_h.ffill(inplace=True)
+
+    df.wind_max_km_h.mask(df.wind_max_km_h > 70, inplace=True) # mask bad pressure
+    df.wind_max_km_h.bfill(inplace=True)
+    df.wind_max_km_h.ffill(inplace=True)
+
+    df.rain_mm.mask(df.rain_mm > 1000, inplace=True)
+    df.rain_mm.bfill(inplace=True)
+    df.rain_mm.ffill(inplace=True)
+
+    df.to_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr}.parquet'))
 
 
 

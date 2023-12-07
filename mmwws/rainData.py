@@ -16,11 +16,9 @@ def recentRain(df, outdir):
     with open(outfname, 'w') as of:
         of.write("$(function() {\nMorris.Line({\n element: 'dragontail-recent-rainfall',\n data: [\n")
         lastts = df1hr.iloc[-1].timestamp
-        initialrain = df1hr.iloc[0].rain_mm
-        for idx, rw in df1hr.iterrows():
+        for _, rw in df1hr.iterrows():
             ts = rw.timestamp
-            temp = rw.rain_mm - initialrain
-
+            temp = max(rw.rainchg, 0)
             of.write(f'    {{time: {int(ts.timestamp()*1000)}, rain: {temp} }}')
             if ts != lastts:
                 of.write(',\n')
@@ -30,21 +28,15 @@ def recentRain(df, outdir):
         of.write("       ],\n        xkey: 'time',\n        ykeys: ['rain'],\n")
         of.write("       labels: ['Rainfall'],\n        hideHover: 'auto',\n")
         of.write("       postUnits: 'mm',\n        resize: true\n    });\n});\n")
-
-    outfname = os.path.join(outdir, 'dragontailrecentrain.txt')
-    with open(outfname, 'w') as of:
-        of.write(f'{max(round(df1hr.rain_mm.max() - initialrain,0),1)} mm')
     return 
 
 
 def last24hRain(df, outdir):
     now=datetime.datetime.now()
     backdt = now + datetime.timedelta(hours=-25)
-    df1hr = df[df.timestamp > pd.Timestamp(backdt, tz='UTC')]
     outfname = os.path.join(outdir, 'dragontail-24hr-rainfall.js')
     with open(outfname, 'w') as of:
         of.write("$(function() {\nMorris.Area({\n element: 'dragontail-24hr-rainfall',\n data: [\n")
-        initialrain = df1hr.iloc[0].rain_mm
         numrows = 25
         for r in range(numrows):
             seldf = df[df.timestamp >= pd.Timestamp(backdt, tz='UTC')]
@@ -54,8 +46,7 @@ def last24hRain(df, outdir):
                 backdt = todt
                 continue
             ts = int(seldf.timestamp.max().timestamp()*1000)
-            temp = round(seldf.rain_mm.max() - initialrain, 2)
-
+            temp = round(max(seldf.rainchg.sum(),0), 1)
             of.write(f'    {{time: {ts}, rain: {temp} }}')
             if r < (numrows-1):
                 of.write(',\n')
@@ -67,6 +58,12 @@ def last24hRain(df, outdir):
         of.write("       postUnits: 'mm',\n        resize: true,\n")
         of.write("fillOpacity: 0.6, pointFillColors: ['black'], pointStrokeColors: ['black'],")
         of.write("lineColors: ['red'], smooth: false });\n});\n")
+
+    backdt = now + datetime.timedelta(hours=-24)
+    seldf = df[df.timestamp >= pd.Timestamp(backdt, tz='UTC')]
+    outfname = os.path.join(outdir, 'dragontailrecentrain.txt')
+    with open(outfname, 'w') as of:
+        of.write(f'{round(max(seldf.rainchg.sum(),0), 1)} mm')
     return 
 
 
@@ -100,10 +97,7 @@ def periodRain(df, outdir, period):
             if len(seldf) == 0:
                 backdt = todt
                 continue
-            srain = seldf.iloc[0].rain_mm
-            erain = seldf.rain_mm.max()
-            totrain = max(erain - srain, 0)
-            totrain = round(totrain, 1)
+            totrain = round(max(seldf.rainchg.sum(),0), 1)
             of.write(f'    {{time: \'{ts}\', rain: {totrain} }}')
             if r < (numrows):
                 of.write(',\n')
@@ -116,3 +110,28 @@ def periodRain(df, outdir, period):
         of.write("       postUnits: 'mm',\n        resize: true\n")
         of.write("});\n});\n")
     return 
+
+
+
+def fixupRainData():
+    yr = 2023
+    rawdir = '/home/bitnami/weather/raw'
+
+    # general fixer upper which will need tweaked for every use-case i discover
+    #startdt = datetime.datetime(2023, 10, 27)
+    #enddt = datetime.datetime(2023, 11, 23)
+    #adj = 846.4
+
+    df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
+#    df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] = \
+#        df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] - adj
+#    df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] = \
+#        df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] - adj
+    #df.loc[df.rain_mm==28.5, ['rain_mm']] = np.nan
+    df.rain_mm.mask(round(df.rain_mm,1) == 8.1, inplace=True)
+    df.rain_mm.mask(round(df.rain_mm,1) == 8.5, inplace=True)
+    df.rain_mm.mask(round(df.rain_mm,1) == 8.9, inplace=True)
+    df.rain_mm.ffill(inplace=True) # and backfill 
+    df['rainchg'] = df.rain_mm.diff().fillna(0)
+    df.loc[df.rainchg < -0.31, ['rainchg']] = 0
+    df.to_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))

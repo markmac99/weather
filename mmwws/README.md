@@ -15,4 +15,4 @@ Data are read from an API thats running on a Pi3 and is reading from my weathers
 Improvements that could be made
 - merge the API reader into this tool.
 - secure the API.
-- 
+  

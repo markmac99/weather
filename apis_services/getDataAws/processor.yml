@@ -1,6 +1,6 @@
 - hosts: wordpresssite
   vars:
-    srcdir: /mnt/e/dev/weather/apis/getDataAws
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getDataAws
     apidir: ~/src/weatherprocessor
   tasks:
 
