@@ -94,10 +94,10 @@ if __name__ == '__main__':
     os.makedirs(tmpdir, exist_ok=True)
 
     # adjust these for each processing run
-    t_adj = 1.2 # adjustment to handle the different locations of the stations
-    r_adj = 17.4 - 1184.4 # adjust rain gauge to balance 
-    startdt = datetime.datetime(2023,12,6,6,16,25)
-    enddt = datetime.datetime(2023,12,6,9,7,30)
+    t_adj = 0.7 # adjustment to handle the different locations of the stations
+    r_adj = 21 - 1184.4 # adjust rain gauge to balance 
+    startdt = datetime.datetime(2023,12,3,0,11,0)
+    enddt = datetime.datetime(2023,12,3,23,50,0)
 
     print('starting')
     convertData(tmpdir)
