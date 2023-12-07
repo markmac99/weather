@@ -15,13 +15,6 @@ logger = logging.getLogger('mqtofile')
 
 def getNewData(datafile, url='http://themcintyres.ddns.net:8081/values'):
     newdata = None
-    df = None
-    if os.path.isfile(datafile):
-        df = pd.read_parquet(datafile)
-        if 'timestamp' not in df:
-            df['timestamp'] = pd.to_datetime(df.index)            
-    else:
-        logger.debug('mo old data to load')
     try:
         newdata = pd.read_json(url)
         newdata.set_index(['time'], inplace=True)
@@ -29,7 +22,20 @@ def getNewData(datafile, url='http://themcintyres.ddns.net:8081/values'):
     except:
         logger.warning('unable to connect to url')
         pass
+    df = None
+    if os.path.isfile(datafile):
+        df = pd.read_parquet(datafile)
+        if 'timestamp' not in df:
+            df['timestamp'] = pd.to_datetime(df.index)
+        if 'rainchg' not in df:
+            df['rainchg'] = df.rain_mm.diff().fillna(0)
+            df.loc[df.rainchg < -0.31, ['rainchg']] = 0
+    else:
+        logger.debug('mo old data to load')
     if df is not None and newdata is not None:
+        lastrain = df.iloc[-1].rain_mm
+        newdata['rainchg'] = newdata.rain_mm - lastrain
+        newdata.loc[newdata.rainchg < -0.31, ['rainchg']] = 0
         newdata = pd.concat([df, newdata])
     else:
         logger.debug('no new newdata to concatenate')
