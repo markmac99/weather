@@ -14,6 +14,7 @@
     - {src: '{{srcdir}}/windRose.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/createWsFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/createMthlyFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/createHourlyFiles.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/tableData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/tableHeaders.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/windData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
@@ -22,6 +23,7 @@
     - {src: '{{srcdir}}/convertLegacyData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/convertOHdata.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/wsCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+    - {src: '{{srcdir}}/hourlyCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mthlyCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mergeData.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
