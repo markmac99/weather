@@ -11,16 +11,18 @@ import logging
 import requests
 from logging.handlers import RotatingFileHandler
 
+
 from apiConfig import apiUrl, apiKey
 
 logger = logging.getLogger('mqtofile')
 
 
 def getNewData(datafile, url, key):
-    logger.warning(url)
+    #logger.warning(url)
     newdata = None
     try:
-        res = requests.get(url, auth=((key, '')))
+        headers={'x-api-key': key}
+        res = requests.get(url, headers=headers)
         if res.status_code == 200:
             newdata = pd.read_json(res.text.strip())
             newdata.set_index(['time'], inplace=True)

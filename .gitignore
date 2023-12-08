@@ -14,3 +14,4 @@ mmwws/weathersites.ini
 **/__pycache__
 **/weather.ini
 **/*.pyc
+apis_services/weatherapi/weatherapi.keys
