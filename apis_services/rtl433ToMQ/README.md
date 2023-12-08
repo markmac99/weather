@@ -75,10 +75,9 @@ systemctl status rtl_433
 systemctl status rtl2mq
 ```
 
-*rtl_433* writes data to a file *~/weather/maplinstn/weatherdata.json* which you may need to periodically delete
-to save space. The system will recreate it automatically. 
+*rtl_433* writes data to a file *~/weather/maplinstn/weatherdata.json*. The service logfiles are written to *~/weather/logs*, and error messages may also be logged to syslog. 
 
-The service logfiles are written to *~/weather/logs*, and error messages may also be logged to syslog. 
+Each time the service is restarted it will attempt to rename the JSON file and start a new one, and to delete any JSON and log files that are more than 14 days old. This ensures that space usage is not excessive. You should therefore either schedule your Pi to restart each day, or use cron to restart the service. 
 
 That's it. Your weatherstation data is now being written to MQTT to a topic named *sensors/wh1080*
 

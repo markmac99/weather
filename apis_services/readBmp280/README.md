@@ -27,8 +27,9 @@ To stop the service, run *sudo systemctl stop bmp280*.
 
 # Logging Output
 The programme generates a log in a *logs* folder and a JSON data file in a folder *maplinstn* 
-relative to the output location you specified. You'll need to keep an eye on the sizes of these folders
-and delete files as needed. 
+relative to the output location you specified.
+
+Each time the service is restarted it will attempt to rename the JSON file and start a new one, and to delete any JSON and log files that are more than 14 days old. This ensures that space usage is not excessive. You should therefore either schedule your Pi to restart each day, or use cron to restart the service. 
 
 # MQ output
 The service publishes to four MQTT topics 

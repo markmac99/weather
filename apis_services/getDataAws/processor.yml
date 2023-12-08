@@ -9,6 +9,7 @@
     tags: [aws, local]
     with_items:
     - {src: '{{srcdir}}/getData.py', dest: '{{apidir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/apiConfig.py', dest: '{{apidir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/startGetData.sh', dest: '{{apidir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/stopGetData.sh', dest: '{{apidir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/getweatherdata.service', dest: '{{apidir}}/', mode: '644', backup: yes }

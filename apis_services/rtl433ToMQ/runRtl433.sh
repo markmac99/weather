@@ -1,6 +1,13 @@
 #!/bin/bash
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
-mkdir -p /home/pi/weather/maplinstn
-mkdir -p /home/pi/weather/logs
-/usr/local/bin/rtl_433 -R 32 -R 155 -F json::/home/pi/weather/maplinstn/weatherdata.json
+datadir=/home/pi/weather/maplinstn
+logdir=/home/pi/weather/logs
+mkdir -p $datadir
+mkdir -p $logdir
+
+if [ ! -f $datadir/weatherdata.json.$(date +%Y%m%d) ] ; then
+    mv $datadir/weatherdata.json $datadir/weatherdata.json.$(date +%Y%m%d)
+fi
+find $datadir -name "weatherdata.json*" -mtime +14 -exec rm -f {} \;
+/usr/local/bin/rtl_433 -R 32 -R 155 -F json::$datadir/weatherdata.json

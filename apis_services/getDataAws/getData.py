@@ -8,19 +8,28 @@ import os
 import time
 import datetime
 import logging
+import requests
 from logging.handlers import RotatingFileHandler
+
+from apiConfig import apiUrl, apiKey
 
 logger = logging.getLogger('mqtofile')
 
 
-def getNewData(datafile, url='http://themcintyres.ddns.net:8081/values'):
+def getNewData(datafile, url, key):
+    logger.warning(url)
     newdata = None
     try:
-        newdata = pd.read_json(url)
-        newdata.set_index(['time'], inplace=True)
-        newdata['timestamp'] = pd.to_datetime(newdata.index)
-    except:
+        res = requests.get(url, auth=((key, '')))
+        if res.status_code == 200:
+            newdata = pd.read_json(res.text.strip())
+            newdata.set_index(['time'], inplace=True)
+            newdata['timestamp'] = pd.to_datetime(newdata.index)
+        else:
+            logger.warning('unable to retrieve data')
+    except Exception as e:
         logger.warning('unable to connect to url')
+        logger.warning(e)
         pass
     df = None
     if os.path.isfile(datafile):
@@ -73,5 +82,5 @@ if __name__ == '__main__':
         yr = datetime.datetime.now().year
         os.makedirs(os.path.expanduser(outdir), exist_ok=True)
         fname = os.path.expanduser(os.path.join(outdir, f'raw-{yr}.parquet'))
-        df = getNewData(fname)
+        df = getNewData(fname, apiUrl, apiKey)
         time.sleep(pause)
