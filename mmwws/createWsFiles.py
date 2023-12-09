@@ -11,7 +11,7 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 
-from windData import minmaxWind
+from windData import minmaxWind, recentWind
 from tempPressData import recentTemps, periodTemps
 from rainData import recentRain, last24hRain
 from tableData import recentTable
@@ -72,6 +72,7 @@ if __name__ == '__main__':
     periodTemps(df, outdir, period=24, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
     logger.info('creating wind graphs')
+    recentWind(df, outdir)
     minmaxWind(df, outdir, period=24)
 
     logger.info('creating rainfall graphs')
