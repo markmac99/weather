@@ -57,6 +57,20 @@
                 <div class="col-lg-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
+                            Recent Max/Average Wind Speed
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div id="dragontail-recent-wind"></div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-6 -->
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
                             24 Hour Max/Average Wind Speed
                         </div>
                         <!-- /.panel-heading -->
@@ -116,6 +130,7 @@
     <!-- Morris Charts JavaScript -->
     <script src="js/plugins/morris/raphael.min.js"></script>
     <script src="js/plugins/morris/morris.min.js"></script>
+	<script src="data/dragontail-recent-wind.js"></script>
 	<script src="data/dragontail-7day-wind.js"></script>
 	<script src="data/dragontail-24hr-wind.js"></script>
 	<script src="data/dragontail-28day-wind.js"></script>
