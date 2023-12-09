@@ -5,4 +5,4 @@ cd $here
 export FLASK_APP=$here/weatherapi.py
 export DATAFILE=$HOME/weather/weatherdata.json
 
-python -m flask run --host=0.0.0.0 -p 8081
+python -m flask run --host=0.0.0.0 -p 8081 --cert=$here/server.crt --key=$here/server.key

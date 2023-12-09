@@ -10,7 +10,7 @@ import datetime
 import logging
 import requests
 from logging.handlers import RotatingFileHandler
-
+from urllib3.exceptions import InsecureRequestWarning
 
 from apiConfig import apiUrl, apiKey
 
@@ -21,8 +21,9 @@ def getNewData(datafile, url, key):
     #logger.warning(url)
     newdata = None
     try:
+        requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
         headers={'x-api-key': key}
-        res = requests.get(url, headers=headers)
+        res = requests.get(url, headers=headers, verify=False)
         if res.status_code == 200:
             newdata = pd.read_json(res.text.strip())
             newdata.set_index(['time'], inplace=True)

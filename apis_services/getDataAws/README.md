@@ -19,3 +19,10 @@ The programme writes its output to a Python PANDAS dataframe stored in Parquet f
   sudo systemctl enable getweatherdata 
   sudo systemctl start getweatherdata
   ```
+
+Note that i'm using a self-signed certificate, so python's requests library will complain. You can work around that by setting verify=False and disabling notification of the warning:
+```python
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+res = requests.get(url, headers=headers, verify=False)
+```

@@ -4,6 +4,7 @@ from getLastData import getData, getOutsideTemp
 from functools import wraps
 from flask import request, abort
 
+
 app = Flask(__name__)
 
 keys =[]
