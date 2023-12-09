@@ -6,9 +6,20 @@ import os
 import datetime
 import numpy as np
 from dateutil.relativedelta import relativedelta
+import math
 
 # correction for instrument readout inaccuracy
 pressureCorrection = 10
+
+
+def dewPoint(t, rh): 
+    # t in C, rh as a number eg 90, 50
+    E0 = 0.611 # kPa
+    lrv = 5423 # K (L/Rv over flat surface of water)
+    T0 = 273.15 # K
+    Es = E0 * math.exp(lrv * (1/T0 - 1/(t + T0)))
+    dewPoint = 1.0 / (-math.log(rh/100 * Es/E0)/lrv + 1/T0)-T0
+    return round(dewPoint,4)
 
 
 def getRangeValues(df, starttime, mins, doaverage=False):
@@ -42,15 +53,16 @@ def recentTemps(df, outdir):
         for idx, rw in df1hr.iterrows():
             ts = rw.timestamp
             temp = rw.temperature_C
+            dewpoint = round(dewPoint(rw.temperature_C, rw.humidity),1)
 
-            of.write(f'    {{time: {int(ts.timestamp()*1000)}, temp: {temp} }}')
+            of.write(f'    {{time: {int(ts.timestamp()*1000)}, temp: {temp}, dewpoint: {dewpoint} }}')
             if ts != lastts:
                 of.write(',\n')
             else:
                 of.write('\n')
 
-        of.write("       ],\n        xkey: 'time',\n        ykeys: ['temp'],\n")
-        of.write("       labels: ['Temp'],\n        hideHover: 'auto',\n")
+        of.write("       ],\n        xkey: 'time',\n        ykeys: ['temp', 'dewpoint'],\n")
+        of.write("       labels: ['Temp', 'DewPoint'],\n        hideHover: 'auto',\n")
         of.write("       postUnits: '°C',\n        resize: true\n    });\n});\n")
 
     outfname = os.path.join(outdir, 'dragontailcurrenttemp.txt')
@@ -87,14 +99,22 @@ def periodTemps(df, outdir, period,
                 continue
             temp = round(vals[datafield],1)
             ts = vals['time']
-            of.write(f'    {{time: {int(ts.timestamp()*1000)}, {fieldname}: {temp} }}')
+            if datafield == 'temp_c':
+                dewpoint = round(dewPoint(vals[datafield], vals['humidity']),1)
+                of.write(f'    {{time: {int(ts.timestamp()*1000)}, {fieldname}: {temp}, \'dewpoint\': {dewpoint} }}')
+            else:
+                of.write(f'    {{time: {int(ts.timestamp()*1000)}, {fieldname}: {temp}}}')
             if ts != lastts:
                 of.write(',\n')
             else:
                 of.write('\n')
 
-        of.write("       ],\n        xkey: 'time',\n        ykeys: ['" + fieldname + "'],\n")
-        of.write("       labels: ['" + fieldname + "'],\n        hideHover: 'auto',\n")
+        if datafield == 'temp_c':
+            of.write(f"       ],\n        xkey: 'time',\n        ykeys: [\'{fieldname}\', 'dewpoint'],\n")
+            of.write(f"       labels: [\'{fieldname}\','dewpoint'],\n        hideHover: 'auto',\n")
+        else:
+            of.write("       ],\n        xkey: 'time',\n        ykeys: ['" + fieldname + "'],\n")
+            of.write("       labels: ['" + fieldname + "'],\n        hideHover: 'auto',\n")
         of.write("       xLabelAngle: 45,\n")
         if units == 'hPa':
             of.write("       ymax: 1050, ymin: 950, \n")

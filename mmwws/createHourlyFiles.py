@@ -8,6 +8,8 @@ import sys
 import platform
 import datetime
 import time
+import logging
+from logging.handlers import RotatingFileHandler
 
 from windData import minmaxWind
 from tempPressData import minmaxTemps, periodTemps
@@ -15,8 +17,18 @@ from rainData import periodRain
 from tableData import recentTable
 from windRose import makeRose
 
+logger = logging.getLogger('weather_hourly')
+
 
 if __name__ == '__main__':
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+    fh = RotatingFileHandler(os.path.expanduser('~/logs/weather_hourly.log'), maxBytes=51200, backupCount=10)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
     now = datetime.datetime.now()
     yr = now.year
     if len(sys.argv) < 2:
@@ -33,39 +45,41 @@ if __name__ == '__main__':
         retries = 0
         while retries < 5:
             try:
-                print('loading datafiles')
+                logger.info('loading datafiles')
                 df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
                 break
             except:
-                print('file in use, waiting 5s')
+                logger.info('file in use, waiting 5s')
                 time.sleep(5)
                 retries += 1
         if retries == 5:
-            print('unable to open datafile, aborting')
+            logger.warning('unable to open datafile, aborting')
             exit(0)
         # only load last years data if needed
         if (now +datetime.timedelta(days=-32)).year != yr:
             df2 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr-1}.parquet'))
             df = pd.concat([df2,df])
-    print('creating temperature graphs')
+    logger.info('creating temperature graphs')
     periodTemps(df, outdir, period=24*7) 
     minmaxTemps(df, outdir, '28day')
 
-    print('creating tables')
+    logger.info('creating tables')
     recentTable(df, outdir, period=24*31) # last 31 days
 
-    print('creating pressure graphs')
+    logger.info('creating pressure graphs')
     periodTemps(df, outdir, period=24*7, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
     periodTemps(df, outdir, period=24*28, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
-    print('creating wind graphs')
+    logger.info('creating wind graphs')
     minmaxWind(df, outdir, period=24*7)
     minmaxWind(df, outdir, period=24*28)
 
-    print('creating rainfall graphs')
+    logger.info('creating rainfall graphs')
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
-    print('creating wind roses')
+
+    logger.info('creating wind roses')
     makeRose(df, outdir, 1)
     makeRose(df, outdir, 7)
-    print('done')
+
+    logger.info('done')

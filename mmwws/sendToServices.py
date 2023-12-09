@@ -12,12 +12,18 @@ import os
 import sys
 import platform
 import time 
+import logging
+from logging.handlers import RotatingFileHandler
+
+from tempPressData import dewPoint
+
+logger = logging.getLogger('weather_services')
 
 # dateutc must be %Y-%m-%d+%H:%M:%S with the :s encoded as %3A
-# units should be imperial - nches, mph, fahrenheit
+# units should be imperial - inHg, mph, fahrenheit
 moTemplate = 'siteid={}&siteAuthenticationKey={}&dateutc={}&softwaretype={}&' \
     'baromin={}&tempf={}&winddir={}&windspeedmph={}&windgustmph={}&' \
-    'humidity={}&dailyrainin={}'
+    'humidity={}&dailyrainin={}&dewpointf={}'
 
 HPATOIN = 0.02953
 KMHTOMPH = 0.6214
@@ -39,8 +45,8 @@ def sendToMetOffice(cfgdir, latestdata, rainstart):
     windgust = round(latestdata.wind_max_km_h * KMHTOMPH, 1)
     humidity = latestdata.humidity
     dailyrain = round((latestdata.rain_mm - rainstart)* MMTOIN, 1)
-    prepared_data = moTemplate.format(siteid, key, dateutc, swtype, press, tempf, winddir, wind, windgust, humidity, dailyrain)
-    print(prepared_data)
+    dewpointf = round(dewPoint(latestdata.temperature_C, latestdata.humidity)*1.8+32, 1)
+    prepared_data = moTemplate.format(siteid, key, dateutc, swtype, press, tempf, winddir, wind, windgust, humidity, dailyrain, dewpointf)
     
     try:
         rsp = requests.get('http://wow.metoffice.gov.uk/automaticreading', params=prepared_data, timeout=60)
@@ -58,6 +64,14 @@ def sendToMetOffice(cfgdir, latestdata, rainstart):
 
 
 if __name__ == '__main__':
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+    fh = RotatingFileHandler(os.path.expanduser('~/logs/weather_services.log'), maxBytes=51200, backupCount=10)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
     now = datetime.datetime.now()
     yr = now.year
     if len(sys.argv) < 2:
@@ -74,15 +88,15 @@ if __name__ == '__main__':
         retries = 0
         while retries < 5:
             try:
-                print('loading datafiles')
+                logger.info('loading datafiles')
                 df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
                 break
             except:
-                print('file in use, waiting 5s')
+                logger.info('file in use, waiting 5s')
                 time.sleep(5)
                 retries += 1
         if retries == 5:
-            print('unable to open datafile, aborting')
+            logger.warning('unable to open datafile, aborting')
             exit(0)
         # only load last years data if needed
         if (now +datetime.timedelta(days=-32)).year != yr:
@@ -95,4 +109,4 @@ if __name__ == '__main__':
     latestdata=df.iloc[-1]
 
     sts, msg = sendToMetOffice('.', latestdata, rainstart)
-    print('metoffice:', sts, msg)
+    logger.info(f'metoffice: {sts} {msg}')
