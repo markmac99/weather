@@ -15,7 +15,7 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 
-from tempPressData import dewPoint
+from conversions import dewPoint, CtoF, KMHTOMPH, MMTOIN, HPATOINHG
 
 logger = logging.getLogger('weather_services')
 
@@ -24,10 +24,6 @@ logger = logging.getLogger('weather_services')
 moTemplate = 'siteid={}&siteAuthenticationKey={}&dateutc={}&softwaretype={}&' \
     'baromin={}&tempf={}&winddir={}&windspeedmph={}&windgustmph={}&' \
     'humidity={}&dailyrainin={}&dewpointf={}'
-
-HPATOIN = 0.02953
-KMHTOMPH = 0.6214
-MMTOIN = 1/25.4
 
 
 def sendToMetOffice(cfgdir, latestdata, rainstart):
@@ -38,14 +34,14 @@ def sendToMetOffice(cfgdir, latestdata, rainstart):
     swtype='mmwws'
     dateutc = latestdata.timestamp.strftime('%Y-%m-%d+%H:%M:%S')
     dateutc = dateutc.replace(':','%3A').replace(':','%3A')
-    press = round(latestdata.press_rel * HPATOIN, 1)
-    tempf = round(latestdata.temperature_C * 1.8 + 32, 1)
+    press = round(latestdata.press_rel * HPATOINHG, 1)
+    tempf = round(CtoF(latestdata.temperature_C), 1)
     winddir = latestdata.wind_dir_deg
     wind = round(latestdata.wind_avg_km_h * KMHTOMPH, 1)
     windgust = round(latestdata.wind_max_km_h * KMHTOMPH, 1)
     humidity = latestdata.humidity
     dailyrain = round((latestdata.rain_mm - rainstart)* MMTOIN, 1)
-    dewpointf = round(dewPoint(latestdata.temperature_C, latestdata.humidity)*1.8+32, 1)
+    dewpointf = round(CtoF(dewPoint(latestdata.temperature_C, latestdata.humidity)), 1)
     prepared_data = moTemplate.format(siteid, key, dateutc, swtype, press, tempf, winddir, wind, windgust, humidity, dailyrain, dewpointf)
     
     try:

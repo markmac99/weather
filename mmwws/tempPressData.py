@@ -6,20 +6,7 @@ import os
 import datetime
 import numpy as np
 from dateutil.relativedelta import relativedelta
-import math
-
-# correction for instrument readout inaccuracy
-pressureCorrection = 10
-
-
-def dewPoint(t, rh): 
-    # t in C, rh as a number eg 90, 50
-    E0 = 0.611 # kPa
-    lrv = 5423 # K (L/Rv over flat surface of water)
-    T0 = 273.15 # K
-    Es = E0 * math.exp(lrv * (1/T0 - 1/(t + T0)))
-    dewPoint = 1.0 / (-math.log(rh/100 * Es/E0)/lrv + 1/T0)-T0
-    return round(dewPoint,4)
+from conversions import dewPoint, PRESSCORR
 
 
 def getRangeValues(df, starttime, mins, doaverage=False):
@@ -30,13 +17,15 @@ def getRangeValues(df, starttime, mins, doaverage=False):
         return {'temp_c': np.nan, 'pressure': np.nan, 'rain_mm': np.nan}
     if doaverage:
         return {'temp_c': subdf.temperature_C.mean(), 'humidity': subdf.humidity.mean(),
-            'wind_ave': subdf.wind_avg_km_h.mean(), 'wind_max': subdf.wind_max_km_h.max(), 'pressure': subdf.press_rel.mean(),
+            'wind_ave': subdf.wind_avg_km_h.mean(), 'wind_max': subdf.wind_max_km_h.max(), 
+            'pressure': subdf.press_rel.mean() + PRESSCORR,
             'rain_mm': subdf.rain_mm.max(), 'wind_dir': subdf.wind_dir_deg.mean(),
             'temp_in': subdf.temp_c_in.mean(), 'hum_in': subdf.humidity_in.mean(), 
             'time': subdf.timestamp.max()}
     else:
         return {'temp_c': subdf.iloc[-1].temperature_C, 'humidity': subdf.iloc[-1].humidity,
-            'wind_ave': subdf.iloc[-1].wind_avg_km_h, 'wind_max': subdf.iloc[-1].wind_max_km_h, 'pressure': subdf.iloc[-1].press_rel,
+            'wind_ave': subdf.iloc[-1].wind_avg_km_h, 'wind_max': subdf.iloc[-1].wind_max_km_h, 
+            'pressure': subdf.iloc[-1].press_rel + PRESSCORR,
             'rain_mm': subdf.iloc[-1].rain_mm, 'wind_dir': subdf.iloc[-1].wind_dir_deg,
             'temp_in': subdf.iloc[-1].temp_c_in, 'hum_in': subdf.iloc[-1].humidity_in, 
             'time': subdf.iloc[-1].timestamp}

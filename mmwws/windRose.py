@@ -14,8 +14,10 @@ import sys
 import platform
 import time
 
+from conversions import KMHTOMPH
 
-def speed_labels(bins, units):   
+
+def _speedLabels(bins, units):   
     labels = []
     for left, right in zip(bins[:-1], bins[1:]):
         if left == bins[0]:
@@ -27,7 +29,7 @@ def speed_labels(bins, units):
     return list(labels)
 
 
-def _convert_dir(directions, N=None):
+def _convertDir(directions, N=None):
     if N is None:
         N = directions.shape[0]
     barDir = directions * np.pi/180. - np.pi/N
@@ -35,10 +37,10 @@ def _convert_dir(directions, N=None):
     return barDir, barWidth
 
 
-def wind_rose(rosedata, wind_dirs, palette=None):
+def windRose(rosedata, wind_dirs, palette=None):
     if palette is None:
         palette = seaborn.color_palette('inferno', n_colors=rosedata.shape[1])
-    bar_dir, bar_width = _convert_dir(wind_dirs)
+    bar_dir, bar_width = _convertDir(wind_dirs)
 
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
     ax.set_theta_direction('clockwise')
@@ -78,12 +80,12 @@ def makeRose(df, outdir, period):
     print('Of {} total observations, {} have calm winds.'.format(total_count, calm_count))
 
     spd_bins = [-1, 0, 5, 10, 15, 20, 25, 30, np.inf]
-    spd_labels = speed_labels(spd_bins, units='mph')
+    spd_labels = _speedLabels(spd_bins, units='mph')
 
     dir_bins = np.arange(-7.5, 370, 15)
     dir_labels = (dir_bins[:-1] + dir_bins[1:]) / 2
 
-    rose = (df.assign(WindSpd_bins=lambda df: pd.cut(df['wind_max_km_h']*0.6215, bins=spd_bins, labels=spd_labels, right=True))
+    rose = (df.assign(WindSpd_bins=lambda df: pd.cut(df['wind_max_km_h']*KMHTOMPH, bins=spd_bins, labels=spd_labels, right=True))
             .assign(WindDir_bins=lambda df: pd.cut(df['wind_dir_deg'], bins=dir_bins, labels=dir_labels, right=False))
             .replace({'WindDir_bins': {360: 0}})
             .groupby(by=['WindSpd_bins', 'WindDir_bins'])
@@ -95,7 +97,7 @@ def makeRose(df, outdir, period):
             .applymap(lambda x: x / total_count * 100))
 
     directions = np.arange(0, 360, 15)
-    _ = wind_rose(rose, directions)
+    _ = windRose(rose, directions)
     if period == 1:
         plt.savefig(os.path.join(outdir, 'rose_24hrs.png'))
     else:

@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import datetime
 
+from conversions import KMHTOMPH
+
 
 def recentWind(df, outdir):
     now=datetime.datetime.now()
@@ -15,8 +17,8 @@ def recentWind(df, outdir):
         of.write("$(function() {\nMorris.Line({\n element: 'dragontail-recent-wind',\n data: [\n")
         lastts = seldf.iloc[-1].timestamp
         for _, rw in seldf.iterrows():
-            maxw = round(rw.wind_max_km_h * 0.6214, 1)
-            avew = round(rw.wind_avg_km_h * 0.6214, 1)
+            maxw = round(rw.wind_max_km_h * KMHTOMPH, 1)
+            avew = round(rw.wind_avg_km_h * KMHTOMPH, 1)
             ts = int(rw.timestamp.timestamp()*1000)
             of.write(f'    {{time: {ts}, ave: {avew}, gust: {maxw} }}')
             if ts != lastts:
@@ -61,8 +63,8 @@ def minmaxWind(df, outdir, period=24):
             if len(seldf) == 0:
                 backdt = todt
                 continue
-            maxw = round(seldf.wind_max_km_h.max() * 0.6214, 1)
-            avew = round(seldf.wind_avg_km_h.max() * 0.6214, 1)
+            maxw = round(seldf.wind_max_km_h.max() * KMHTOMPH, 1)
+            avew = round(seldf.wind_avg_km_h.max() * KMHTOMPH, 1)
             ts = int(seldf.timestamp.max().timestamp()*1000)
             of.write(f'    {{time: {ts}, ave: {avew}, gust: {maxw} }}')
             if r < (numrows-1):
@@ -78,7 +80,9 @@ def minmaxWind(df, outdir, period=24):
         of.write("});\n});\n")
 
     if period == 24:
+        backdt = now + datetime.timedelta(hours=-12)
+        seldf = df[df.timestamp > pd.Timestamp(backdt, tz='UTC')]
         outfname = os.path.join(outdir, 'dragontailrecentwind.txt')
         with open(outfname, 'w') as of:
-            of.write(f'{round(df.wind_max_km_h.max()*0.6214,1)} mph')
+            of.write(f'{round(df.wind_max_km_h.max()*KMHTOMPH,1)} mph')
     return 

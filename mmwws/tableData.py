@@ -9,9 +9,7 @@ from dateutil.relativedelta import relativedelta
 
 from tempPressData import getRangeValues
 from tableHeaders import amhdr, amrwtempl, amfootr, rerwtempl, refootr
-
-# correction for instrument readout inaccuracy
-pressureCorrection = 10
+from conversions import KMHTOMPH, PRESSCORR
 
 
 def recentTable(df, outdir, period=1):
@@ -62,15 +60,15 @@ def recentTable(df, outdir, period=1):
             ts = vals['time'].strftime(tfmt) 
             temp = round(vals['temp_c'], 1)
             hum = int(vals['humidity'])
-            wina = round(vals['wind_ave'] * 0.6214, 1)
-            winm = round(vals['wind_max'] * 0.6214, 1)
+            wina = round(vals['wind_ave'] * KMHTOMPH, 1)
+            winm = round(vals['wind_max'] * KMHTOMPH, 1)
             # rainfall is cumulative
             if prevrain < 0:
                 rain = 0.0
             else:
                 rain = round(max(vals['rain_mm'] - prevrain, 0), 1)
             prevrain = round(vals['rain_mm'], 1)
-            pres = round(vals['pressure'] + pressureCorrection, 1)
+            pres = round(vals['pressure'] + PRESSCORR, 1)
             of.write(rerwtempl.format(ts, temp, hum, wina, winm, rain, pres))
         of.write(refootr.format(pp, hord2))
 
