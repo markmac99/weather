@@ -55,11 +55,21 @@ def sendDataToMQTT(data, logdir):
 
 
 def windChill(t, v):
+    # after https://www.calculator.net/wind-chill-calculator.html
+    # note not defined for T > 10C or v < 4.8 km/h
+    if t > 10.1 or v < 4.8:
+        return t
     wc = 13.12 + 0.6215 * t -11.37 * pow(v, 0.16) + 0.3965 * t * pow(v, 0.16)
     return round(wc,4)
 
 
 def heatIndex(t, rh):
+    # after https://www.weather.gov/media/epz/wxcalc/heatIndex.pdf
+    # and https://en.wikipedia.org/wiki/Heat_index for the formula in centigrade
+
+    # Note the formula is only useful for T > 27C and H > 40%
+    if t < 27.1 or rh < 40.1:
+        return t
     c_1 = -8.78469475556
     c_2 = 1.61139411
     c_3 = 2.33854883889
