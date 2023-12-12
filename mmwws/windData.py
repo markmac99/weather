@@ -84,5 +84,5 @@ def minmaxWind(df, outdir, period=24):
         seldf = df[df.timestamp > pd.Timestamp(backdt, tz='UTC')]
         outfname = os.path.join(outdir, 'dragontailrecentwind.txt')
         with open(outfname, 'w') as of:
-            of.write(f'{round(df.wind_max_km_h.max()*KMHTOMPH,1)} mph')
+            of.write(f'{round(seldf.wind_max_km_h.max()*KMHTOMPH,1)} mph')
     return 
