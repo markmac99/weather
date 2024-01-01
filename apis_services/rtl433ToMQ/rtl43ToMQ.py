@@ -96,6 +96,9 @@ def dewPoint(t, rh):
 
 def jsonToMQ(fname, priordata, logdir):
     lis = open(fname, 'r').readlines()
+    if len(lis) == 0:
+        writeLogEntry(logdir, 'datafile empty\n')
+        return 
     lastline = lis[-1].strip()
     if lastline[-6:] != '"CRC"}':
         writeLogEntry(logdir, f'malformed line {lastline}\n')
