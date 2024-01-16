@@ -47,13 +47,17 @@ def sendDataToMQTT(data, logdir):
     return ret
 
 
-def getTempPressHum():
+def getTempPressHum(prvdata = None):
     data = bme280.read_all()
     humidity, pressure, cTemp = data
+    if prvdata:
+        if abs(cTemp - prvdata['temp_c_in']) > 5:
+            writeLogEntry(logdir, f'temp diff too big - {cTemp} to {prvdata["temp_c_in"]}')
+            cTemp = prvdata['temp_c_in']
     cpressure = correctForAltitude(pressure, cTemp, stationAltitude())
     now = datetime.datetime.now().isoformat()[:19]+'Z'
     return {'temp_c_in': round(cTemp,4), 'press_rel': round(cpressure,4), 'humidity_in': round(humidity,4), 'time': now, 
-            'apressure': pressure}
+            'apressure': round(pressure,4)}
 
 
 
@@ -79,12 +83,14 @@ if __name__ == '__main__':
     outfname = os.path.join(outdir,'bmp280.json')
     bme280_i2c.set_default_i2c_address(0x76)
     bme280_i2c.set_default_bus(1)
+    prvdata = None
     bme280.setup()
     while runme is True:
-        data = getTempPressHum()
+        data = getTempPressHum(prvdata)
         with open(outfname, 'a+') as outf:
             outf.write(json.dumps(data) + '\n')
         sendDataToMQTT(data, logdir)
+        prvdata = data
         time.sleep(60)
         if os.path.isfile(stopfile):
             writeLogEntry(logdir, 'Exiting...\n==========\n')
