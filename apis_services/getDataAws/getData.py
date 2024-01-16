@@ -9,6 +9,7 @@ import time
 import datetime
 import logging
 import requests
+import json
 from logging.handlers import RotatingFileHandler
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -20,20 +21,26 @@ logger = logging.getLogger('mqtofile')
 def getNewData(datafile, url, key):
     #logger.warning(url)
     newdata = None
+    
     try:
-        requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-        headers={'x-api-key': key}
-        res = requests.get(url, headers=headers, verify=False)
-        if res.status_code == 200:
-            newdata = pd.read_json(res.text.strip())
-            newdata.set_index(['time'], inplace=True)
-            newdata['timestamp'] = pd.to_datetime(newdata.index)
-        else:
-            logger.warning('unable to retrieve data')
+        #requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+        #headers={'x-api-key': key}
+        #res = requests.get(url, headers=headers, verify=False)
+        #if res.status_code == 200:
+        #    newdata = pd.read_json(res.text.strip())
+        #    newdata.set_index(['time'], inplace=True)
+        #    newdata['timestamp'] = pd.to_datetime(newdata.index)
+        #else:
+        #    logger.warning('unable to retrieve data')
+        rawdata = json.load(open(os.path.expanduser('~/weather/raw/weatherdata.json')))
+        newdata=pd.DataFrame([rawdata])
+        newdata.set_index(['time'], inplace=True)
+        newdata['timestamp'] = pd.to_datetime(newdata.index)
     except Exception as e:
         logger.warning('unable to connect to url')
         logger.warning(e)
         pass
+    
     df = None
     if os.path.isfile(datafile):
         df = pd.read_parquet(datafile)
