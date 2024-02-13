@@ -80,6 +80,13 @@ def cleanData(yr):
     df.apressure.bfill(inplace=True)
     df.apressure.ffill(inplace=True)
 
+    df.press_rel.mask(df.press_rel > 1060, inplace=True)
+    df.press_rel.bfill(inplace=True)
+    df.press_rel.ffill(inplace=True)
+
+    df.apressure.mask(df.apressure > 1060, inplace=True)
+    df.apressure.bfill(inplace=True)
+    df.apressure.ffill(inplace=True)
     #df['rainchg'] = df.rain_mm.diff().fillna(0)
     #df.loc[df.rainchg < -0.31, ['rainchg']] = 0
     #df.rainchg.mask(df.rainchg > 30, inplace=True)
