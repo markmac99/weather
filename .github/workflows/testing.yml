@@ -6,7 +6,13 @@ jobs:
     tests:
       name: tests
       runs-on: thelinux
-      container: markmac99/rmstestcont
+      container:
+        image: docker.io/markmac99/rmstestcont:latest
+        env:
+          MYENV: foo
+        ports:
+          - 22
+          - 443
       strategy:
         matrix:
           python-version: ["3.7"] #, "3.8", "3.9", "3.10", "3.11"]
