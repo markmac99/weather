@@ -5,7 +5,7 @@ on:
 jobs:
     tests:
       name: tests
-      runs-on: thelinux
+      runs-on: ubuntu-latest
       container:
         image: docker.io/markmac99/rmstestcont:latest
         env:
