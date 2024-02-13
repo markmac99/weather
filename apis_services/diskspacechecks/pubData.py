@@ -60,6 +60,8 @@ def on_publish(client, userdata, result,x,y):
 
 def sendDataToMQTT(data, hn, logdir):
     broker, mqport = readConfig()
+    if broker == 'someserver.net': # not deployed
+        broker='wxsatpi'
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='dschecks')
     client.on_connect = on_connect
     client.on_publish = on_publish
@@ -68,7 +70,7 @@ def sendDataToMQTT(data, hn, logdir):
         hn = 'ukmcalcserver'
     topic = f'servers/{hn}/pctused'
     print(hn, round(data, 2))
-    ret = client.publish(topic, payload=data, qos=0, retain=False)
+    ret = client.publish(topic, payload=round(data,2), qos=0, retain=False)
     writeLogEntry(logdir, f'sent {data}\n')
     return ret
 
