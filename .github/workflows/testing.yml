@@ -6,6 +6,7 @@ jobs:
     tests:
       name: tests
       runs-on: thelinux
+      container: markmac99/rmstestcont
       strategy:
         matrix:
           python-version: ["3.7"] #, "3.8", "3.9", "3.10", "3.11"]
