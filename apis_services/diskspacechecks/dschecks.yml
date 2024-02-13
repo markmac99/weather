@@ -1,0 +1,27 @@
+- hosts: thelinux
+  vars:
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/diskspacechecks
+    dsdir: ~/src/dschecks
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/mqConfig.py', dest: '{{dsdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/pubData.py', dest: '{{dsdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/dsChecks.sh', dest: '{{dsdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{dsdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/test_pubData.py', dest: '{{dsdir}}/', mode: '644', backup: yes }
+
+  - name: update broker
+    ansible.builtin.replace:
+      path: '{{dsdir}}/mqConfig.py'
+      regexp: "someserver.net"
+      replace: "wxsatpi"
+
+  - name: update mqport 
+    ansible.builtin.replace:
+      path: '{{dsdir}}/mqConfig.py'
+      regexp: "1883"
+      replace: "1883"
