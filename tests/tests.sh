@@ -1,8 +1,7 @@
 #!/bin/bash
 
 cd ./apis_services/diskspacechecks
-ls /
-ls /github
+ls -ltra /github/home 
 pip install -r requirements.txt
 pip install pytest pytest-cov
 pytest -v . 
