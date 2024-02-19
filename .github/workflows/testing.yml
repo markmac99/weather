@@ -18,11 +18,17 @@ jobs:
           python-version: ["3.7"] #, "3.8", "3.9", "3.10", "3.11"]
       steps:
         - uses: actions/checkout@v4
-        - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v5
-          with:
-            python-version: ${{ matrix.python-version }}
+        #- name: Set up Python ${{ matrix.python-version }}
+        #  uses: actions/setup-python@v5
+        #  with:
+        #    python-version: ${{ matrix.python-version }}
         - name: run tests
           run: |
-            chmod +x ./tests/*.sh
-            ./tests/tests.sh
+            cd ./apis_services/diskspacechecks
+            echo HOME is $HOME
+            if [ ! -f $HOME/.ssh/config ] ; then 
+              mkdir $HOME/.ssh
+              cp /sshkeys/* $HOME/.ssh
+              chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
+            fi 
+            pytest -v .
