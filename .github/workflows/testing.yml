@@ -5,9 +5,9 @@ on:
 jobs:
     tests:
       name: tests
-      runs-on: thelinuxnative
+      runs-on: thelinuxnative # this is a github runner on my Linux box
       container:
-        image: docker.io/markmac99/wstesting:latest
+        image: docker.io/markmac99/wstesting:latest # this is the docker image built in this repo
         env:
           MYENV: foo
         ports:
