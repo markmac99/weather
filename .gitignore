@@ -16,3 +16,5 @@ mmwws/weathersites.ini
 **/*.pyc
 apis_services/weatherapi/weatherapi.keys
 apis_services/weatherapi/server.*
+testingcontainer/keys/*
+testingcontainer/ssh/*
