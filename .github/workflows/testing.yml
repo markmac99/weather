@@ -7,7 +7,7 @@ jobs:
       name: tests
       runs-on: thelinuxnative
       container:
-        image: docker.io/markmac99/rmstestcont:latest
+        image: docker.io/markmac99/wstesting:latest
         env:
           MYENV: foo
         ports:
