@@ -15,7 +15,8 @@ from bme280 import bme280, bme280_i2c
 
 
 def writeLogEntry(logdir, msg):
-    with open(os.path.join(logdir, "bmp280-"+datetime.datetime.now().strftime("%Y%m%d")+".log"), mode='a+', encoding='utf-8') as f:
+    #with open(os.path.join(logdir, "bmp280-"+datetime.datetime.now().strftime("%Y%m%d")+".log"), mode='a+', encoding='utf-8') as f:
+    with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
         nowdt = datetime.datetime.now().isoformat()
         f.write(f'{nowdt}: {msg}')
 

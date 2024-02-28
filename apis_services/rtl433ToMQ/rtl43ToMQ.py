@@ -17,7 +17,7 @@ from mqConfig import readConfig
 
 
 def writeLogEntry(logdir, msg):
-    with open(os.path.join(logdir, "WH1080Fwd-"+datetime.datetime.now().strftime("%Y%m%d")+".log"), mode='a+', encoding='utf-8') as f:
+    with open(os.path.join(logdir, "WH1080Fwd.log"), mode='a+', encoding='utf-8') as f:
         nowdt = datetime.datetime.now().isoformat()
         f.write(f'{nowdt}: {msg}')
 
