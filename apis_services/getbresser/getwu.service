@@ -3,8 +3,10 @@ Description=Get Wunderground Data
 After=network.target
 
 [Service]
-ExecStart=/home/bitnami/mmwebsite/getwu/getBresserData.sh
-ExecStop=/usr/bin/touch /home/bitnami/mmwebsite/getwu/stopwu
+User=pi
+Group=pi
+ExecStart=/home/pi/weather/getwu/getBresserData.sh
+ExecStop=/usr/bin/touch /home/pi/weather/getwu/stopwu
 Restart=always
 RestartSec=5
 

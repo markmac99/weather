@@ -1,7 +1,7 @@
-- hosts: wordpresssite #ukmonhelper
+- hosts: weatherpi3 #ukmonhelper
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getbresser
-    wudir: ~/mmwebsite/getwu
+    wudir: ~/weather/getwu
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
@@ -20,10 +20,10 @@
     ansible.builtin.replace:
       path: '{{wudir}}/mqConfig.py'
       regexp: "someserver.net"
-      replace: "themcintyres.ddns.net"
+      replace: "wxsatpi"
 
   - name: update mqport 
     ansible.builtin.replace:
       path: '{{wudir}}/mqConfig.py'
       regexp: "1883"
-      replace: "9883"
+      replace: "1883"

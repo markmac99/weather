@@ -14,7 +14,7 @@ from mqConfig import readConfig
 from wuconfig import stationid, getWUkey, getOpenhabURL
 
 
-LOG_DIRECTORY = './logs/'
+LOG_DIRECTORY = os.getenv('LOGDIR', default=os.path.expanduser('~/logs'))
 STOPFILE = './stopgetwu'
 MAX_RETRIES = 20
 SLEEP_TIME = 60 # wunderground limits you to 1500 requests per day = 1 per min
@@ -46,8 +46,8 @@ def sendDataToMQTT(data):
 
 
 def writeLogEntry(msg):
-    with open(LOG_DIRECTORY+"WULog"+datetime.datetime.now().strftime("%Y%m%d")+".log", mode='a+', encoding='utf-8') as f:
-        f.write(msg)
+    with open(LOG_DIRECTORY+"/getwu.log", mode='a+', encoding='utf-8') as f:
+        f.write(msg + '\n')
 
 
 def correctForAltitude(press, temp, alti):
@@ -58,13 +58,13 @@ def correctForAltitude(press, temp, alti):
 
 
 def getDataFromWU():
-    baseurl = 'https://api.weather.com/v2/pws/observations/current?' 
+    baseurl = 'https://api.weather.com/v2/pws/observations/current?'
     wukey = getWUkey()
     url = f'{baseurl}stationId={stationid}&format=json&units=m&apiKey={wukey}&numericPrecision=decimal'
     r = requests.get(url)
     if r.status_code != 200:
         # Not successful. Assume Authentication Error
-        writeLogEntry("\nRequest Status Error:" + str(r.status_code))
+        writeLogEntry(f'Request Status Error: {str(r.status_code)}')
         return False
     data_dict = json.loads(r.text)['observations'][0]
     dtutc = data_dict['obsTimeUtc']
@@ -97,8 +97,8 @@ def getDataFromWU():
     else:
         feels_like = temp
 
-    writeLogEntry(f'\n{evt_time},{temp}, {feels_like}, {pressure}, {windSpeed}, {windGust},')
-    writeLogEntry(f'{windir}, {humid}, {uvidx}, {solrad} {dewpt}, {precipRate},{precipTotal}')
+    writeLogEntry(f'{evt_time},{temp}, {feels_like}, {pressure}, {windSpeed}, {windGust},' 
+        f'{windir}, {humid}, {uvidx}, {solrad}, {dewpt}, {precipRate},{precipTotal}')
 
     # update openhab
     openhab = OpenHAB(getOpenhabURL())
@@ -110,7 +110,7 @@ def getDataFromWU():
         FeelsLike.state = feels_like
         RelPressure.state = pressure
     else:
-        writeLogEntry('\nproblem connecting to openhab\n')
+        writeLogEntry('problem connecting to openhab')
 
     sendDataToMQTT(['outsideTemp', temp])
     sendDataToMQTT(['feels_like', feels_like])
@@ -134,14 +134,14 @@ def getDataFromWU():
 
 
 if __name__ == '__main__':
-    writeLogEntry('\nStarting...\n')
+    writeLogEntry('========\nStarting...')
     os.makedirs(LOG_DIRECTORY, exist_ok=True)
     runme = True
     while runme is True:
         getDataFromWU()
         time.sleep(SLEEP_TIME)
         if os.path.isfile(STOPFILE):
-            writeLogEntry('\nExiting...\n')
+            writeLogEntry('Exiting...')
             os.remove(STOPFILE)
             runme = False
             break
