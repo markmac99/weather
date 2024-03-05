@@ -6,8 +6,8 @@ jobs:
     k8stest:
       name: k8stest
       runs-on: thelinux
-      container:
-        image: docker.io/markmac99/wstesting:latest
+      # container:
+      #   image: docker.io/markmac99/wstesting:latest
       steps:
         - uses: actions/checkout@v4
         - name: runme
