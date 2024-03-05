@@ -3,6 +3,16 @@ on:
     push:
         branches: master
 jobs:
+    k8stest:
+      name: k8stest
+      runs-on: thelinux
+      container:
+        image: docker.io/markmac99/wstesting:latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: runme
+          run: ls /
+          
     tests:
       name: tests
       runs-on: thelinuxnative # this is a github runner on my Linux box
