@@ -7,6 +7,7 @@
 
 # The locations of the source files and target file are defined in whConfig
 
+import time
 import json 
 import paramiko
 from scp import SCPClient
@@ -51,6 +52,9 @@ def uploadFile(fname, remotedir):
 
 if __name__ == '__main__':
     whfile, bpfile, targfile, remotedir = loadConfig()
-    loadAndSave(whfile, bpfile, targfile)
-    if len(targfile) > 5:
-        uploadFile(targfile, remotedir)
+    runme = True
+    while runme is True:
+        loadAndSave(whfile, bpfile, targfile)
+        if len(targfile) > 5:
+            uploadFile(targfile, remotedir)
+        time.sleep(30)
