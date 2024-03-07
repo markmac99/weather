@@ -5,7 +5,7 @@ cd $here
 lhr=-1
 lval=0
 [ -f ./lastdata.txt ] &&  source ./lastdata.txt
-echo "lhr $lhr lval $lval"
+# echo "lhr $lhr lval $lval"
 hr=$(date +%H)
 val=$(mosquitto_sub -h wxsatpi -t sensors/rtl_433/P172/C0/rain_mm -i readrain -C 1)
 valdiff=$(python -c "print(round(${val}-${lval},3))")

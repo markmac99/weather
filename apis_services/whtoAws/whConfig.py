@@ -7,5 +7,6 @@
 def loadConfig():
     whfile = '/home/pi/weather/maplinstn/weatherdata.json'
     bpfile = '/home/pi/weather/maplinstn/bmp280.json'
-    targfile = '/home/pi/weather/weatherdata.json'        
-    return whfile, bpfile, targfile
+    targfile = '/home/pi/weather/weatherdata.json' 
+    remotedir = 'wordpresssite:weather/raw/'
+    return whfile, bpfile, targfile, remotedir

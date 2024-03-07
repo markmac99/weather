@@ -33,11 +33,11 @@ This service runs on a Pi3 and reads data from a BMP/BME280 temperature, humidit
 ### rtl433ToMQ
 A second instance of RTL433 runs on the same Pi3 as the BME280 to retrieve the WH1080 outdoor sensor data at 433 MHz. For some reason this insance isn't able to directly publish to MQ, so i have a second process that reads the data from file and publishes it to MQ in topic sensors/wh1080. I need to revisit this klunky process. 
 
-### weatherapi
-This runs on the same Pi3 and reads the data files created by readBmp280 and rtl433ToMQ and exposes it via a REST API so that i can consume the data on my webserver which is running on AWS. 
+### whotoAws 
+This reads the data created by the bmp280 and rtl433 and saves it as a file. The file can be consumed by the dummy USB driver for pywws, but is also now pushed to AWS for direct use in the mmwws. 
 
 ### getDataAws
-Reads data from the above API and adds it to a datafile on my AWS server. The data are then consumed by mmwws. 
+Reads data from the whtoAws and adds it to a datafile on my AWS server. The data are then consumed by mmwws. 
 
 # pibackup
 a backup of the installation on the Pi, in case i need to refer to it. 
@@ -46,11 +46,11 @@ a backup of the installation on the Pi, in case i need to refer to it.
 ### subswh1080
 subscribed to the MQ data and wrote to file. Never properly worked, not sure why.
 
-### whotodummy 
-This read the data created by the bmp280 and rtl433 and saved it as a file for consumption by the dummy USB driver for pywws. 
-
 ### weatherfwd 
 Was used to read data from an API and publish it to OpenHAB. I had this running on the old PyWWS machine, before i was able to publsh the data directly via MQ. No longer used. 
+
+### weatherapi
+This runs on the same Pi3 and reads the data files created by readBmp280 and rtl433ToMQ and exposes it via a REST API so that i can consume the data on my webserver which is running on AWS. 
 
 ### tofb 
 legacy code to send data to facebook. No longer supported by FB, kept for historical purposes. 
