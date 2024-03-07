@@ -11,7 +11,15 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: runme
-          run: ls /
+          run: |
+            curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/values
+            if [ ! -f $HOME/.ssh/config ] ; then 
+              mkdir $HOME/.ssh
+              cp /sshkeys/* $HOME/.ssh
+            chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
+            fi 
+
+
           
     tests:
       name: tests
