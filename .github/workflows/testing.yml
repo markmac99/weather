@@ -10,7 +10,7 @@ jobs:
       #   image: docker.io/markmac99/wstesting:latest
       steps:
         - uses: actions/checkout@v4
-        - name: runme
+        - name: test diskspacechecks
           run: |
             sudo apt update -y && sudo apt install curl unzip -y
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
@@ -21,6 +21,7 @@ jobs:
               popd
             chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi 
+            pip install pytest pytest-cov
             cd ./apis_services/diskspacechecks
             pytest -v .
           
