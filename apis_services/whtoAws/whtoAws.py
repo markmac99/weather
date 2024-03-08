@@ -7,11 +7,11 @@
 
 # The locations of the source files and target file are defined in whConfig
 
-import time
 import json 
 import paramiko
 from scp import SCPClient
 import os
+import datetime
 
 from whConfig import loadConfig
 
@@ -44,17 +44,22 @@ def uploadFile(fname, remotedir):
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     pkey = paramiko.RSAKey.from_private_key_file(os.path.expanduser(sitecfg['identityfile'][0])) 
-    c.connect(sitecfg['hostname'], username=sitecfg['user'], pkey=pkey, look_for_keys=False)
-    scpcli = SCPClient(c.get_transport())
-    scpcli.put(fname, os.path.join(pth, os.path.split(fname)[1]))
+    for ret in range(10):
+        try:
+            c.connect(sitecfg['hostname'], username=sitecfg['user'], pkey=pkey, look_for_keys=False)
+            scpcli = SCPClient(c.get_transport())
+            scpcli.put(fname, os.path.join(pth, os.path.split(fname)[1]))
+            scpcli.close()
+            c.close()
+        except:
+            print('connection failed, retrying')
     return
 
 
 if __name__ == '__main__':
     whfile, bpfile, targfile, remotedir = loadConfig()
     runme = True
-    while runme is True:
-        loadAndSave(whfile, bpfile, targfile)
-        if len(targfile) > 5:
-            uploadFile(targfile, remotedir)
-        time.sleep(30)
+    print('running at', datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
+    loadAndSave(whfile, bpfile, targfile)
+    if len(targfile) > 5:
+        uploadFile(targfile, remotedir)
