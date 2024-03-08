@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 from getLastData import getData, getOutsideTemp
 from functools import wraps
 from flask import request, abort
@@ -34,6 +34,12 @@ def get_values():
     fname = os.getenv('DATAFILE', default='/home/pi/weather/weatherdata.json')
     values=[getData(fname)]
     return jsonify(values)
+
+
+@app.route('/testdata')
+@require_appkey
+def get_testdata():
+    return send_file('/home/pi/weather/testdata/testdata.zip', mimetype='application/zip')
 
 
 @app.route('/tempout')
