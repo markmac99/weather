@@ -6,13 +6,12 @@ jobs:
     k8stest:
       name: k8stest
       runs-on: thelinux
-      # container:
-      #   image: docker.io/markmac99/wstesting:latest
+      container:
+        image: docker.io/markmac99/wstesting:latest
       steps:
         - uses: actions/checkout@v4
         - name: test diskspacechecks
           run: |
-            sudo apt update -y && sudo apt install curl unzip -y
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
               mkdir $HOME/.ssh
