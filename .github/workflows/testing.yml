@@ -13,14 +13,14 @@ jobs:
         - name: runme
           run: |
             sudo apt update -y && sudo apt install curl unzip -y
-            curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/values
+            curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
               mkdir $HOME/.ssh
-              cp /sshkeys/* $HOME/.ssh
+              cd $HOME/.ssh
+              unzip /tmp/testdata.zip
             chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi 
-
-
+            cat ~/.ssh/config
           
     tests:
       name: tests
