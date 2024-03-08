@@ -16,8 +16,9 @@ jobs:
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
               mkdir $HOME/.ssh
-              cd $HOME/.ssh
+              pushd $HOME/.ssh
               unzip /tmp/testdata.zip
+              popd
             chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi 
             cd ./apis_services/diskspacechecks
