@@ -5,7 +5,7 @@ on:
 jobs:
     k8stest:
       name: k8stest
-      runs-on: thelinux
+      runs-on: arc-runner-wh
       container:
         image: docker.io/markmac99/wstesting:latest
       steps:
