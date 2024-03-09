@@ -9,11 +9,7 @@ RUN apt-get install -y python3.8 python3-pip git \
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
  
+RUN apt-get install -y curl unzip
 WORKDIR /root/source
 COPY requirements.txt .
 RUN pip3 install -v -r requirements.txt
-WORKDIR /
-COPY keys ./keys/
-RUN chmod 0600 ./keys/* && chmod 0700 ./keys
-COPY ssh ./sshkeys/
-RUN chmod 0600 ./sshkeys/* && chmod 0700 ./sshkeys
