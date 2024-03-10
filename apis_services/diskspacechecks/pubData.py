@@ -65,13 +65,17 @@ def sendDataToMQTT(data, hn, logdir):
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='dschecks')
     client.on_connect = on_connect
     client.on_publish = on_publish
-    client.connect(broker, mqport, 60)
-    if hn == 'calcserver':
-        hn = 'ukmcalcserver'
-    topic = f'servers/{hn}/pctused'
-    print(hn, round(data, 2))
-    ret = client.publish(topic, payload=round(data,2), qos=0, retain=False)
-    writeLogEntry(logdir, f'sent {data}\n')
+    try:
+        client.connect(broker, mqport, 60)
+        if hn == 'calcserver':
+            hn = 'ukmcalcserver'
+        topic = f'servers/{hn}/pctused'
+        print(hn, round(data, 2))
+        ret = client.publish(topic, payload=round(data,2), qos=0, retain=False)
+        writeLogEntry(logdir, f'sent {data}\n')
+    except:
+        writeLogEntry(logdir, f'send {data} failed\n')
+        ret = False
     return ret
 
 

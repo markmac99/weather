@@ -8,5 +8,5 @@ def readConfig():
 
 
 def hostnames():
-    hn = ['wordpresssite','ukmonhelper2','calcserver']
+    hn = ['wordpresssite.','ukmonhelper2.','calcserver.']
     return hn

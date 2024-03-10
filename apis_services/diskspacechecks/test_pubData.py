@@ -11,7 +11,7 @@ os.makedirs(logdir, exist_ok=True)
 
 
 def test_getDF():
-    hn = 'wordpresssite'
+    hn = hostnames()[0]
     dfpct = getDF(hn, logdir)
     print(dfpct)
     assert dfpct is not False
@@ -19,7 +19,7 @@ def test_getDF():
 
 def test_hostnames():
     x = hostnames()
-    assert x[0]=='wordpresssite'
+    assert x[0]=='wordpresssite.'
 
 
 def test_readConfig():
