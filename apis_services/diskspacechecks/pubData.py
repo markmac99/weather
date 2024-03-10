@@ -31,8 +31,9 @@ def getDF(hn, logdir):
         used = float(sizedata[2])
         writeLogEntry(logdir, f'{tot}, {used}, {used/tot*100.0}')
         dfpct = used/tot
-    except Exception:
+    except Exception as e:
         writeLogEntry(logdir, f'connection to {sitecfg["hostname"]} failed')
+        print(e)
         dfpct = False
     ssh_client.close()
     return dfpct
@@ -42,6 +43,7 @@ def writeLogEntry(logdir, msg):
     with open(os.path.join(logdir, 'dscheck.log'), mode='a+', encoding='utf-8') as f:
         nowdt = datetime.datetime.now().isoformat()
         f.write(f'{nowdt}: {msg}\n')
+        print(f'{nowdt}: {msg}')
 
 
 # The MQTT callback function. It will be triggered when trying to connect to the MQTT broker
@@ -73,8 +75,9 @@ def sendDataToMQTT(data, hn, logdir):
         print(hn, round(data, 2))
         ret = client.publish(topic, payload=round(data,2), qos=0, retain=False)
         writeLogEntry(logdir, f'sent {data}\n')
-    except:
+    except Exception as e:
         writeLogEntry(logdir, f'send {data} failed\n')
+        print(e)
         ret = False
     return ret
 
