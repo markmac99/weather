@@ -7,6 +7,22 @@ import os
 import sys
 import datetime
 
+# actual columns in the parquet file as of 2024
+# 'model', 'subtype', 'id', 'battery_ok', 'temperature_C', 'humidity',
+#       'wind_dir_deg', 'wind_avg_km_h', 'wind_max_km_h', 'rain_mm', 'mic',
+#       'temp_c_in', 'press_rel', 'humidity_in', 'apressure', 'timestamp',
+#       'rainchg'
+
+
+
+
+def correctForAltitude(press, temp, alti):
+    # converts sea-level pressure to abs pressure at given altitude
+    denom = temp + 273.15 + 0.0065 * alti
+    val = (1 - (0.0065 * alti)/denom)
+    press_abs = press / pow(val, -5.257)
+    return round(press_abs,4)
+
 
 def loadADay(dtval, srcdir):
     fname = os.path.join(os.path.expanduser(srcdir), dtval.strftime('%Y'), dtval.strftime('%Y-%m'), dtval.strftime('%Y-%m-%d.txt'))
@@ -18,10 +34,12 @@ def loadADay(dtval, srcdir):
         'press_rel','wind_ave','wind_max','wind_dir','rain_mm','spare']
     df = pd.read_csv(fname, names=names)
     df['wind_dir_deg'] = df.wind_dir * 22.5 + 7.5 # convert from direction to angle 
-    df['wind_avg_km_h'] = df.wind_ave * 3.6 # convert from m/s to kmh
-    df['wind_max_km_h'] = df.wind_max * 3.6 # convert from m/s to kmh
+    df['wind_avg_km_h'] = df.wind_ave #* 3.6 # convert from m/s to kmh
+    df['wind_max_km_h'] = df.wind_max #* 3.6 # convert from m/s to kmh
     df['timestamp'] = pd.to_datetime(df.time + 'Z')
     df['time']=[x.strftime('%Y-%m-%dT%H:%M:%SZ') for x in df.timestamp]
+    df['rainchg'] = df.rain_mm.diff().fillna(0)
+    df['apressure'] = [correctForAltitude(p, t, 80) for p,t in zip(df.temperature_C, df.press_rel)]
     df.set_index(['time'],inplace=True)
     df = df.drop(axis=1, labels=['wind_ave','wind_max','wind_dir','spare'])
     df['model'] = 'Fineoffset-WHx080'
@@ -38,8 +56,9 @@ def mergeData():
     nn.to_parquet('tmp/raw-2023-new.parquet')
 
 
-def cleanData(yr):
-    df = pd.read_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr}.parquet'))
+def cleanData(yr, srcdir):
+    pqfile = os.path.expanduser(os.path.join(srcdir, f'raw-{yr}.parquet'))
+    df = pd.read_parquet(pqfile)
 
     df.temperature_C.mask(df.temperature_C > 48, inplace=True) # mask bad outdoor temperatures as NaN
     df.temperature_C.mask(df.temperature_C == -22.4, inplace=True) # mask bad outdoor temperatures as NaN
@@ -59,15 +78,15 @@ def cleanData(yr):
     df.press_rel.bfill(inplace=True)
     df.press_rel.ffill(inplace=True)
 
-    df.wind_avg_km_h.mask(df.wind_avg_km_h > 50, inplace=True) # mask bad pressure
+    df.wind_avg_km_h.mask(df.wind_avg_km_h > 50, inplace=True) # mask bad wind
     df.wind_avg_km_h.bfill(inplace=True)
     df.wind_avg_km_h.ffill(inplace=True)
 
-    df.wind_max_km_h.mask(df.wind_max_km_h > 70, inplace=True) # mask bad pressure
+    df.wind_max_km_h.mask(df.wind_max_km_h > 70, inplace=True) # mask bad wind
     df.wind_max_km_h.bfill(inplace=True)
     df.wind_max_km_h.ffill(inplace=True)
 
-    df.rain_mm.mask(df.rain_mm > 1000, inplace=True)
+    df.rain_mm.mask(df.rain_mm > 1000, inplace=True) # mask bad rain
     df.rain_mm.bfill(inplace=True)
     df.rain_mm.ffill(inplace=True)
 
@@ -87,28 +106,23 @@ def cleanData(yr):
     df.apressure.mask(df.apressure > 1060, inplace=True)
     df.apressure.bfill(inplace=True)
     df.apressure.ffill(inplace=True)
-    #df['rainchg'] = df.rain_mm.diff().fillna(0)
-    #df.loc[df.rainchg < -0.31, ['rainchg']] = 0
-    #df.rainchg.mask(df.rainchg > 30, inplace=True)
-    #df.rainchg.bfill(inplace=True)
-    #df.rainchg.ffill(inplace=True)
 
-    df.to_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr}.parquet'))
+    df['rainchg'] = df.rain_mm.diff().fillna(0)
+    df.loc[df.rainchg < -1, ['rainchg']] = 0
+    df.rainchg.mask(df.rainchg > 30, inplace=True)
+    df.rainchg.bfill(inplace=True)
+    df.rainchg.ffill(inplace=True)
 
+    df.to_parquet(pqfile)
 
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        yr = int(sys.argv[1])
-    else:
-        yr = 2023
-    srcdir = 'sampledata'
+    yr = int(sys.argv[1])
+    srcdir = os.path.expanduser(sys.argv[2])
+    targdir = os.path.expanduser(sys.argv[3])
     currdt = datetime.datetime(int(yr),1,1)
-    if yr == 2023:
-        enddt = datetime.datetime(2023,12,5)
-    else:
-        enddt = datetime.datetime(int(yr)+1,1,1)
+    enddt = datetime.datetime(int(yr)+1,1,1)
     newdf = None
     while currdt < enddt:
         currdf = loadADay(currdt, srcdir)
@@ -119,4 +133,5 @@ if __name__ == '__main__':
                 newdf = pd.concat([newdf, currdf])
         currdt = currdt + datetime.timedelta(days=1)
     newdf = newdf.bfill(axis=0).ffill(axis=0)
-    newdf.to_parquet(os.path.join(srcdir, f'raw-{yr}.parquet'))
+    newdf.to_parquet(os.path.join(targdir, f'raw-{yr}.parquet'))
+    cleanData(yr, targdir)

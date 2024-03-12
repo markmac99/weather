@@ -2,4 +2,4 @@
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
 source $HOME/venvs/openhabstuff/bin/activate
-python $here/getData.py $HOME/weather/raw 30
+python $here/getData.py

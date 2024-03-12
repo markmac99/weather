@@ -3,25 +3,23 @@
 #
 
 import pandas as pd
-import sys
 import os
 import time
 import datetime
 import logging
-import requests
 import json
 from logging.handlers import RotatingFileHandler
-from urllib3.exceptions import InsecureRequestWarning
+#import requests
+#from urllib3.exceptions import InsecureRequestWarning
 
-from apiConfig import apiUrl, apiKey
+from apiConfig import apiUrl, apiKey, basedir, pause
 
 logger = logging.getLogger('mqtofile')
 
 
-def getNewData(datafile, url, key):
+def getNewData(datafile, srcdir, url, key):
     #logger.warning(url)
-    newdata = None
-    
+    newdata = None    
     try:
         #requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
         #headers={'x-api-key': key}
@@ -32,15 +30,14 @@ def getNewData(datafile, url, key):
         #    newdata['timestamp'] = pd.to_datetime(newdata.index)
         #else:
         #    logger.warning('unable to retrieve data')
-        rawdata = json.load(open(os.path.expanduser('~/weather/raw/weatherdata.json')))
+        rawdata = json.load(open(os.path.expanduser(os.path.join(srcdir, 'weatherdata.json'))))
         newdata=pd.DataFrame([rawdata])
         newdata.set_index(['time'], inplace=True)
         newdata['timestamp'] = pd.to_datetime(newdata.index)
     except Exception as e:
-        logger.warning('unable to connect to url')
+        logger.warning('unable to load source data')
         logger.warning(e)
-        pass
-    
+        return     
     df = None
     if os.path.isfile(datafile):
         df = pd.read_parquet(datafile)
@@ -63,21 +60,15 @@ def getNewData(datafile, url, key):
         logger.info(f'saving updated data with {len(newdata)} records')
         newdata.to_parquet(datafile)
     else:
-        logger.debug('no newdata')
-    
-    return newdata
+        logger.debug('no newdata')  
+    return 
 
 
 if __name__ == '__main__':
-    outdir = '~/weather/raw'
-    pause = 30
-    if len(sys.argv) > 1:
-        outdir = sys.argv[1]
-    if len(sys.argv) > 2:
-        try:
-            pause = int(sys.argv[2])
-        except: 
-            pass
+    indir = os.path.join(basedir, 'upload')
+    outdir = os.path.join(basedir, 'raw')
+    os.makedirs(os.path.expanduser(indir), exist_ok=True)
+    os.makedirs(os.path.expanduser(outdir), exist_ok=True)
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
@@ -85,12 +76,10 @@ if __name__ == '__main__':
     fh.setLevel(logging.INFO)
     fh.setFormatter(formatter)
     logger.addHandler(fh)
-
     logger.info(f'capturing data at {pause} intervals to {outdir}')
     keepgoing = True
     while keepgoing:
         yr = datetime.datetime.now().year
-        os.makedirs(os.path.expanduser(outdir), exist_ok=True)
         fname = os.path.expanduser(os.path.join(outdir, f'raw-{yr}.parquet'))
-        df = getNewData(fname, apiUrl, apiKey)
+        getNewData(fname, indir, apiUrl, apiKey)
         time.sleep(pause)
