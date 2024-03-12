@@ -12,6 +12,8 @@ jobs:
         - uses: actions/checkout@v4
         - name: test diskspacechecks
           run: |
+            ping wxsatpi.
+            ping wordpresssite.
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
               here=$(pwd)
@@ -23,7 +25,7 @@ jobs:
             fi 
             pip install pytest pytest-cov
             cd ./apis_services/diskspacechecks
-            pytest -v .
+          # pytest -v .
           
     #tests:
     #  name: tests

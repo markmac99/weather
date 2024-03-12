@@ -13,3 +13,4 @@ RUN apt-get install -y curl unzip
 WORKDIR /root/source
 COPY requirements.txt .
 RUN pip3 install -v -r requirements.txt
+RUN apt-get install -y dnsutils iputils-ping
