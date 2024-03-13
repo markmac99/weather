@@ -13,7 +13,7 @@ jobs:
         - name: test diskspacechecks
           run: |
             ping -c 1 wxsatpi.
-            ping -c 1 wordpresssite.
+            nslookup wordpresssite.
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
               here=$(pwd)
