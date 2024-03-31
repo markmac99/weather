@@ -59,6 +59,8 @@ if __name__ == '__main__':
             df2 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr-1}.parquet'))
             df = pd.concat([df2,df])
 
+    df.drop_duplicates(inplace=True)
+    df.sort_values(by=['timestamp'], inplace=True)
     logger.info('creating temperature graphs')
     recentTemps(df, outdir)
     periodTemps(df, outdir, period=24) 

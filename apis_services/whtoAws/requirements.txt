@@ -1,3 +1,5 @@
 # requirements file 
 paramiko
 scp
+pandas
+pyarrow

@@ -9,12 +9,77 @@ import datetime
 import logging
 import json
 from logging.handlers import RotatingFileHandler
+import shutil
 #import requests
 #from urllib3.exceptions import InsecureRequestWarning
 
 from apiConfig import apiUrl, apiKey, basedir, pause
 
 logger = logging.getLogger('mqtofile')
+
+
+def loadHistoricData(whfile, bpfile, targfile):
+    whraw = open(whfile, 'r').readlines()
+    bpraw = open(bpfile, 'r').readlines()
+    bpdata = []
+    whdata = []
+    for wh in whraw:
+        whdata.append(json.loads(wh))
+    for bp in bpraw:
+        bpdata.append(json.loads(bp))
+    bpdf=pd.DataFrame(bpdata)
+    whdf=pd.DataFrame(whdata)
+    whdf.drop_duplicates(inplace=True)
+    bpdf['timestamp']=[datetime.datetime.strptime(v, '%Y-%m-%dT%H:%M:%SZ') for v in bpdf.time]
+    whdf['timestamp']=[datetime.datetime.strptime(v, '%Y-%m-%d %H:%M:%S') for v in whdf.time]
+
+    tvals = []
+    pvals = []
+    hvals = []
+    avals = []
+    for rw, wh in whdf.iterrows():
+        tval = wh.timestamp
+        bprec = bpdf.iloc[(bpdf['timestamp']-tval).abs().argsort()[:2]]
+        tvals.append(sum(bprec.temp_c_in)/2)
+        pvals.append(sum(bprec.press_rel)/2)
+        hvals.append(sum(bprec.humidity_in)/2)
+        avals.append(sum(bprec.apressure)/2)
+
+    whdf['temp_c_in'] = tvals
+    whdf['press_rel'] = pvals
+    whdf['humidity_in'] = hvals
+    whdf['apressure'] = avals
+    whdf['year'] = [v.year for v in whdf.timestamp]
+    whdf['month'] = [v.month for v in whdf.timestamp]
+    whdf['day'] = [v.day for v in whdf.timestamp]
+    whdf['rainchg'] = whdf.rain_mm.diff().fillna(0)
+    whdf.loc[whdf.rainchg < -0.31, ['rainchg']] = 0
+    whdf.set_index(['time'], inplace=True)
+
+    curryr = whdf.year.min()
+    currdf = pd.read_parquet(f'/home/bitnami/weather/raw/raw-{curryr}.parquet')
+    #currdf = pd.read_parquet(targfile)
+    newdf = pd.concat([currdf, whdf])
+    newdf.drop_duplicates(inplace=True)
+    newdf.to_parquet(targfile, partition_cols=['year','month','day'])
+    return 
+
+
+def addPartition(datafile):
+    df = None
+    if os.path.isfile(datafile):
+        shutil.move(datafile, datafile+'.bkp')
+        df = pd.read_parquet(datafile+'.bkp')
+        if 'timestamp' not in df:
+            df['timestamp'] = pd.to_datetime(df.index)
+        if 'rainchg' not in df:
+            df['rainchg'] = df.rain_mm.diff().fillna(0)
+            df.loc[df.rainchg < -0.31, ['rainchg']] = 0
+        if 'year' not in df:
+            df['year'] = [v.year for v in df.timestamp]
+            df['month'] = [v.month for v in df.timestamp]
+            df['day'] = [v.day for v in df.timestamp]
+        df.to_parquet(datafile, partition_cols=['year','month','day'])
 
 
 def getNewData(datafile, srcdir, url, key):
@@ -34,31 +99,46 @@ def getNewData(datafile, srcdir, url, key):
         newdata=pd.DataFrame([rawdata])
         newdata.set_index(['time'], inplace=True)
         newdata['timestamp'] = pd.to_datetime(newdata.index)
+        newdata['year'] = [v.year for v in newdata.timestamp]
+        newdata['month'] = [v.month for v in newdata.timestamp]
+        newdata['day'] = [v.day for v in newdata.timestamp]
+        logger.debug('loaded new datafile')
     except Exception as e:
         logger.warning('unable to load source data')
         logger.warning(e)
-        return     
+        return
+    
     df = None
-    if os.path.isfile(datafile):
+    if os.path.isdir(datafile):
+        logger.debug(f'loading {datafile}')
         df = pd.read_parquet(datafile)
+        df.drop_duplicates(inplace=True)
         if 'timestamp' not in df:
             df['timestamp'] = pd.to_datetime(df.index)
         if 'rainchg' not in df:
             df['rainchg'] = df.rain_mm.diff().fillna(0)
             df.loc[df.rainchg < -0.31, ['rainchg']] = 0
+        if 'year' not in df:
+            df['year'] = [v.year for v in df.timestamp]
+            df['month'] = [v.month for v in df.timestamp]
+            df['day'] = [v.day for v in df.timestamp]
     else:
-        logger.debug('mo old data to load')
+        logger.debug('no old data to load')
     if df is not None and newdata is not None:
         lastrain = df.iloc[-1].rain_mm
         newdata['rainchg'] = newdata.rain_mm - lastrain
         newdata.loc[newdata.rainchg < -0.31, ['rainchg']] = 0
         newdata = pd.concat([df, newdata])
+        newdata.drop_duplicates(inplace=True)
     else:
         logger.debug('no new newdata to concatenate')
+        newdata = df
     if newdata is not None:
-        newdata = newdata.drop_duplicates()
+        newdata['rainchg'] = newdata.rainchg.fillna(0)
+        newdata.drop_duplicates(inplace=True)
+        newdata.sort_values(by=['timestamp'], inplace=True)
         logger.info(f'saving updated data with {len(newdata)} records')
-        newdata.to_parquet(datafile)
+        newdata.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
     else:
         logger.debug('no newdata')  
     return 
