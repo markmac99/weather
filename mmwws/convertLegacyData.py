@@ -52,7 +52,7 @@ def loadADay(dtval, srcdir):
 def fixBadRain():
     datafile='/home/bitnami/weather/raw/raw-2024.parquet'
     df = pd.read_parquet(datafile)
-    df2 = df[(df.month==3) & (df.day==31) & (df.rainchg>80)]
+    df2 = df[(df.month==4) & (df.day==1) & (df.rainchg>80)]
     df.loc[df2.index, 'rainchg'] = 0
     df.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')    
 
