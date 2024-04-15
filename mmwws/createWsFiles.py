@@ -60,7 +60,7 @@ if __name__ == '__main__':
             df = pd.concat([df2,df])
 
     df.drop_duplicates(inplace=True)
-    df.sort_values(by=['timestamp'], inplace=True)
+    df.sort_index(inplace=True)
     logger.info('creating temperature graphs')
     recentTemps(df, outdir)
     periodTemps(df, outdir, period=24) 

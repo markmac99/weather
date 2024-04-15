@@ -183,6 +183,7 @@ if __name__ == '__main__':
             df2 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr-1}.parquet'))
             df = pd.concat([df2,df])
 
+    df.sort_index(inplace=True)
     nowzeroed = now.replace(hour=0, minute=0, second=0, microsecond=0)
     df = df[df.timestamp >= pd.Timestamp(nowzeroed, tz='UTC')]
     rainstart = df.iloc[0].rain_mm

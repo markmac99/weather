@@ -54,6 +54,7 @@ if __name__ == '__main__':
             exit(0)
         df2 = pd.read_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr-1}.parquet'))
     df = pd.concat([df2,df1])
+    df.sort_index(inplace=True)
 
     logger.info('creating 12mth temps')
     minmaxTemps(df, outdir, '12month')
