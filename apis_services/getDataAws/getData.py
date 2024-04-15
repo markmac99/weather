@@ -70,6 +70,7 @@ def addPartition(datafile):
     if os.path.isfile(datafile):
         shutil.move(datafile, datafile+'.bkp')
         df = pd.read_parquet(datafile+'.bkp')
+        df.sort_index(inplace=True)
         if 'timestamp' not in df:
             df['timestamp'] = pd.to_datetime(df.index)
         if 'rainchg' not in df:
@@ -112,6 +113,7 @@ def getNewData(datafile, srcdir, url, key):
     if os.path.isdir(datafile):
         logger.debug(f'loading {datafile}')
         df = pd.read_parquet(datafile)
+        df.sort_index(inplace=True)
         df.drop_duplicates(inplace=True)
         if 'timestamp' not in df:
             df['timestamp'] = pd.to_datetime(df.index)
@@ -125,11 +127,13 @@ def getNewData(datafile, srcdir, url, key):
     else:
         logger.debug('no old data to load')
     if df is not None and newdata is not None:
+        logger.debug('adding raindata')
         lastrain = df.iloc[-1].rain_mm
         newdata['rainchg'] = newdata.rain_mm - lastrain
         newdata.loc[newdata.rainchg < -0.31, ['rainchg']] = 0
         newdata = pd.concat([df, newdata])
         newdata.drop_duplicates(inplace=True)
+        #logger.debug(f'{lastrain} {newdata.rain_mm} ')
     else:
         logger.debug('no new newdata to concatenate')
         newdata = df
@@ -153,7 +157,7 @@ if __name__ == '__main__':
     # create file handler which logs even debug messages
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
     fh = RotatingFileHandler(os.path.expanduser('~/logs/getweatherdata.log'), maxBytes=5243880, backupCount=10)
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
     logger.addHandler(fh)
     logger.info(f'capturing data at {pause} intervals to {outdir}')
