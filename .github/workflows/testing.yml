@@ -10,7 +10,7 @@ jobs:
         image: docker.io/markmac99/wstesting:latest
       steps:
         - uses: actions/checkout@v4
-        - name: test diskspacechecks
+        - name: collect test data
           run: |
             curl -k -H "x-api-key: ${{ secrets.DATAKEY }}" https://192.168.1.195:8081/testdata -o /tmp/testdata.zip
             if [ ! -f $HOME/.ssh/config ] ; then 
@@ -21,6 +21,15 @@ jobs:
               cd ${here}
               chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi 
+        - name: install requirements
+          run: |
             pip install pytest pytest-cov
+        - name: test diskspacechecks
+          run: |
             cd ./apis_services/diskspacechecks
             pytest -v .
+        - name: test diskspacechecks
+          run: |
+            cd ./apis_services/diskspacechecks
+            pytest . --cov=. --cov-report=term-missing
+  
