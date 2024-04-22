@@ -1,5 +1,6 @@
 # Copyright (C) 2018-2023 Mark McIntyre
 ########################################################################
+
 resource "aws_s3_bucket" "mjmm_weatherdata" {
   bucket = "mjmm-weatherdata"
   tags = {
@@ -7,12 +8,14 @@ resource "aws_s3_bucket" "mjmm_weatherdata" {
   }
 }
 
+# disable this as its not useful and is generating a LOT of data
+/*
 resource "aws_s3_bucket_logging" "mjmm_weatherdata" {
   bucket        = aws_s3_bucket.mjmm_weatherdata.bucket
   target_bucket = "mjmmauditing"
   target_prefix = "weatherdata-logs/"
 }
-
+*/
 resource "aws_s3_bucket_server_side_encryption_configuration" "mjmm_weatherdata" {
   bucket = aws_s3_bucket.mjmm_weatherdata.bucket
 
@@ -23,11 +26,3 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "mjmm_weatherdata"
     }
   }
 }
-
-resource "aws_s3_bucket_versioning" "mjmm_weatherdata" {
-  bucket = aws_s3_bucket.mjmm_weatherdata.id
-  versioning_configuration {
-    status = "Suspended"
-  }
-}
-
