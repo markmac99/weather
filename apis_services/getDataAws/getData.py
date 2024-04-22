@@ -83,7 +83,7 @@ def addPartition(datafile):
         df.to_parquet(datafile, partition_cols=['year','month','day'])
 
 
-def getNewData(datafile, srcdir, url, key):
+def getNewData(datafile, srcdir, s3loc, url=None, key=None):
     #logger.warning(url)
     newdata = None    
     try:
@@ -143,6 +143,7 @@ def getNewData(datafile, srcdir, url, key):
         newdata.sort_values(by=['timestamp'], inplace=True)
         logger.info(f'saving updated data with {len(newdata)} records')
         newdata.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
+        newdata.to_parquet(s3loc, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
     else:
         logger.debug('no newdata')  
     return 
@@ -165,5 +166,6 @@ if __name__ == '__main__':
     while keepgoing:
         yr = datetime.datetime.now().year
         fname = os.path.expanduser(os.path.join(outdir, f'raw-{yr}.parquet'))
-        getNewData(fname, indir, apiUrl, apiKey)
+        s3loc = f's3://mjmm-weatherdata/raw-{yr}.parquet'
+        getNewData(fname, indir, s3loc, apiUrl, apiKey)
         time.sleep(pause)
