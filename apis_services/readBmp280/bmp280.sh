@@ -9,9 +9,8 @@ weatherdir=/home/pi/weather
 
 source /home/pi/venvs/pywws/bin/activate
 rm -f $weatherdir/stopbmp280
-if [ ! -f $weatherdir/maplinstn/bmp280.json.$(date +%Y%m%d) ] ; then
-    mv $weatherdir/maplinstn/bmp280.json $weatherdir/maplinstn/bmp280.json.$(date +%Y%m%d)
+yday=$(date --date yesterday +%Y%m%d)
+if [ ! -f $weatherdir/maplinstn/bmp280.json.${yday} ] ; then
+    mv $weatherdir/maplinstn/bmp280.json $weatherdir/maplinstn/bmp280.json.${yday}
 fi
-find $datadir -name "bmp280-*.log" -mtime +14 -exec rm -f {} \;
-find $datadir -name "bmp280.json.*" -mtime +14 -exec rm -f {} \;
 python $here/readBmp280.py $weatherdir

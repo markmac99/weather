@@ -17,7 +17,7 @@ from bme280 import bme280, bme280_i2c
 def writeLogEntry(logdir, msg):
     #with open(os.path.join(logdir, "bmp280-"+datetime.datetime.now().strftime("%Y%m%d")+".log"), mode='a+', encoding='utf-8') as f:
     with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
-        nowdt = datetime.datetime.now().isoformat()
+        nowdt = datetime.datetime.utcnow().isoformat()
         f.write(f'{nowdt}: {msg}')
 
 
@@ -56,7 +56,7 @@ def getTempPressHum(prvdata = None):
             writeLogEntry(logdir, f'temp diff too big - {cTemp} to {prvdata["temp_c_in"]}')
             cTemp = prvdata['temp_c_in']
     cpressure = correctForAltitude(pressure, cTemp, stationAltitude())
-    now = datetime.datetime.now().isoformat()[:19]+'Z'
+    now = datetime.datetime.utcnow().isoformat()[:19]+'Z'
     return {'temp_c_in': round(cTemp,4), 'press_rel': round(cpressure,4), 'humidity_in': round(humidity,4), 'time': now, 
             'apressure': round(pressure,4)}
 

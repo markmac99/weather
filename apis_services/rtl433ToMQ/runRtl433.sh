@@ -6,8 +6,8 @@ logdir=/home/pi/weather/logs
 mkdir -p $datadir
 mkdir -p $logdir
 
-if [ ! -f $datadir/weatherdata.json.$(date +%Y%m%d) ] ; then
-    mv $datadir/weatherdata.json $datadir/weatherdata.json.$(date +%Y%m%d)
+yday=$(date --date yesterday +%Y%m%d)
+if [ ! -f $datadir/weatherdata.json.${yday} ] ; then
+    mv $datadir/weatherdata.json $datadir/weatherdata.json.${yday}
 fi
-find $datadir -name "weatherdata.json*" -mtime +365 -exec rm -f {} \;
-/usr/local/bin/rtl_433 -R 32 -R 155 -F json::$datadir/weatherdata.json
+/usr/local/bin/rtl_433 -R 32 -R 155 -F json::$datadir/weatherdata.json -M time:utc
