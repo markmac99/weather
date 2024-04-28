@@ -20,6 +20,18 @@
       regexp: "someserver.net"
       replace: "wxsatpi"
 
+  - name: update user
+    ansible.builtin.replace:
+      path: '{{dsdir}}/mqConfig.py'
+      regexp: "mquser"
+      replace: "dschecks"
+
+  - name: update pass
+    ansible.builtin.replace:
+      path: '{{dsdir}}/mqConfig.py'
+      regexp: "mqpass"
+      replace: "mqdspass"
+
   - name: update mqport 
     ansible.builtin.replace:
       path: '{{dsdir}}/mqConfig.py'

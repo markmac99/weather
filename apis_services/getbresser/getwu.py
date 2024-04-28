@@ -35,10 +35,12 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data):
-    broker, mqport = readConfig()
+    broker, mqport, mquser, mqpass = readConfig()
     client = mqtt.Client('bresser_wu')
     client.on_connect = on_connect
     client.on_publish = on_publish
+    if mquser != '':
+        client.username_pw_set(mquser, mqpass)
     client.connect(broker, mqport, 60)
     topic = f'sensors/bresser_wu/{data[0]}'
     ret = client.publish(topic, payload=data[1], qos=0, retain=False)

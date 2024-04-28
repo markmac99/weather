@@ -3,5 +3,7 @@
 
 def readConfig():
     broker = 'someserver.net'
+    username = 'mquser'
+    passwd = 'mqpass'
     mqport = 1883
-    return broker, mqport
+    return broker, mqport, username, passwd

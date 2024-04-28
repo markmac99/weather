@@ -61,13 +61,12 @@ def on_publish(client, userdata, result,x,y):
 
 
 def sendDataToMQTT(data, hn, logdir):
-    broker, mqport = readConfig()
-    if broker == 'someserver.net': # not deployed
-        broker='wxsatpi'
+    broker, mqport, user, passwd = readConfig()
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='dschecks')
     client.on_connect = on_connect
     client.on_publish = on_publish
     try:
+        client.username_pw_set(user, passwd)
         client.connect(broker, mqport, 60)
         if hn == 'calcserver':
             hn = 'ukmcalcserver'

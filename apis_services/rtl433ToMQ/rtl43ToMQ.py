@@ -37,10 +37,12 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data, logdir):
-    broker, mqport = readConfig()
+    broker, mqport, username, password = readConfig()
     client = mqtt.Client('wh1080_fwd')
     client.on_connect = on_connect
     client.on_publish = on_publish
+    if username != '':
+        client.username_pw_set(username, password)
     try:
         client.connect(broker, mqport, 60)
     except Exception as e:

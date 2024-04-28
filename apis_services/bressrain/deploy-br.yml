@@ -9,3 +9,13 @@
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
     - {src: '{{srcdir}}/getBressRain.sh', dest: '{{dsdir}}/', mode: '754', backup: yes }
+  - name: update mquser 
+    ansible.builtin.replace:
+      path: '{{dsdir}}/getBressRain.sh'
+      regexp: "mquser"
+      replace: "sensors"
+  - name: update mqpasswd 
+    ansible.builtin.replace:
+      path: '{{dsdir}}/getBressRain.sh'
+      regexp: "changeme"
+      replace: "mqsenspass"

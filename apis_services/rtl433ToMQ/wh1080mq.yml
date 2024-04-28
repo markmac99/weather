@@ -25,3 +25,13 @@
       path: '{{targdir}}/rtl433/mqConfig.py'
       regexp: "someserver.net"
       replace: "wxsatpi"
+  - name: update mquser bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/rtl433/mqConfig.py'
+      regexp: "someuser"
+      replace: "sensors"
+  - name: update mqpasswd bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/rtl433/mqConfig.py'
+      regexp: "changeme"
+      replace: "mqsenspass"

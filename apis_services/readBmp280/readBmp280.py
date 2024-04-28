@@ -36,10 +36,13 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data, logdir):
-    broker, mqport = readConfig()
+    broker, mqport, username, password = readConfig()
     client = mqtt.Client('bmp280_fwd')
     client.on_connect = on_connect
     client.on_publish = on_publish
+    open('/tmp/info.log','w').write(f'{username} {password}\n')
+    if username != '':
+        client.username_pw_set(username, password)
     client.connect(broker, mqport, 60)
     for ele in data:
         topic = f'sensors/bmp280/{ele}'

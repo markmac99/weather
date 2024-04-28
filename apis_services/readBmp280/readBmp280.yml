@@ -1,6 +1,6 @@
 - hosts: weatherpi3
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services
     targdir: ~/weather
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
@@ -21,3 +21,13 @@
       path: '{{targdir}}/readBmp280/mqConfig.py'
       regexp: "someserver.net"
       replace: "wxsatpi"
+  - name: update mquser bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/readBmp280/mqConfig.py'
+      regexp: "someuser"
+      replace: "sensors"
+  - name: update mqpasswd bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/readBmp280/mqConfig.py'
+      regexp: "changeme"
+      replace: "mqsenspass"
