@@ -1,4 +1,6 @@
 - hosts: weatherpi3 #ukmonhelper
+  vars_files: 
+    - /mnt/e/dev/weather/weatherstation/keys.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getbresser
     wudir: ~/weather/getwu
@@ -32,7 +34,7 @@
     ansible.builtin.replace:
       path: '{{wudir}}/mqConfig.py'
       regexp: "mqpass"
-      replace: "mqsenspass"
+      replace: "{{ mqsenspassword }}"
 
   - name: update mqport 
     ansible.builtin.replace:

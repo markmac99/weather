@@ -1,4 +1,6 @@
 - hosts: thelinux
+  vars_files: 
+    - /mnt/e/dev/weather/weatherstation/keys.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/diskspacechecks
     dsdir: ~/src/dschecks
@@ -30,7 +32,7 @@
     ansible.builtin.replace:
       path: '{{dsdir}}/mqConfig.py'
       regexp: "mqpass"
-      replace: "mqdspass"
+      replace: "{{ mqdspassword }}"
 
   - name: update mqport 
     ansible.builtin.replace:

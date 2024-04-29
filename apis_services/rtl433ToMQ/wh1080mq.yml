@@ -1,4 +1,7 @@
 - hosts: weatherpi3
+  gather_facts: false
+  vars_files: 
+    - /mnt/e/dev/weather/weatherstation/keys.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/
     targdir: ~/weather
@@ -34,4 +37,4 @@
     ansible.builtin.replace:
       path: '{{targdir}}/rtl433/mqConfig.py'
       regexp: "changeme"
-      replace: "mqsenspass"
+      replace: "{{ mqsenspassword }}"
