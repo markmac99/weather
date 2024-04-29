@@ -1,6 +1,6 @@
 - hosts: weatherpi3
   vars_files: 
-    - /mnt/e/dev/weather/weatherstation/keys.enc
+    - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/bressrain
     dsdir: ~/source/bressrain

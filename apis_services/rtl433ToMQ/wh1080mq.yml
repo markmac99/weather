@@ -1,7 +1,7 @@
 - hosts: weatherpi3
   gather_facts: false
   vars_files: 
-    - /mnt/e/dev/weather/weatherstation/keys.enc
+    - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/
     targdir: ~/weather
