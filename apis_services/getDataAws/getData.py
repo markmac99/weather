@@ -142,8 +142,11 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         newdata.drop_duplicates(inplace=True)
         newdata.sort_values(by=['timestamp'], inplace=True)
         logger.info(f'saving updated data with {len(newdata)} records')
-        newdata.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
-        newdata.to_parquet(s3loc, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
+        basename_template='weatherdata_{i}'
+        newdata.to_parquet(datafile, partition_cols=['year','month','day'], 
+            existing_data_behavior='delete_matching', basename_template=basename_template)
+        # do not do this here, it rewrites every file once a minute, which is extremely costly
+        # newdata.to_parquet(s3loc, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
     else:
         logger.debug('no newdata')  
     return 
