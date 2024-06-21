@@ -138,6 +138,14 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         logger.debug('no new newdata to concatenate')
         newdata = df
     if newdata is not None:
+        # mask bad outdoor temperatures as NaN, then backfill with adjacent value
+        newdata.temperature_C.mask(newdata.temperature_C > 55, inplace=True) 
+        newdata.temperature_C.mask(newdata.temperature_C < -30, inplace=True) 
+        newdata.temperature_C.mask(newdata.temperature_C == -22.4, inplace=True)
+        newdata.temperature_C.mask(newdata.temperature_C == -14.7, inplace=True)
+        newdata.temperature_C.bfill(inplace=True)
+        newdata.temperature_C.ffill(inplace=True)
+
         newdata['rainchg'] = newdata.rainchg.fillna(0)
         newdata.drop_duplicates(inplace=True)
         newdata.sort_values(by=['timestamp'], inplace=True)
