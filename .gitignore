@@ -21,3 +21,5 @@ testingcontainer/ssh/*
 */.terraform.lock.hcl
 */.terraform/
 */terraform.tfstate*
+apis_services/retired/weatherapi/server.crt
+apis_services/retired/weatherapi/server.key

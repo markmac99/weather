@@ -86,6 +86,13 @@ def heatIndex(t, rh):
     return round(HI,4)
 
 
+def correctBadData(data, prevdata):
+    if data['temperature_C'] > 55 or data['temperature_C'] < -30 or \
+            data['temperature_C'] == -22.4 or data['temperature_C'] == -14.7:
+        data['temperature_C'] = prevdata['temperature_C']
+    return data
+
+
 def dewPoint(t, rh): 
     # t in C, rh as a number eg 90, 50
     E0 = 0.611 # kPa
@@ -110,6 +117,7 @@ def jsonToMQ(fname, priordata, logdir):
             writeLogEntry(logdir, f'data unchanged {lastline}\n')
             return lastline
         eles = json.loads(lastline)
+        eles = correctBadData(eles, priordata)
         t = eles['temperature_C']
         v = eles['wind_avg_km_h']
         h = eles['humidity']
