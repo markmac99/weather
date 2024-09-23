@@ -47,6 +47,19 @@ def sendDataToMQTT(data):
     return ret
 
 
+def sendAllDataToMQTTParent(data):
+    broker, mqport, mquser, mqpass = readConfig()
+    client = mqtt.Client('bresser_wu')
+    client.on_connect = on_connect
+    client.on_publish = on_publish
+    if mquser != '':
+        client.username_pw_set(mquser, mqpass)
+    client.connect(broker, mqport, 60)
+    topic = 'sensors/bresser_wu'
+    ret = client.publish(topic, payload=data, qos=0, retain=False)
+    return ret
+
+
 def writeLogEntry(msg):
     with open(LOG_DIRECTORY+"/getwu.log", mode='a+', encoding='utf-8') as f:
         f.write(msg + '\n')
@@ -90,7 +103,7 @@ def getDataFromWU():
     lati = data_dict['lat']
     lngi = data_dict['lon']
 
-    pressure = round(correctForAltitude(pressure, temp, 80),3)
+    #pressure = round(correctForAltitude(pressure, temp, 80),3) not needed
 
     if temp > 21.1111: # 70F
         feels_like = heatIndex
@@ -131,6 +144,12 @@ def getDataFromWU():
     sendDataToMQTT(['lat', lati])
     sendDataToMQTT(['lng', lngi])
     sendDataToMQTT(['ele', elev])
+
+    alldata = {"outsideTemp": temp, "feels_like": feels_like, "pressure": pressure, "precipTotal": precipTotal,
+                "precipRate": precipRate, "windGust": windGust, "windSpeed": windSpeed, "windDir": windir,
+                "dewPoint": dewpt, "humidity": humid, "UVIdx": uvidx, "solarRadiation": solrad, "obsTimeUtc": dtutc}
+    writeLogEntry('sending all data')
+    sendAllDataToMQTTParent(json.dumps(alldata))
 
     return True
 
