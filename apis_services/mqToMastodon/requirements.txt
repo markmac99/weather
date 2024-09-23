@@ -1,0 +1,3 @@
+# requirements file for the mastodon weather poster
+Mastodon.py
+paho-mqtt

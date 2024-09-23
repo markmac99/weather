@@ -1,0 +1,40 @@
+- hosts: weatherpi3
+  vars_files: 
+    - /mnt/e/dev/apikeys/mqvariables.enc
+  vars:
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/mqToMastodon
+    targdir: ~/source/mqToMastodon
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/postWeather.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/mqToMastodon.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+
+  - name: update broker
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "someserver.net"
+      replace: "wxsatpi"
+
+  - name: update mquser
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "mquser"
+      replace: "sensors"
+
+  - name: update mqpass
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "mqpass"
+      replace: "{{ mqsenspassword }}"
+
+  - name: update mqport 
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "1883"
+      replace: "1883"
