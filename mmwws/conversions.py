@@ -8,7 +8,7 @@ KMHTOMPH = 0.6214
 HPATOINHG = 0.02953
 MMTOIN = 1/25.4
 
-PRESSCORR = 10.0
+PRESSCORR = 10.0 # not used
 
 
 def dewPoint(t, rh): 

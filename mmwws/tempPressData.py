@@ -6,7 +6,7 @@ import os
 import datetime
 import numpy as np
 from dateutil.relativedelta import relativedelta
-from conversions import dewPoint, PRESSCORR
+from conversions import dewPoint
 
 
 def getRangeValues(df, starttime, mins, doaverage=False):
@@ -18,14 +18,14 @@ def getRangeValues(df, starttime, mins, doaverage=False):
     if doaverage:
         return {'temp_c': subdf.temperature_C.mean(), 'humidity': subdf.humidity.mean(),
             'wind_ave': subdf.wind_avg_km_h.mean(), 'wind_max': subdf.wind_max_km_h.max(), 
-            'pressure': subdf.press_rel.mean() + PRESSCORR,
+            'pressure': subdf.press_rel.mean(),
             'rain_mm': subdf.rain_mm.max(), 'wind_dir': subdf.wind_dir_deg.mean(),
             'temp_in': subdf.temp_c_in.mean(), 'hum_in': subdf.humidity_in.mean(), 
             'time': subdf.timestamp.max()}
     else:
         return {'temp_c': subdf.iloc[-1].temperature_C, 'humidity': subdf.iloc[-1].humidity,
             'wind_ave': subdf.iloc[-1].wind_avg_km_h, 'wind_max': subdf.iloc[-1].wind_max_km_h, 
-            'pressure': subdf.iloc[-1].press_rel + PRESSCORR,
+            'pressure': subdf.iloc[-1].press_rel,
             'rain_mm': subdf.iloc[-1].rain_mm, 'wind_dir': subdf.iloc[-1].wind_dir_deg,
             'temp_in': subdf.iloc[-1].temp_c_in, 'hum_in': subdf.iloc[-1].humidity_in, 
             'time': subdf.iloc[-1].timestamp}

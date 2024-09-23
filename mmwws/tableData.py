@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 
 from tempPressData import getRangeValues
 from tableHeaders import amhdr, amrwtempl, amfootr, rerwtempl, refootr
-from conversions import KMHTOMPH, PRESSCORR
+from conversions import KMHTOMPH
 
 
 def recentTable(df, outdir, period=1):
@@ -68,7 +68,7 @@ def recentTable(df, outdir, period=1):
             else:
                 rain = round(max(vals['rain_mm'] - prevrain, 0), 1)
             prevrain = round(vals['rain_mm'], 1)
-            pres = round(vals['pressure'] + PRESSCORR, 1)
+            pres = round(vals['pressure'], 1)
             of.write(rerwtempl.format(ts, temp, hum, wina, winm, rain, pres))
         of.write(refootr.format(pp, hord2))
 
