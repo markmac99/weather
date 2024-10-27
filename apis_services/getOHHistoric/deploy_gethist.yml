@@ -13,3 +13,4 @@
     - {src: '{{srcdir}}/convertOHdata.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/getOHHistoric.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/config.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
