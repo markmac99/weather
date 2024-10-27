@@ -1,0 +1,15 @@
+- hosts: ohserver
+  vars_files: 
+    - /mnt/e/dev/apikeys/mqvariables.enc
+  vars:
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getOHHistoric
+    targdir: ~/src/getOHHistoric
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/convertOHdata.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/getOHHistoric.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/config.txt', dest: '{{targdir}}/', mode: '644', backup: yes }

@@ -23,7 +23,7 @@
     - {src: '{{srcdir}}/tempPressData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/rainData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/convertLegacyData.py', dest: '{{targdir}}/', mode: '644', backup: yes }
-    - {src: '{{srcdir}}/convertOHdata.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/loadOHdata.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/wsCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/hourlyCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mthlyCreator.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
