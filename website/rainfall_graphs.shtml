@@ -110,6 +110,20 @@
                     <!-- /.panel -->
                 </div>
                 <!-- /.col-lg-6 -->
+				<div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            90 Day Rainfall
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div id="dragontail-90day-rainfall"></div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-6 -->
             </div>
             <!-- /.row -->
         </div>
@@ -134,6 +148,7 @@
 	<script src="data/dragontail-24hr-rainfall.js"></script>
 	<script src="data/dragontail-28day-rainfall.js"></script>
 	<script src="data/dragontail-12month-rainfall.js"></script>
+	<script src="data/dragontail-90day-rainfall.js"></script>
 
 
 

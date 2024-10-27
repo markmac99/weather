@@ -78,6 +78,10 @@ def periodRain(df, outdir, period):
         numrows = 28
         dstep = 1
         backdt = now + datetime.timedelta(days = -numrows)
+    elif period == '90day':
+        numrows = 90
+        dstep = 1
+        backdt = now + datetime.timedelta(days = -numrows)
     else:
         numrows=12
         dstep = 99

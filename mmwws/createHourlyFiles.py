@@ -78,6 +78,7 @@ if __name__ == '__main__':
     logger.info('creating rainfall graphs')
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
+    periodRain(df, outdir, '90day')
 
     logger.info('creating wind roses')
     makeRose(df, outdir, 1)
