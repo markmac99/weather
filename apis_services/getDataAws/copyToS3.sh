@@ -8,4 +8,12 @@ source $HOME/venvs/openhabstuff/bin/activate
 # unacceptably
 
 cd ~/weather/raw
-aws s3 sync . s3://mjmm-weatherdata --no-progress --size-only
+
+# check parquet file isn't corrupted
+yr=$(date +%Y)
+python -c "import pandas as pd;df=pd.read_parquet('raw-2023.parquet')"
+if [ $? == 0 ] ; then 
+    aws s3 sync . s3://mjmm-weatherdata --no-progress --size-only
+else
+    echo "parquet file unreadable"
+fi
