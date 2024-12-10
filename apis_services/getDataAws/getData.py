@@ -72,7 +72,7 @@ def addPartition(datafile):
         df = pd.read_parquet(datafile+'.bkp')
         df.sort_index(inplace=True)
         if 'timestamp' not in df:
-            df['timestamp'] = pd.to_datetime(df.index)
+            df['timestamp'] = pd.to_datetime(df.index, utc=True)
         if 'rainchg' not in df:
             df['rainchg'] = df.rain_mm.diff().fillna(0)
             df.loc[df.rainchg < -0.31, ['rainchg']] = 0
@@ -93,13 +93,13 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         #if res.status_code == 200:
         #    newdata = pd.read_json(res.text.strip())
         #    newdata.set_index(['time'], inplace=True)
-        #    newdata['timestamp'] = pd.to_datetime(newdata.index)
+        #    newdata['timestamp'] = pd.to_datetime(newdata.index, utc=True)
         #else:
         #    logger.warning('unable to retrieve data')
         rawdata = json.load(open(os.path.expanduser(os.path.join(srcdir, 'weatherdata.json'))))
         newdata=pd.DataFrame([rawdata])
         newdata.set_index(['time'], inplace=True)
-        newdata['timestamp'] = pd.to_datetime(newdata.index)
+        newdata['timestamp'] = pd.to_datetime(newdata.index, utc=True)
         newdata['year'] = [v.year for v in newdata.timestamp]
         newdata['month'] = [v.month for v in newdata.timestamp]
         newdata['day'] = [v.day for v in newdata.timestamp]
@@ -116,7 +116,7 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         df.sort_index(inplace=True)
         df.drop_duplicates(inplace=True)
         if 'timestamp' not in df:
-            df['timestamp'] = pd.to_datetime(df.index)
+            df['timestamp'] = pd.to_datetime(df.index, utc=True)
         if 'rainchg' not in df:
             df['rainchg'] = df.rain_mm.diff().fillna(0)
             df.loc[df.rainchg < -0.31, ['rainchg']] = 0

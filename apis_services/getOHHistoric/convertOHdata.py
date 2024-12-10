@@ -68,7 +68,7 @@ def getDataFromInflux(outdir, r_adj, t_adj, startdt, enddt, host='ohserver', por
     fulldf.rain_mm.mask(fulldf.rain_mm < 0, inplace=True) # remove bad data
 
     fulldf.set_index(keys=['time'],inplace=True)
-    fulldf['timestamp'] = pd.to_datetime(fulldf.index)
+    fulldf['timestamp'] = pd.to_datetime(fulldf.index, utc=True)
 
     if 'rainchg' not in fulldf:
         fulldf['rainchg'] = fulldf.rain_mm.diff().fillna(0)
