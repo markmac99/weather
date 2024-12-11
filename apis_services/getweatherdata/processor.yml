@@ -1,7 +1,7 @@
 - hosts: wordpresssite
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getDataAws
-    apidir: ~/src/weatherprocessor
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getweatherdata
+    apidir: ~/src/getweatherdata
   tasks:
 
   - name: Copy files

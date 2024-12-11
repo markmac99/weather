@@ -3,8 +3,8 @@ Description=Get Weatherstation Data
 After=network.target
 
 [Service]
-ExecStart=/home/bitnami/src/weatherprocessor/startGetData.sh
-ExecStop=/home/bitnami/src/weatherprocessor/stopGetData.sh
+ExecStart=/home/bitnami/src/getweatherdata/startGetData.sh
+ExecStop=/home/bitnami/src/getweatherdata/stopGetData.sh
 Restart=always
 RestartSec=5
 User=bitnami
