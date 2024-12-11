@@ -36,7 +36,9 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data, logdir):
+    writeLogEntry('reading mq details')
     broker, mqport, username, password = readConfig()
+    writeLogEntry('got mq details')
     client = mqtt.Client('bmp280_fwd')
     client.on_connect = on_connect
     client.on_publish = on_publish
