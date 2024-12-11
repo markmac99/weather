@@ -11,9 +11,11 @@ cd ~/weather/raw
 
 # check parquet file isn't corrupted
 yr=$(date +%Y)
-python -c "import pandas as pd;df=pd.read_parquet('raw-2023.parquet')"
+python -c "import pandas as pd;df=pd.read_parquet('raw-${yr}.parquet')"
 if [ $? == 0 ] ; then 
-    aws s3 sync . s3://mjmm-weatherdata --no-progress --size-only
+    echo "backing up to S3"
+    aws s3 sync . s3://mjmm-weatherdata  --size-only
 else
     echo "parquet file unreadable"
+    python $here/sendAnEmail.py markmcintyre99@googlemail.com "weather parquet file corrupt" "alert from weather" weather@wordpresssite
 fi
