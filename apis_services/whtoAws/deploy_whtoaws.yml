@@ -13,6 +13,8 @@
     - {src: '{{srcdir}}/whToAws.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/install.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/createHistoric.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/loadHistoric.py', dest: '{{targdir}}/', mode: '644', backup: yes }
 
 #  - name: update broker
 #    ansible.builtin.replace:
