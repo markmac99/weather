@@ -15,3 +15,5 @@
     - {src: '{{srcdir}}/getweatherdata.service', dest: '{{apidir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{apidir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/copyToS3.sh', dest: '{{apidir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/sendAnEmail.py', dest: '{{apidir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/dailyReboot.sh', dest: '{{apidir}}/', mode: '754', backup: yes }
