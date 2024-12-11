@@ -83,6 +83,29 @@ def cleanData(yr, srcdir):
         existing_data_behavior='delete_matching', basename_template=basename_template)
 
 
+def addTSColumn(yr):
+    datafile = f'raw-{yr}.parquet'
+    targdir = os.path.expanduser('~/weather/raw')
+    newdata = pd.read_parquet(os.path.join(targdir, datafile))
+    newdata['timestamp'] = pd.to_datetime(newdata.index, utc=True)
+    basename_template='weatherdata_{i}'
+    newdata.to_parquet(os.path.join(targdir, datafile), partition_cols=['year','month','day'], 
+        existing_data_behavior='delete_matching', basename_template=basename_template)
+
+
+def dropNAHum(yr):
+    datafile = f'raw-{yr}.parquet'
+    targdir = os.path.expanduser('~/weather/raw')
+    pfile = os.path.join(targdir, datafile)
+    newdata = pd.read_parquet(pfile)
+    print(f'currently {len(newdata)} records')
+    newdata.dropna(subset=['humidity_in'], inplace=True)
+    print(f'now {len(newdata)} records, writing to {pfile}')
+    basename_template='weatherdata_{i}'
+    newdata.to_parquet(pfile+'_new', partition_cols=['year','month','day'], 
+        existing_data_behavior='delete_matching', basename_template=basename_template)
+
+
 if __name__ == '__main__':
     yr = datetime.datetime.now().year
     if len(sys.argv)>1:

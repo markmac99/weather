@@ -39,7 +39,7 @@ def loadADay(dtval, srcdir):
     df['timestamp'] = pd.to_datetime(df.time + 'Z')
     df['time']=[x.strftime('%Y-%m-%dT%H:%M:%SZ') for x in df.timestamp]
     df['rainchg'] = df.rain_mm.diff().fillna(0)
-    df['apressure'] = [correctForAltitude(p, t, 80) for p,t in zip(df.temperature_C, df.press_rel)]
+    df['apressure'] = [correctForAltitude(p, t, 80) for p,t in zip(df.press_rel, df.temperature_C)]
     df.set_index(['time'],inplace=True)
     df = df.drop(axis=1, labels=['wind_ave','wind_max','wind_dir','spare'])
     df['model'] = 'Fineoffset-WHx080'
