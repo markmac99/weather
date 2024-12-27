@@ -49,16 +49,6 @@ def loadADay(dtval, srcdir):
     return df
 
 
-def fixBadRain():
-    datafile='/home/bitnami/weather/raw/raw-2024.parquet'
-    df = pd.read_parquet(datafile)
-    df['rainchg'] = df.rain_mm.diff().fillna(0)
-    df.loc[df.rainchg < -0.31, ['rainchg']] = 0
-    df2 = df[(df.month==2) & (df.rainchg>0.25)]
-    df.loc[df2.index, 'rainchg'] = 0
-    df.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')    
-
-
 def mergeData():
     olddf = pd.read_parquet('tmp/raw-2023.parquet')
     newdf = pd.read_parquet('raw-2023.parquet')

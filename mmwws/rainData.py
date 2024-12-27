@@ -114,28 +114,3 @@ def periodRain(df, outdir, period):
         of.write("       postUnits: 'mm',\n        resize: true\n")
         of.write("});\n});\n")
     return 
-
-
-
-def fixupRainData():
-    yr = 2023
-    rawdir = '/home/bitnami/weather/raw'
-
-    # general fixer upper which will need tweaked for every use-case i discover
-    #startdt = datetime.datetime(2023, 10, 27)
-    #enddt = datetime.datetime(2023, 11, 23)
-    #adj = 846.4
-
-    df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
-#    df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] = \
-#        df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] - adj
-#    df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] = \
-#        df.loc[(df.timestamp >=pd.Timestamp(startdt, tz='UTC')) & (df.timestamp < pd.Timestamp(enddt, tz='UTC')), ['rain_mm']] - adj
-    #df.loc[df.rain_mm==28.5, ['rain_mm']] = np.nan
-    df.rain_mm.mask(round(df.rain_mm,1) == 8.1, inplace=True)
-    df.rain_mm.mask(round(df.rain_mm,1) == 8.5, inplace=True)
-    df.rain_mm.mask(round(df.rain_mm,1) == 8.9, inplace=True)
-    df.rain_mm.ffill(inplace=True) # and backfill 
-    df['rainchg'] = df.rain_mm.diff().fillna(0)
-    df.loc[df.rainchg < -0.31, ['rainchg']] = 0
-    df.to_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))

@@ -7,15 +7,30 @@ source $HOME/venvs/openhabstuff/bin/activate
 # it saves, and so we would have tens of thousands of writes per day, driving up cost
 # unacceptably
 
-cd ~/weather/raw
+datadir=~/weather/raw
 
-# check parquet file isn't corrupted
+# check parquet file isn't corrupted or being written to
 yr=$(date +%Y)
-python -c "import pandas as pd;df=pd.read_parquet('raw-${yr}.parquet')"
+python << EOD
+import pandas as pd
+from time import sleep
+import os
+loopctr=0
+while loopctr < 5:
+    try:
+        df=pd.read_parquet(os.path.expanduser('${datadir}/raw-${yr}.parquet'))
+        exit(0)
+    except Exception:
+        sleep(6)
+        loopctr +=1
+exit(1)
+EOD
 if [ $? == 0 ] ; then 
     echo "backing up to S3"
-    aws s3 sync . s3://mjmm-weatherdata  --size-only
+    sudo systemctl stop getweatherdata    
+    aws s3 sync ${datadir} s3://mjmm-weatherdata  --size-only
+    sudo systemctl start getweatherdata
 else
     echo "parquet file unreadable"
-    python $here/sendAnEmail.py markmcintyre99@googlemail.com "weather parquet file corrupt" "alert from weather" weather@wordpresssite
+    python $here/sendAnEmail.py markmcintyre99@googlemail.com "weather parquet file unreadable" "alert from weather" weather@wordpresssite
 fi

@@ -39,7 +39,10 @@ def getDataFromInflux(outdir, r_adj, t_adj, startdt, enddt, host='ohserver', por
     res = client.query(f"select mean(value) from rain_b where time > '{startdt}' and time <= '{enddt}' group by time(1m)")
     raindf = pd.DataFrame(res.get_points()).bfill().ffill()
     raindf.rename(columns={'mean':'rain_mm'}, inplace=True)
-    startrain = raindf.iloc[0].rain_mm
+    if len(raindf)> 0:
+        startrain = raindf.iloc[0].rain_mm
+    else:
+        startrain = 0.0
     print('got rain data')
 
     res = client.query(f"select mean(value) from BresserWS_temp where time > '{startdt}' and time <= '{enddt}' group by time(1m)")

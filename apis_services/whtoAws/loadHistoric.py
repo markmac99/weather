@@ -11,6 +11,7 @@ import json
 import paramiko
 from scp import SCPClient
 import os
+import sys
 import datetime
 import pandas as pd
 import numpy as np
@@ -18,7 +19,7 @@ import numpy as np
 from whConfig import loadHistConfig
 
 
-def loadAndSave(whfile, bpfile, targfile):
+def loadOneDay(whfile, bpfile):
     whdata = open(whfile, 'r').readlines()
     jsd = ''
     for li in whdata:
@@ -50,7 +51,38 @@ def loadAndSave(whfile, bpfile, targfile):
 
     whdf['rainchg'] = whdf.rain_mm.diff().fillna(0)
     whdf.loc[whdf.rainchg < -0.31, ['rainchg']] = 0
+    return whdf
 
+
+def loadAndSave(origwhfile, origbpfile, targfile, startdt=None, enddt=None):
+    today = datetime.datetime.now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+    if startdt is not None:
+        d1 = startdt.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+        d2 = enddt.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+        numdays = (d2 - d1).days + 1
+        whdf = None
+        finished = False
+        for step in range(numdays):
+            thisdt = d1 + datetime.timedelta(days=step)
+            if thisdt != today:
+                whfile = f'{origwhfile}.{thisdt.strftime("%Y%m%d")}'
+                bpfile = f'{origbpfile}.{thisdt.strftime("%Y%m%d")}'
+                finished = True
+            else: 
+                whfile = origwhfile
+                bpfile = origbpfile
+            if whdf is None:
+                whdf = loadOneDay(whfile, bpfile)
+            else:
+                newdf = loadOneDay(whfile, bpfile)
+                whdf = whdf.append(newdf)
+            if finished: 
+                whdf = whdf[whdf.timestamp >= startdt.timestamp]
+                whdf = whdf[whdf.timestamp <= enddt.timestamp]
+                break
+
+    else:
+        whdf = loadOneDay(whfile, bpfile)
     whdf.to_parquet(targfile)
 
 
@@ -75,6 +107,14 @@ def uploadFile(fname, remotedir):
 
 if __name__ == '__main__':
     whfile, bpfile, targfile, remotedir = loadHistConfig()
-    loadAndSave(whfile, bpfile, targfile)
+    startdt = None
+    enddt = None
+    if len(sys.argv)> 2:
+        startdt = datetime.datetime.strptime(sys.argv[1],'%Y-%m-%dT%H:%M:%SZ')
+        enddt = datetime.datetime.now()
+    if len(sys.argv)> 3:
+        enddt = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%dT%H:%M:%SZ')
+
+        loadAndSave(whfile, bpfile, targfile, startdt, enddt)
     if len(targfile) > 5:
         uploadFile(targfile, remotedir)
