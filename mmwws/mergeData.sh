@@ -5,7 +5,7 @@ source $HOME/venvs/openhabstuff/bin/activate
 sudo systemctl stop getweatherdata
 outdir=$HOME/weather/raw
 tmpdir=$HOME/weather/tmp
-yr=2024
+yr=$(date +%Y)
 mkdir -p $outdir/bkp
 cp -r $outdir/raw-$yr.parquet $outdir/bkp/raw-$yr.parquet.$(date +%Y%m%d-%h%m%s)
 python -c "from loadOHdata import mergeDataIn;mergeDataIn('$outdir', '$tmpdir', $yr);"

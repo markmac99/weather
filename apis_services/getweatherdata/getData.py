@@ -85,7 +85,8 @@ def addPartition(datafile):
 
 def getNewData(datafile, srcdir, s3loc, url=None, key=None):
     #logger.warning(url)
-    newdata = None    
+    newdata = None
+    df = None
     try:
         #requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
         #headers={'x-api-key': key}
@@ -134,10 +135,11 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         newdata = pd.concat([df, newdata])
         newdata.drop_duplicates(inplace=True)
         #logger.debug(f'{lastrain} {newdata.rain_mm} ')
-    else:
-        logger.debug('no new newdata to concatenate')
+    if df is not None and newdata is None:
+        logger.debug('no new data to concatenate')
         newdata = df
     if newdata is not None:
+        logger.debug('cleaning new data if needed')
         # mask bad outdoor temperatures as NaN, then backfill with adjacent value
         newdata.temperature_C.mask(newdata.temperature_C > 55, inplace=True) 
         newdata.temperature_C.mask(newdata.temperature_C < -30, inplace=True) 
@@ -146,7 +148,11 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         newdata.temperature_C.bfill(inplace=True)
         newdata.temperature_C.ffill(inplace=True)
 
-        newdata['rainchg'] = newdata.rainchg.fillna(0)
+        try:
+            newdata['rainchg'] = newdata.rainchg.fillna(0)
+        except:
+            # above will fail if only one record
+            pass
         newdata.drop_duplicates(inplace=True)
         newdata.sort_values(by=['timestamp'], inplace=True)
         logger.info(f'saving updated data with {len(newdata)} records')
@@ -156,7 +162,7 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         # do not do this here, it rewrites every file once a minute, which is extremely costly
         # newdata.to_parquet(s3loc, partition_cols=['year','month','day'], existing_data_behavior='delete_matching')
     else:
-        logger.debug('no newdata')  
+        logger.debug('no data at all')  
     return 
 
 
