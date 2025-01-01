@@ -5,7 +5,7 @@
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
 
-weatherdir=/home/pi/weather
+weatherdir=WEATHERDIR
 
 source /home/pi/venvs/pywws/bin/activate
 rm -f $weatherdir/stopbmp280

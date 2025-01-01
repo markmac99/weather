@@ -1,0 +1,53 @@
+- hosts: weatherpi3
+  vars_files: 
+    - /mnt/e/dev/apikeys/mqvariables.enc
+  vars:
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/readBmp280
+    targdir:  "{{ ansible_env.HOME }}/source/readbmp280"
+    weatherdir: "{{ ansible_env.HOME }}/weather"
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/bmp280.service', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/bmp280.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+    - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+    - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/readBmp280.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+
+  - name: update broker bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "someserver.net"
+      replace: "wxsatpi"
+  - name: update mquser bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "someuser"
+      replace: "sensors"
+  - name: update mqpasswd bmp280
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "changeme"
+      replace: "{{ mqsenspassword }}"
+
+  - name: update SRCDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/bmp280.service'
+      regexp: "SRCDIR"
+      replace: " {{ targdir }}"
+
+  - name: update WEATHERDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/bmp280.service'
+      regexp: "WEATHERDIR"
+      replace: "{{ weatherdir }}"
+  - name: update WEATHERDIR 2
+    ansible.builtin.replace:
+      path: '{{targdir}}/bmp280.sh'
+      regexp: "WEATHERDIR"
+      replace: "{{ weatherdir }}"

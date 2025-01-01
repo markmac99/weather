@@ -15,7 +15,6 @@ from bme280 import bme280, bme280_i2c
 
 
 def writeLogEntry(logdir, msg):
-    #with open(os.path.join(logdir, "bmp280-"+datetime.datetime.now().strftime("%Y%m%d")+".log"), mode='a+', encoding='utf-8') as f:
     with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
         nowdt = datetime.datetime.utcnow().isoformat()
         f.write(f'{nowdt}: {msg}')
@@ -36,9 +35,9 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data, logdir):
-    writeLogEntry('reading mq details')
+    writeLogEntry(logdir, 'reading mq details')
     broker, mqport, username, password = readConfig()
-    writeLogEntry('got mq details')
+    writeLogEntry(logdir,'got mq details')
     client = mqtt.Client('bmp280_fwd')
     client.on_connect = on_connect
     client.on_publish = on_publish
