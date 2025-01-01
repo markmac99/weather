@@ -2,8 +2,8 @@
   vars_files: 
     - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getbresser
-    wudir: ~/weather/getwu
+    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getbresserwu
+    wudir: "{{ ansible_env.HOME }}/source/getbresswu"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
@@ -15,7 +15,7 @@
     - {src: '{{srcdir}}/mqConfig.py', dest: '{{wudir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/getBresserData.sh', dest: '{{wudir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/installGetWu.sh', dest: '{{wudir}}/', mode: '754', backup: yes }
-    - {src: '{{srcdir}}/getwu.service', dest: '{{wudir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/getbresswu.service', dest: '{{wudir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{wudir}}/', mode: '644', backup: yes }
 
   - name: update broker
@@ -41,3 +41,16 @@
       path: '{{wudir}}/mqConfig.py'
       regexp: "1883"
       replace: "1883"
+
+  - name: update SRCDIR
+    ansible.builtin.replace:
+      path: '{{wudir}}/getbresswu.service'
+      regexp: "SRCDIR"
+      replace: "{{ wudir }}"
+
+  - name: update HOMEDIR
+    ansible.builtin.replace:
+      path: '{{wudir}}/getBresserData.sh'
+      regexp: "HOMEDIR"
+      replace: "{{ ansible_env.HOME }}"
+

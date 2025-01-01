@@ -5,8 +5,8 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-ExecStart=/home/pi/weather/getwu/getBresserData.sh
-ExecStop=/usr/bin/touch /home/pi/weather/getwu/stopwu
+ExecStart=SRCDIR/getBresserData.sh
+ExecStop=/usr/bin/touch SRCDIR/stopwu
 Restart=always
 RestartSec=5
 
