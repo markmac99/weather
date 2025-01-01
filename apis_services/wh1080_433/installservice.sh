@@ -8,12 +8,8 @@
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
 
-sudo cp rtl2mq.service /etc/systemd/system/
-sudo cp rtl_433.service /etc/systemd/system/
+sudo cp wh1080_rtl433.service /etc/systemd/system/
 sudo cp rtl-sdr.rules /etc/udev/rules.d/
+sudo systemctl enable wh1080_rtl433
 sudo systemctl daemon-reload
-echo need to reboot now
-sudo systemctl enable rtl2mq
-sudo systemctl start rtl2mq
-sudo systemctl enable rtl_433
-sudo systemctl start rtl_433
+sudo systemctl start wh1080_rtl433

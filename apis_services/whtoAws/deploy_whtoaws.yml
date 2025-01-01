@@ -1,7 +1,7 @@
 - hosts: weatherpi3
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/whtoAws
-    targdir: ~/weather/whtoaws
+    targdir: ~/source/whtoaws
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:

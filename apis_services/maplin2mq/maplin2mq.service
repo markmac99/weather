@@ -1,10 +1,10 @@
 [Unit]
-Description=Get WH1080 data from Rtl433
+Description=Push data from WH1080 to MQTT
 After=network.target
 
 [Service]
-ExecStart=/home/pi/weather/rtl433/runRtl433.sh
-ExecStop=/home/pi/weather/rtl433/stopRtl433.sh
+ExecStart=/home/pi/source/maplin2mq/wh1080_mq.sh
+ExecStop=/usr/bin/touch /home/pi/weather/stopwhfwd
 Restart=always
 RestartSec=5
 
