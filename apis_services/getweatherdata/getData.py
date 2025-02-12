@@ -145,6 +145,7 @@ def getNewData(datafile, srcdir, s3loc, url=None, key=None):
         newdata.temperature_C.mask(newdata.temperature_C < -30, inplace=True) 
         newdata.temperature_C.mask(newdata.temperature_C == -22.4, inplace=True)
         newdata.temperature_C.mask(newdata.temperature_C == -14.7, inplace=True)
+        newdata.temperature_C.mask(newdata.temperature_C == -16.1, inplace=True)
         newdata.temperature_C.bfill(inplace=True)
         newdata.temperature_C.ffill(inplace=True)
 

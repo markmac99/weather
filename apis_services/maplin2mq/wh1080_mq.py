@@ -87,9 +87,17 @@ def heatIndex(t, rh):
 
 
 def correctBadData(data, prevdata):
-    if data['temperature_C'] > 55 or data['temperature_C'] < -30 or \
-            data['temperature_C'] == -22.4 or data['temperature_C'] == -14.7:
+    # these values indicate impossible temps for the UK
+    if data['temperature_C'] > 55 or data['temperature_C'] < -30:
         data['temperature_C'] = prevdata['temperature_C']
+
+    # these values indicate dodgy data
+    if data['temperature_C'] == -22.4 or data['temperature_C'] == -14.7 or data['temperature_C'] == -16.1:
+        data['temperature_C'] = prevdata['temperature_C']
+        data['wind_max_km_h'] = prevdata['wind_max_km_h']
+        data['wind_avg_km_h'] = prevdata['wind_avg_km_h']
+        data['rain_mm'] = prevdata['rain_mm']
+        data['humidity'] = prevdata['humidity']
     return data
 
 
