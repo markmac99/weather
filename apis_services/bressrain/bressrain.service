@@ -1,0 +1,9 @@
+[Unit]
+Description=Runn bresser hourly rain calculator
+After=syslog.target
+
+[Service]
+ExecStart=SRCDIR/getBressRain.sh
+
+[Install]
+WantedBy=multi-user.target

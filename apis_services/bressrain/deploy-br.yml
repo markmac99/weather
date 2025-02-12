@@ -3,7 +3,7 @@
     - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/bressrain
-    dsdir: ~/source/bressrain
+    dsdir: "{{ ansible_env.HOME }}/source/bressrain"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
@@ -11,6 +11,8 @@
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
     - {src: '{{srcdir}}/getBressRain.sh', dest: '{{dsdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/bressrain.timer', dest: '{{dsdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/bressrain.service', dest: '{{dsdir}}/', mode: '644', backup: yes }
   - name: update mquser 
     ansible.builtin.replace:
       path: '{{dsdir}}/getBressRain.sh'
@@ -21,3 +23,9 @@
       path: '{{dsdir}}/getBressRain.sh'
       regexp: "changeme"
       replace: "{{ mqsenspassword }}"
+
+  - name: update SRCDIR
+    ansible.builtin.replace:
+      path: '{{dsdir}}/bressrain.service'
+      regexp: "SRCDIR"
+      replace: "{{ dsdir }}"

@@ -1,0 +1,9 @@
+[Unit]
+Description=Bressrain scheduler
+
+[Timer]
+OnBootSec=0min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=multi-user.target
