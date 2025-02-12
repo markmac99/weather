@@ -8,6 +8,21 @@ import sys
 import datetime
 
 
+def removeBadRow(yr, datadir, timestr):
+    datafile=f'{datadir}/raw-{yr}.parquet'
+    df = pd.read_parquet(datafile)
+    evtstart = datetime.datetime.strptime(timestr, '%Y%m%d-%H%M%S') + datetime.timedelta(seconds=-30)
+    evtend = datetime.datetime.strptime(timestr, '%Y%m%d-%H%M%S') + datetime.timedelta(seconds=+30)
+    evtend = evtend.replace(tzinfo=datetime.timezone.utc)
+    evtstart = evtstart.replace(tzinfo=datetime.timezone.utc)
+    subdf=df[df.timestamp>evtstart]
+    subdf=subdf[subdf.timestamp<evtend]
+    newdf = df.drop(subdf.index)
+    basename_template='weatherdata_{i}'
+    newdf.to_parquet(datafile, partition_cols=['year','month','day'], existing_data_behavior='delete_matching', basename_template=basename_template)
+    return 
+
+
 def fixBadRain(datadir, yr):
     datafile=f'{datadir}/raw-{yr}.parquet'
     df = pd.read_parquet(datafile)
@@ -136,5 +151,10 @@ if __name__ == '__main__':
     targdir = os.path.expanduser('~/weather/raw')
     if len(sys.argv)>2:
         targdir = os.path.expanduser(sys.argv[2])
-    print(f'processing {yr}, output to {targdir}')
-    cleanData(yr, targdir)
+    if len(sys.argv) > 3:
+        badrowts = sys.argv[3]
+        print('removing bad row')
+        removeBadRow(yr, targdir, badrowts)
+    else:
+        print(f'processing {yr}, output to {targdir}')
+        cleanData(yr, targdir)
