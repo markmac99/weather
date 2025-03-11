@@ -19,8 +19,22 @@ import numpy as np
 from whConfig import loadHistConfig
 
 
-def loadOneDay(whfile, bpfile):
-    whdata = open(whfile, 'r').readlines()
+def loadOneDay(whfile, bpfile, lastwhdata=None, lastbpdata=None):
+    whdata = None
+    bpdata = None
+    try:
+        whdata = open(whfile, 'r').readlines()
+    except:
+        whdata = lastwhdata
+    try:
+        bpdata = open(bpfile, 'r').readlines()
+    except:
+        bpdata = lastbpdata
+
+    if len(whdata) == 0:
+        whdata = lastwhdata
+    if len(bpdata) == 0:
+        bpdata = lastbpdata
     jsd = ''
     for li in whdata:
         jsd = jsd + li.strip() + ','
@@ -30,7 +44,6 @@ def loadOneDay(whfile, bpfile):
     whdf.drop_duplicates(inplace=True)
     whdf['timestamp']=[datetime.datetime.strptime(v, '%Y-%m-%d %H:%M:%S').replace(tzinfo=datetime.timezone.utc) for v in whdf.index]
     
-    bpdata = open(bpfile, 'r').readlines()
     jsd = ''
     for li in bpdata:
         jsd = jsd + li.strip() + ','
@@ -51,31 +64,35 @@ def loadOneDay(whfile, bpfile):
 
     whdf['rainchg'] = whdf.rain_mm.diff().fillna(0)
     whdf.loc[whdf.rainchg < -0.31, ['rainchg']] = 0
-    return whdf
+    return whdf, whdata, bpdata
 
 
 def loadAndSave(origwhfile, origbpfile, targfile, startdt=None, enddt=None):
     today = datetime.datetime.now().replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+    if enddt is None:
+        enddt = datetime.datetime.now()
     if startdt is not None:
         d1 = startdt.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
         d2 = enddt.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
         numdays = (d2 - d1).days + 1
         whdf = None
         finished = False
+        lastbpdata = None
+        lastwhdata = None
         for step in range(numdays):
             thisdt = d1 + datetime.timedelta(days=step)
+            print('processing', thisdt.strftime('%Y-%m-%d'))
             if thisdt != today:
                 whfile = f'{origwhfile}.{thisdt.strftime("%Y%m%d")}'
                 bpfile = f'{origbpfile}.{thisdt.strftime("%Y%m%d")}'
-                finished = True
             else: 
                 whfile = origwhfile
                 bpfile = origbpfile
             if whdf is None:
-                whdf = loadOneDay(whfile, bpfile)
+                whdf, lastwhdata, lastbpdata = loadOneDay(whfile, bpfile)
             else:
-                newdf = loadOneDay(whfile, bpfile)
-                whdf = whdf.append(newdf)
+                newdf, lastwhdata, lastbpdata = loadOneDay(whfile, bpfile, lastwhdata, lastbpdata)
+                whdf = pd.concat([whdf,newdf])
             if finished: 
                 whdf = whdf[whdf.timestamp >= startdt.timestamp]
                 whdf = whdf[whdf.timestamp <= enddt.timestamp]
@@ -115,6 +132,7 @@ if __name__ == '__main__':
     if len(sys.argv)> 3:
         enddt = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%dT%H:%M:%SZ')
 
-        loadAndSave(whfile, bpfile, targfile, startdt, enddt)
+    print('processing', startdt, enddt)
+    loadAndSave(whfile, bpfile, targfile, startdt, enddt)
     if len(targfile) > 5:
         uploadFile(targfile, remotedir)

@@ -6,4 +6,4 @@ here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
 
 source /home/pi/venvs/pywws/bin/activate
-python $here/loadHistoric.py $1 $2
+python $here/loadHistoric.py "$1" "$2"
