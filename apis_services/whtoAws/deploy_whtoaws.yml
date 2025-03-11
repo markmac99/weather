@@ -1,4 +1,6 @@
 - hosts: weatherpi3
+  vars_files: 
+    - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/whtoAws
     targdir: ~/source/whtoaws
@@ -9,6 +11,7 @@
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
     - {src: '{{srcdir}}/whToAws.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/sqlInterface.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/whConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/whToAws.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/install.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
@@ -16,8 +19,8 @@
     - {src: '{{srcdir}}/createHistoric.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
     - {src: '{{srcdir}}/loadHistoric.py', dest: '{{targdir}}/', mode: '644', backup: yes }
 
-#  - name: update broker
-#    ansible.builtin.replace:
-#      path: '{{targdir}}/whConfig.py'
-#      regexp: "someserver.net"
-#      replace: "wxsatpi"
+  - name: update SQLpass
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "SQLPASSTOCHANGE"
+      replace: "{{ wh1080dbpassword }}"

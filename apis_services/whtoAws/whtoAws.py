@@ -14,6 +14,7 @@ import os
 import datetime
 
 from whConfig import loadConfig
+from sqlInterface import postToMySQL
 
 
 def loadAndSave(whfile, bpfile, targfile):
@@ -63,3 +64,9 @@ if __name__ == '__main__':
     loadAndSave(whfile, bpfile, targfile)
     if len(targfile) > 5:
         uploadFile(targfile, remotedir)
+        try:
+            postToMySQL(targfile)
+        except Exception as e:
+            print('failed to update mysql')
+            print(e)
+            pass

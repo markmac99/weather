@@ -3,3 +3,4 @@ paramiko
 scp
 pandas
 pyarrow
+pymysql

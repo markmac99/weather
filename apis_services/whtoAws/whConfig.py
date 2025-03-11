@@ -19,6 +19,14 @@ def loadConfig():
     return whfile, bpfile, targfile, remotedir
 
 
+def loadSQLconfig():
+    sqldb = 'weather'
+    sqluser = 'wh1080'
+    sqlpass = 'SQLPASSTOCHANGE'
+    sqlserver = 'wordpresssite'
+    return sqldb, sqluser, sqlpass, sqlserver
+
+
 def loadHistConfig():
     whfile = 'weatherdata.json'
     bpfile = 'bmp280.json'
