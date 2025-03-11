@@ -13,7 +13,7 @@ import shutil
 #import requests
 #from urllib3.exceptions import InsecureRequestWarning
 
-from apiConfig import apiUrl, apiKey, basedir, pause
+from apiConfig import basedir, pause
 
 logger = logging.getLogger('mqtofile')
 
@@ -83,20 +83,11 @@ def addPartition(datafile):
         df.to_parquet(datafile, partition_cols=['year','month','day'])
 
 
-def getNewData(datafile, srcdir, s3loc, url=None, key=None):
+def getNewData(datafile, srcdir):
     #logger.warning(url)
     newdata = None
     df = None
     try:
-        #requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-        #headers={'x-api-key': key}
-        #res = requests.get(url, headers=headers, verify=False)
-        #if res.status_code == 200:
-        #    newdata = pd.read_json(res.text.strip())
-        #    newdata.set_index(['time'], inplace=True)
-        #    newdata['timestamp'] = pd.to_datetime(newdata.index, utc=True)
-        #else:
-        #    logger.warning('unable to retrieve data')
         rawdata = json.load(open(os.path.expanduser(os.path.join(srcdir, 'weatherdata.json'))))
         newdata=pd.DataFrame([rawdata])
         newdata.set_index(['time'], inplace=True)
@@ -184,6 +175,5 @@ if __name__ == '__main__':
     while keepgoing:
         yr = datetime.datetime.now().year
         fname = os.path.expanduser(os.path.join(outdir, f'raw-{yr}.parquet'))
-        s3loc = f's3://mjmm-weatherdata/raw-{yr}.parquet'
-        getNewData(fname, indir, s3loc, apiUrl, apiKey)
+        getNewData(fname, indir)
         time.sleep(pause)
