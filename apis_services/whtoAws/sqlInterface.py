@@ -29,12 +29,11 @@ def postToMySQL(targfile):
     lastdata = cur.fetchone()
     prevrain = lastdata[0]
     rainchg = whdata['rain_mm'] - prevrain
-    if rainchg > -0.31 and rainchg < 150:
+    if rainchg > -0.31 and rainchg < 50:
         whdata['rainchg'] = rainchg
         
     prevtempc = lastdata[1]
-    if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or whdata['temperature_C'] == -16.1 \
-            or whdata['temperature_C'] == -22.4 or whdata['temperature_C'] == -14.7:
+    if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 10:
         whdata['temperature_C'] = prevtempc
 
     sql = " INSERT INTO wh1080data (time, model, subtype, id, battery_ok, temperature_C, humidity,"\

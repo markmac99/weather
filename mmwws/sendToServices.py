@@ -10,12 +10,12 @@ import datetime
 import configparser
 import os
 import sys
-import platform
-import time 
 import logging
 from logging.handlers import RotatingFileHandler
 
 from conversions import dewPoint, CtoF, KMHTOMPH, MMTOIN, HPATOINHG
+from sqlInterface import loadDfFromDB
+
 
 logger = logging.getLogger('weather_services')
 
@@ -152,6 +152,7 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
+    logger.info('starting')
     now = datetime.datetime.now()
     yr = now.year
     if len(sys.argv) < 2:
@@ -159,31 +160,10 @@ if __name__ == '__main__':
     else:
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
-    rawdir = outdir.replace('data','raw')
-    if platform.node() != 'wordpresssite':
-        df = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr}.parquet')
-        df2 = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr-1}.parquet')
-    else:
-        # current years datafile may be in the process of getting written to
-        retries = 0
-        while retries < 5:
-            try:
-                logger.info('loading datafiles')
-                df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
-                break
-            except:
-                logger.info('file in use, waiting 5s')
-                time.sleep(5)
-                retries += 1
-        if retries == 5:
-            logger.warning('unable to open datafile, aborting')
-            exit(0)
-        # only load last years data if needed
-        if (now +datetime.timedelta(days=-32)).year != yr:
-            df2 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr-1}.parquet'))
-            df = pd.concat([df2,df])
 
-    df.sort_index(inplace=True)
+    df = loadDfFromDB(1)
+    logger.info(f'loaded {len(df)} records')
+
     nowzeroed = now.replace(hour=0, minute=0, second=0, microsecond=0)
     df = df[df.timestamp >= pd.Timestamp(nowzeroed, tz='UTC')]
     rainstart = df.iloc[0].rain_mm

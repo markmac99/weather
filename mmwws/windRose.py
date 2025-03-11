@@ -11,10 +11,9 @@ import datetime
 import seaborn
 import os
 import sys
-import platform
-import time
 
 from conversions import KMHTOMPH
+from sqlInterface import loadDfFromDB
 
 
 def _speedLabels(bins, units):   
@@ -112,28 +111,8 @@ if __name__ =='__main__':
     else:
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
-    rawdir = outdir.replace('data','raw')
-    if platform.node() != 'wordpresssite':
-        df = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr}.parquet')
-        df2 = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr-1}.parquet')
-    else:
-        # current years datafile may be in the process of getting written to
-        retries = 0
-        while retries < 5:
-            try:
-                print('loading datafiles')
-                df = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
-                break
-            except:
-                print('file in use, waiting 5s')
-                time.sleep(5)
-                retries += 1
-        if retries == 5:
-            print('unable to open datafile, aborting')
-            exit(0)
-        # only load last years data if needed
-        if (now +datetime.timedelta(days=-32)).year != yr:
-            df2 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr-1}.parquet'))
-            df = pd.concat([df2,df])
+
+    df = loadDfFromDB(7)
+    
     makeRose(df, outdir, 1)
     makeRose(df, outdir, 7)

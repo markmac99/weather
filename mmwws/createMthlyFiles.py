@@ -2,18 +2,20 @@
 # copyright Mark McIntyre, 2023-
 #
 
-import pandas as pd
+#import pandas as pd
+#import platform
+#import time
 import os
 import sys
-import platform
 import datetime
-import time
 import logging
 from logging.handlers import RotatingFileHandler
 
 from tempPressData import minmaxTemps
 from rainData import periodRain
 from tableData import monthlySummary
+from sqlInterface import loadDfFromDB
+
 
 logger = logging.getLogger('weather_createMthly')
 
@@ -27,6 +29,7 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
+    logger.info('starting')
     yr = datetime.datetime.now().year
     if len(sys.argv) < 2:
         outdir = os.path.expanduser('~/weather/tmp')
@@ -34,27 +37,9 @@ if __name__ == '__main__':
         outdir = os.path.expanduser(sys.argv[1])
     rawdir = outdir.replace('data','raw')
     os.makedirs(outdir, exist_ok=True)
-    if platform.node() != 'wordpresssite':
-        df1 = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr}.parquet')
-        df2 = pd.read_parquet(f'https://markmcintyreastro.co.uk/weather/raw/raw-{yr-1}.parquet')
-    else:
-        # current years datafile may be in the process of getting written to
-        retries = 0
-        while retries < 5:
-            try:
-                logger.info('loading datafiles')
-                df1 = pd.read_parquet(os.path.join(rawdir, f'raw-{yr}.parquet'))
-                break
-            except:
-                logger.info('file in use, waiting 5s')
-                time.sleep(5)
-                retries += 1
-        if retries == 5:
-            logger.warning('unable to open datafile, aborting')
-            exit(0)
-        df2 = pd.read_parquet(os.path.expanduser(f'~/weather/raw/raw-{yr-1}.parquet'))
-    df = pd.concat([df2,df1])
-    df.sort_index(inplace=True)
+
+    df = loadDfFromDB(720)
+    logger.info(f'loaded {len(df)} records')
 
     logger.info('creating 12mth temps')
     minmaxTemps(df, outdir, '12month')
