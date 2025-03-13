@@ -4,9 +4,11 @@
 ``` bash
 create user 'wh1080'@'%' identified by 'wh1080pwd';
 create user 'wh1080'@'127.0.0.1' identified by 'wh1080pwd';
-create schema 'weather';
+create user 'wh1080'@'localhost' identified by 'wh1080pwd';
+create schema weather;
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'localhost';
 ```
 
 * install sqlalchemy 
