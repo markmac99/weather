@@ -63,10 +63,16 @@ if __name__ == '__main__':
     print('running at', datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
     loadAndSave(whfile, bpfile, targfile)
     if len(targfile) > 5:
-        uploadFile(targfile, remotedir)
+        #uploadFile(targfile, remotedir)
         try:
             postToMySQL(targfile)
+            print('saved to primary database')
         except Exception as e:
             print('failed to update mysql')
             print(e)
-            pass
+        try:
+            postToMySQL(targfile, bkp=True)
+            print('saved to backup database')
+        except Exception as e:
+            print('failed to update mysql 2nd db')
+            print(e)

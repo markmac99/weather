@@ -22,5 +22,5 @@
   - name: update SQLpass
     ansible.builtin.replace:
       path: '{{targdir}}/whConfig.py'
-      regexp: "SQLPASSTOCHANGE"
+      regexp: "redacted"
       replace: "{{ wh1080dbpassword }}"

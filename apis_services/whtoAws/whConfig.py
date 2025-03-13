@@ -19,11 +19,14 @@ def loadConfig():
     return whfile, bpfile, targfile, remotedir
 
 
-def loadSQLconfig():
+def loadSQLconfig(bkp=False):
     sqldb = 'weather'
     sqluser = 'wh1080'
-    sqlpass = 'SQLPASSTOCHANGE'
-    sqlserver = 'wordpresssite'
+    sqlpass = 'redacted'
+    if bkp is True:
+        sqlserver = 'wordpresssite'
+    else:
+        sqlserver = 'batchserver.markmcintyreastro.co.uk'
     return sqldb, sqluser, sqlpass, sqlserver
 
 
