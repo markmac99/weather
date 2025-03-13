@@ -6,3 +6,4 @@ active=$(ps -ef | grep createMthlyFiles | grep -v grep | awk '{print $2}')
 if [ "$active" == "" ] ; then 
     python $here/createHourlyFiles.py $HOME/weather/data
 fi
+rsync -avz $HOME/weather/data/ wordpresssite:weather/data

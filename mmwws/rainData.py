@@ -114,3 +114,26 @@ def periodRain(df, outdir, period):
         of.write("       postUnits: 'mm',\n        resize: true\n")
         of.write("});\n});\n")
     return 
+
+
+def monthlyRain(df, outdir):
+    outfname = os.path.join(outdir, 'dragontail-12month-rainfall.js')
+    with open(outfname, 'w') as of:
+        of.write("$(function() {\nMorris.Bar({\n element: 'dragontail-12month-rainfall',\n data: [\n")
+        lastper = df.iloc[-1].period
+        for _,rw in df.iterrows():
+            per = rw['period']
+            perstr = per[:4] + '-' + per[4:]
+            totrain = rw['raintot']
+            of.write(f'    {{time: \'{perstr}\', rain: {totrain}}}')
+            if per != lastper:
+                of.write(',\n')
+            else:
+                of.write('\n')
+
+        of.write("       ],\n        xkey: 'time',\n        ykeys: ['rain'],\n")
+        of.write("       labels: ['Rainfall'],\n        hideHover: 'auto',\n")
+        of.write("       xLabelAngle: 45,\n")
+        of.write("       postUnits: 'mm',\n        resize: true\n")
+        of.write("});\n});\n")
+    return 

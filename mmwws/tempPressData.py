@@ -163,3 +163,28 @@ def minmaxTemps(df, outdir, period='28day', fnamefrag = 'temperature', units='°
         of.write("});\n});\n")
 
     return 
+
+
+def monthlyTemp(df, outdir):
+    outfname = os.path.join(outdir, 'dragontail-12month-temperature.js')
+    with open(outfname, 'w') as of:
+        of.write("$(function() {\nMorris.Bar({\n element: 'dragontail-12month-temperature',\n data: [\n")        
+        lastper = df.iloc[-1].period
+
+        for _,rw in df.iterrows():
+            per = rw['period']
+            perstr = per[:4] + '-' + per[4:]
+            mint = min(rw['minn'], rw['mind'])
+            maxt = max(rw['maxn'], rw['maxd'])
+            of.write(f'    {{time: \'{perstr}\', max_temp: {maxt}, min_temp: {mint} }}')
+            if per != lastper:
+                of.write(',\n')
+            else:
+                of.write('\n')
+
+        of.write("       ],\n        xkey: 'time',\n        ykeys: ['max_temp','min_temp'],\n")
+        of.write("       labels: ['Max Temp','Min Temp'],\n        hideHover: 'auto',\n")
+        of.write("       xLabelAngle: 45,\n")
+        of.write("       postUnits: '°C',\n        resize: true\n")
+        of.write("});\n});\n")
+    return 

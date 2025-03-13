@@ -36,7 +36,7 @@ if __name__ == '__main__':
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
 
-    df = loadDfFromDB(2)
+    df = loadDfFromDB(days=2)
     logger.info(f'loaded {len(df)} records')
 
     logger.info('creating temperature graphs')

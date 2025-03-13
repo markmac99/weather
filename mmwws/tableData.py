@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from tempPressData import getRangeValues
 from tableHeaders import amhdr, amrwtempl, amfootr, rerwtempl, refootr
 from conversions import KMHTOMPH
+from sqlInterface import loadDfFromDB, addToDB, dropCurrentRow
 
 
 def recentTable(df, outdir, period=1):
@@ -74,37 +75,47 @@ def recentTable(df, outdir, period=1):
 
 
 def monthlySummary(df, outdir):
-    now=datetime.datetime.now()
-    backdt = now + relativedelta(years=-5)
-    backdt = backdt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=1)
+    df.sort_values(by='period', ascending=False,inplace=True)
     outfname = os.path.join(outdir, 'dragontail-allmonths-table.js')    
     with open(outfname, 'w') as of:
         of.write(amhdr)
-        while backdt < now:
-            todt = backdt + relativedelta(months=1)
-            mthname = backdt.strftime('%Y-%m')
-            seldf = df[df.timestamp >= pd.Timestamp(backdt, tz='UTC')]
-            seldf = seldf[seldf.timestamp < pd.Timestamp(todt, tz='UTC')]
-            if len(seldf) == 0:
-                backdt = todt
-                continue
-            seldf['mthday'] = [x.day for x in seldf.timestamp]
-            df2=seldf.groupby(['mthday'])
-            rvals=df2.rain_mm.max()-df2.rain_mm.min()
-            raindays = int(len(rvals[rvals>0]))
-            raintot = round(sum(rvals),0)
-
-            seldf['hour'] = [x.hour for x in seldf.timestamp]
-            maxd = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.max(), 1)
-            mind = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.min(), 1)
-            aved = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.mean(), 1)
-            maxn = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.max(), 1)
-            minn = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.min(), 1)
-            aven = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.mean(), 1)
-
-            outval = amrwtempl.format(mthname, maxd, aved, mind, maxn, aven, minn, raintot, raindays)
+        for _, rw in df.iterrows():
+            mthname = rw['period'][:4] +'-' + rw['period'][4:]
+            outval = amrwtempl.format(mthname, rw['maxd'], rw['aved'], rw['mind'], 
+                rw['maxn'], rw['aven'], rw['minn'], rw['raintot'], rw['raindays'])
             of.write(outval)
-            backdt = todt
         of.write(amfootr)
-
     return 
+
+
+def updateMonthlyTable(yr, mth):
+    startdt = datetime.datetime(yr, mth, 1, 0, 0, 0)
+    enddt = startdt + relativedelta(months=1)
+    seldf = loadDfFromDB(startdt=startdt, enddt=enddt)
+    seldf['hour'] = [x.hour for x in seldf.timestamp]
+    maxd = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.max(), 1)
+    mind = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.min(), 1)
+    aved = round(seldf[(seldf.hour>=9) & (seldf.hour<21)].temperature_C.mean(), 1)
+    maxn = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.max(), 1)
+    minn = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.min(), 1)
+    aven = round(seldf[(seldf.hour<9) | (seldf.hour>=21)].temperature_C.mean(), 1)
+
+    seldf['mthday'] = [x.day for x in seldf.timestamp]
+    df2=seldf.groupby(['mthday'])
+    rvals=df2.rain_mm.max()-df2.rain_mm.min()
+
+    raindays = int(len(rvals[rvals>0]))
+    raintot = round(sum(rvals),0)
+    windmax = round(seldf.wind_avg_km_h.max(),1)
+    windavg = round(seldf.wind_avg_km_h.mean(),1)
+    gustmax = round(seldf.wind_max_km_h.max(),1)
+
+    period = f'{yr:04d}{mth:02d}'
+    
+    df = pd.DataFrame([[period,maxd,aved,mind,maxn,aven,minn,raintot, raindays,windavg,windmax,gustmax]],
+                      columns=['period','maxd','aved','mind','maxn','aven','minn',
+                               'raintot','raindays','windavg','windmax','gustmax'])
+    
+    dropCurrentRow(table='mthlydata', colname='period', colval=period)
+    addToDB(table='mthlydata', vals=df)
+    return df

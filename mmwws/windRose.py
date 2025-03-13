@@ -87,7 +87,7 @@ def makeRose(df, outdir, period):
     rose = (df.assign(WindSpd_bins=lambda df: pd.cut(df['wind_max_km_h']*KMHTOMPH, bins=spd_bins, labels=spd_labels, right=True))
             .assign(WindDir_bins=lambda df: pd.cut(df['wind_dir_deg'], bins=dir_bins, labels=dir_labels, right=False))
             .replace({'WindDir_bins': {360: 0}})
-            .groupby(by=['WindSpd_bins', 'WindDir_bins'])
+            .groupby(by=['WindSpd_bins', 'WindDir_bins'], observed=False)
             .size()
             .unstack(level='WindSpd_bins')
             .fillna(0)
@@ -112,7 +112,7 @@ if __name__ =='__main__':
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
 
-    df = loadDfFromDB(7)
+    df = loadDfFromDB(days=7)
     
     makeRose(df, outdir, 1)
     makeRose(df, outdir, 7)

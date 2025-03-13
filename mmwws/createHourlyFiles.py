@@ -14,6 +14,7 @@ from rainData import periodRain
 from tableData import recentTable
 from windRose import makeRose
 from sqlInterface import loadDfFromDB
+from tableData import updateMonthlyTable
 
 
 logger = logging.getLogger('weather_hourly')
@@ -37,7 +38,7 @@ if __name__ == '__main__':
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
 
-    df = loadDfFromDB(90)
+    df = loadDfFromDB(days=32)
     logger.info(f'loaded {len(df)} records')
 
     logger.info('creating temperature graphs')
@@ -58,10 +59,16 @@ if __name__ == '__main__':
     logger.info('creating rainfall graphs')
     periodRain(df, outdir, '7day')
     periodRain(df, outdir, '28day')
-    periodRain(df, outdir, '90day')
+    #periodRain(df, outdir, '90day')
 
     logger.info('creating wind roses')
     makeRose(df, outdir, 1)
     makeRose(df, outdir, 7)
 
+    logger.info('updating monthly tables')
+    currdt = datetime.datetime.now()
+    if currdt.hour < 1 and currdt.day == 1:
+        currdt = datetime.datetime.now() + datetime.timedelta(days=-1)
+    _ = updateMonthlyTable(currdt.year, currdt.month)
+    
     logger.info('done')

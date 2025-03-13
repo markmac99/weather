@@ -1,4 +1,4 @@
-- hosts: wordpresssite
+- hosts: batchserver
   vars_files: 
     - /mnt/e/dev/apikeys/mqvariables.enc
   vars:

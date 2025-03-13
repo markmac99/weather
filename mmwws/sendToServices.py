@@ -161,7 +161,7 @@ if __name__ == '__main__':
         outdir = os.path.expanduser(sys.argv[1])
     os.makedirs(outdir, exist_ok=True)
 
-    df = loadDfFromDB(1)
+    df = loadDfFromDB(days=1)
     logger.info(f'loaded {len(df)} records')
 
     nowzeroed = now.replace(hour=0, minute=0, second=0, microsecond=0)

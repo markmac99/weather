@@ -11,10 +11,10 @@ import datetime
 import logging
 from logging.handlers import RotatingFileHandler
 
-from tempPressData import minmaxTemps
-from rainData import periodRain
+from tempPressData import monthlyTemp
+from rainData import monthlyRain
 from tableData import monthlySummary
-from sqlInterface import loadDfFromDB
+from sqlInterface import loadMonthlyData
 
 
 logger = logging.getLogger('weather_createMthly')
@@ -38,13 +38,14 @@ if __name__ == '__main__':
     rawdir = outdir.replace('data','raw')
     os.makedirs(outdir, exist_ok=True)
 
-    df = loadDfFromDB(720)
+    df = loadMonthlyData(years=2)
+
     logger.info(f'loaded {len(df)} records')
 
-    logger.info('creating 12mth temps')
-    minmaxTemps(df, outdir, '12month')
-    logger.info('creating 12mth rain')
-    periodRain(df, outdir, '12month')
+    logger.info('creating monthly temps')
+    monthlyTemp(df, outdir)
+    logger.info('creating monthly rain')
+    monthlyRain(df, outdir)
     logger.info('creating allmths table')
     monthlySummary(df, outdir)
     logger.info('done')
