@@ -105,7 +105,8 @@ def updateMonthlyTable(yr, mth):
     rvals=df2.rain_mm.max()-df2.rain_mm.min()
 
     raindays = int(len(rvals[rvals>0]))
-    raintot = round(sum(rvals),0)
+    raintot = round(seldf.rainchg.sum(),0)
+    
     windmax = round(seldf.wind_avg_km_h.max(),1)
     windavg = round(seldf.wind_avg_km_h.mean(),1)
     gustmax = round(seldf.wind_max_km_h.max(),1)
