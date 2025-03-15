@@ -75,7 +75,6 @@ def recentTable(df, outdir, period=1):
 
 
 def monthlySummary(df, outdir):
-    df.sort_values(by='period', ascending=False,inplace=True)
     outfname = os.path.join(outdir, 'dragontail-allmonths-table.js')    
     with open(outfname, 'w') as of:
         of.write(amhdr)
