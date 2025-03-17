@@ -3,13 +3,16 @@
     - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
     srcdir: /mnt/e/dev/weather/weatherstation/apis_services/whtoAws
-    targdir: ~/source/whtoaws
+    targdir:  "{{ ansible_env.HOME }}/source/whtoaws"
+    weatherdir: "{{ ansible_env.HOME }}/weather"
+    logname: "whtoaws"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
   - name: Copy files
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
+    - {src: '{{srcdir}}/whtoaws.service', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/whToAws.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/sqlInterface.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/whConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
@@ -24,3 +27,23 @@
       path: '{{targdir}}/whConfig.py'
       regexp: "redacted"
       replace: "{{ wh1080dbpassword }}"
+  - name: update WEATHERDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "WEATHERDIR"
+      replace: "{{ weatherdir }}"
+  - name: update WEATHERDIR part 2
+    ansible.builtin.replace:
+      path: '{{targdir}}/whtoaws.service'
+      regexp: "WEATHERDIR"
+      replace: "{{ weatherdir }}"
+  - name: update SRCDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/whtoaws.service'
+      regexp: "SRCDIR"
+      replace: " {{ targdir }}"
+  - name: update LOGNAME
+    ansible.builtin.replace:
+      path: '{{targdir}}/whToAws.py'
+      regexp: "LOGNAME"
+      replace: "{{ logname }}"

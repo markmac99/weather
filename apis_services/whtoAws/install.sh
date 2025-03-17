@@ -6,11 +6,9 @@
 
 here="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $here
-appname=whToAws.sh
+appname=whtoaws
 
-if [ "$(crontab -l | grep $appname)" == "" ] ; then 
-    echo "installing cron job"
-    (crontab -l && echo "* * * * * $here/$appname > $HOME/weather/logs/whtoaws.log 2>&1" ) | crontab -
-else
-    echo "nothing to install"
-fi
+sudo cp $appname.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable $appname
+sudo systemctl start $appname

@@ -11,31 +11,36 @@ import json
 import paramiko
 from scp import SCPClient
 import os
-import datetime
+import time
+import logging
+from logging.handlers import RotatingFileHandler
 
 from whConfig import loadConfig
 from sqlInterface import postToMySQL
 
+log = logging.getLogger('LOGNAME')
 
-def loadAndSave(whfile, bpfile, targfile):
+
+def loadAndSave(whfile, bpfile, targfile, lastwh, lastbp):
     whdata = None
     bpdata = None
     try:
         lis = open(whfile, 'r').readlines()
         whdata = json.loads(lis[-1])
     except Exception:
-        pass
+        whdata = lastwh
     try:
         lis = open(bpfile, 'r').readlines()
         bpdata = json.loads(lis[-1])
     except Exception:
-        pass
+        bpdata = lastbp
     #print(whdata, bpdata)
     if whdata and bpdata:
         whdata.update(bpdata)
         #print(whdata)
         with open(targfile,'w') as outf:
             outf.write('{}'.format(json.dumps(whdata)))
+        return whdata, bpdata
 
 
 def uploadFile(fname, remotedir):
@@ -58,21 +63,42 @@ def uploadFile(fname, remotedir):
 
 
 if __name__ == '__main__':
-    whfile, bpfile, targfile, remotedir = loadConfig()
+    whfile, bpfile, targfile, remotedir, localdir, intvl = loadConfig()
+
+    log.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+    fh = RotatingFileHandler(os.path.expanduser(os.path.join(localdir,'logs/LOGNAME.log')), maxBytes=51200, backupCount=10)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    log.addHandler(fh)
+
+    if os.path.isfile(os.path.join(localdir, 'stopwhtoaws')):
+        os.remove(os.path.join(localdir, 'stopwhtoaws'))
+
+    lastwh = None
+    lastbp = None
     runme = True
-    print('running at', datetime.datetime.now().strftime('%Y%m%d-%H%M%S.%f'))
-    loadAndSave(whfile, bpfile, targfile)
-    if len(targfile) > 5:
-        #uploadFile(targfile, remotedir)
-        try:
-            postToMySQL(targfile)
-            print('saved to primary database')
-        except Exception as e:
-            print('failed to update mysql')
-            print(e)
-        try:
-            postToMySQL(targfile, bkp=True)
-            print('saved to backup database')
-        except Exception as e:
-            print('failed to update mysql 2nd db')
-            print(e)
+    log.info('starting')
+    while runme is True:
+        lastwh, lastbp = loadAndSave(whfile, bpfile, targfile, lastwh, lastbp)
+        if len(targfile) > 5:
+            #uploadFile(targfile, remotedir)
+            try:
+                postToMySQL(targfile)
+                log.info('saved to primary database')
+            except Exception as e:
+                log.warning('failed to update mysql')
+                log.warning(e)
+            try:
+                postToMySQL(targfile, bkp=True)
+                log.info('saved to backup database')
+            except Exception as e:
+                log.warning('failed to update mysql 2nd db')
+                log.warning(e)
+        if os.path.isfile(os.path.join(localdir, 'stopwhtoaws')):
+            os.remove(os.path.join(localdir, 'stopwhtoaws'))
+            log.info('quitting')
+            runme = False
+        else:
+            time.sleep(60*intvl)

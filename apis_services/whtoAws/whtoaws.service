@@ -1,0 +1,12 @@
+[Unit]
+Description=Send weather data to my AWS server
+After=network.target
+
+[Service]
+ExecStart=SRCDIR/whToAws.sh
+ExecStop=/usr/bin/touch WEATHERDIR/stopwhtoaws
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
