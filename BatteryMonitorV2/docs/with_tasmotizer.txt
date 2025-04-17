@@ -1,0 +1,8 @@
+Using Tasmotizer
+conda activate openhabstuff
+python -m Tasmotizer
+
+use programme tasmota_sensors.bin
+add wifi and MQ details
+should upload a value between 0 and 1
+

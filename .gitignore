@@ -23,3 +23,5 @@ testingcontainer/ssh/*
 */terraform.tfstate*
 apis_services/retired/weatherapi/server.crt
 apis_services/retired/weatherapi/server.key
+BatteryMonitorV2/build/
+secrets.h

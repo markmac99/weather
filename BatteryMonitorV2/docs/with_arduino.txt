@@ -1,0 +1,12 @@
+with arduino
+- solder at least +3.3 +5 GND and A0 
+- might need more pins but i don't thnk so
+
+for up to 20V
+- connect 12V to the input solder points
+- connect 2M resistor from +12V in to A0 on the power hat
+- connect RST to D0 on the D1 or the hat to allow deep sleep mode
+- upload battery-monitor.ino
+
+
+
