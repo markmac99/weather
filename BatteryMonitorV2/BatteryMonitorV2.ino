@@ -28,7 +28,7 @@ const char mqtt_topic[]  = "sensors/batteries/test/voltage";
 const char mqtt_topic2[]  = "sensors/batteries/test/reading";
 
 
-const int publish = 1;
+const int publish = 1; // set to zero to disable mq publ while testing 
 
 void connectToWiFi() {
     WiFi.begin(ssid, password);
@@ -46,7 +46,7 @@ void connectToMQTTBroker() {
         if (mqtt_client.connect(clientid, mqtt_username, mqtt_password)) {
             Serial.println("Connected to MQTT broker");
             // Publish message upon successful connection
-            mqtt_client.publish(mqtt_topic, "Hi I'm ESP8266 ^^");
+            // mqtt_client.publish(mqtt_topic, "Hi I'm ESP8266 ^^");
         } else {
             Serial.print("Failed to connect to MQTT broker, rc=");
             Serial.print(mqtt_client.state());
@@ -68,19 +68,27 @@ void loop() {
   volt=raw/1023.0;
   volt=volt*4.2;
 
-  if (publish){
+  if (publish)
+  {
     String payload=String(volt);
 
-    if (mqtt_client.publish(mqtt_topic, payload.c_str(), true)){
-        Serial.println("Message publised ["+String(mqtt_topic)+"]: "+payload);
-    }
+    connectToMQTTBroker();
+
+    if (mqtt_client.publish(mqtt_topic, payload.c_str(), true))
+        Serial.println("Message published ["+String(mqtt_topic)+"]: "+payload);
+    else
+      Serial.println("Problem publishing ["+String(mqtt_topic)+"]: "+payload);
 
     payload=String(raw);
-    if (mqtt_client.publish(mqtt_topic2, payload.c_str(), true)){
-        Serial.println("Message publised ["+String(mqtt_topic2)+"]: "+payload);
-    }
-  }else{
-    Serial.println("simulated publish");
+    if (mqtt_client.publish(mqtt_topic2, payload.c_str(), true))
+        Serial.println("Message published ["+String(mqtt_topic2)+"]: "+payload);
+    else
+      Serial.println("Problem publishing ["+String(mqtt_topic2)+"]: "+payload);
   }
+  else
+  {
+      Serial.println("simulated publish");
+  }
+  Serial.println("sleeping...");
   delay(SLEEPSECS*1000);
 }
