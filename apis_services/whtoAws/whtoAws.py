@@ -21,26 +21,34 @@ from sqlInterface import postToMySQL
 log = logging.getLogger('LOGNAME')
 
 
-def loadAndSave(whfile, bpfile, targfile, lastwh, lastbp):
-    whdata = None
-    bpdata = None
-    try:
+def loadAndSave(whfile, bpfile, targfile):
+    if os.path.isfile(targfile):
+        lis = open(targfile,'r').readlines()
+        if len(lis) > 0:
+            origdata = json.loads(lis[-1])
+        else:
+            origdata = {}
+            
+    if os.path.isfile(whfile):
         lis = open(whfile, 'r').readlines()
-        whdata = json.loads(lis[-1])
-    except Exception:
-        whdata = lastwh
-    try:
+        if len(lis) > 0:
+            whdata = json.loads(lis[-1])
+            origdata.update(whdata)
+
+    if os.path.isfile(bpfile):
         lis = open(bpfile, 'r').readlines()
-        bpdata = json.loads(lis[-1])
-    except Exception:
-        bpdata = lastbp
-    #print(whdata, bpdata)
-    if whdata and bpdata:
-        whdata.update(bpdata)
-        #print(whdata)
+        if len(lis) > 0:
+            bpdata = json.loads(lis[-1])
+            origdata.update(bpdata)
+            
+    if len(origdata) > 0:
+        if ' ' in origdata['time']:
+            origdata['time'] = origdata['time'].replace(' ','T')
+        if 'Z' not in origdata['time']:
+            origdata['time'] = origdata['time']+'Z'
         with open(targfile,'w') as outf:
-            outf.write('{}'.format(json.dumps(whdata)))
-        return whdata, bpdata
+            outf.write(f'{json.dumps(origdata)}')
+    return
 
 
 def uploadFile(fname, remotedir):
@@ -81,7 +89,7 @@ if __name__ == '__main__':
     runme = True
     log.info('starting')
     while runme is True:
-        lastwh, lastbp = loadAndSave(whfile, bpfile, targfile, lastwh, lastbp)
+        loadAndSave(whfile, bpfile, targfile)
         if len(targfile) > 5:
             #uploadFile(targfile, remotedir)
             try:
