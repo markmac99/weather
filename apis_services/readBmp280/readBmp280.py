@@ -53,8 +53,14 @@ def sendDataToMQTT(data, logdir):
 
 
 def getTempPressHum(prvdata = None):
-    data = bme280.read_all()
-    humidity, pressure, cTemp = data
+    try:
+        data = bme280.read_all()
+        humidity, pressure, cTemp = data
+    except:
+        print('unable to connect to bmp280, check for loose wires')
+        humidity = prvdata['hum_in']
+        cTemp = prvdata['temp_c_in']
+        pressure = prvdata['press_rel']
     if prvdata:
         if abs(cTemp - prvdata['temp_c_in']) > 5:
             writeLogEntry(logdir, f'temp diff too big - {cTemp} to {prvdata["temp_c_in"]}')
@@ -89,16 +95,20 @@ if __name__ == '__main__':
     bme280_i2c.set_default_i2c_address(0x76)
     bme280_i2c.set_default_bus(1)
     prvdata = None
-    bme280.setup()
-    while runme is True:
-        data = getTempPressHum(prvdata)
-        with open(outfname, 'a+') as outf:
-            outf.write(json.dumps(data) + '\n')
-        sendDataToMQTT(data, logdir)
-        prvdata = data
-        time.sleep(60)
-        if os.path.isfile(stopfile):
-            writeLogEntry(logdir, 'Exiting...\n==========\n')
-            os.remove(stopfile)
-            runme = False
-            break
+    try:
+        bme280.setup()
+        while runme is True:
+            data = getTempPressHum(prvdata)
+            with open(outfname, 'a+') as outf:
+                outf.write(json.dumps(data) + '\n')
+            sendDataToMQTT(data, logdir)
+            prvdata = data
+            time.sleep(60)
+            if os.path.isfile(stopfile):
+                writeLogEntry(logdir, 'Exiting...\n==========\n')
+                os.remove(stopfile)
+                runme = False
+                break
+    except OSError:
+        print('unable to connect to bmp280, check wiring')
+        
