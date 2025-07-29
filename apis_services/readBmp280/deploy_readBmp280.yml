@@ -1,8 +1,8 @@
 - hosts: weatherpi3
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/readBmp280
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/readBmp280"
     targdir:  "{{ ansible_env.HOME }}/source/readbmp280"
     weatherdir: "{{ ansible_env.HOME }}/weather"
   environment: 

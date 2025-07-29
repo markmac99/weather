@@ -116,16 +116,19 @@ def getDataFromWU():
         f'{windir}, {humid}, {uvidx}, {solrad}, {dewpt}, {precipRate},{precipTotal}')
 
     # update openhab
-    openhab = OpenHAB(getOpenhabURL())
-    if openhab:
-        OutsideTemp = openhab.get_item('OutsideTemp_wubr')
-        FeelsLike = openhab.get_item('OutsideFeelsLike_wubr')
-        RelPressure = openhab.get_item('RelPressure2')
-        OutsideTemp.state = temp
-        FeelsLike.state = feels_like
-        RelPressure.state = pressure
-    else:
-        writeLogEntry('problem connecting to openhab')
+    try:
+        openhab = OpenHAB(getOpenhabURL())
+        if openhab:
+            OutsideTemp = openhab.get_item('OutsideTemp_wubr')
+            FeelsLike = openhab.get_item('OutsideFeelsLike_wubr')
+            RelPressure = openhab.get_item('RelPressure2')
+            OutsideTemp.state = temp
+            FeelsLike.state = feels_like
+            RelPressure.state = pressure
+        else:
+            writeLogEntry('problem connecting to openhab')
+    except:
+            writeLogEntry('problem connecting to openhab')
 
     sendDataToMQTT(['outsideTemp', temp])
     sendDataToMQTT(['feels_like', feels_like])
@@ -157,6 +160,8 @@ def getDataFromWU():
 if __name__ == '__main__':
     writeLogEntry('========\nStarting...')
     os.makedirs(LOG_DIRECTORY, exist_ok=True)
+    if os.path.isfile(STOPFILE):
+        os.remove(STOPFILE)
     runme = True
     while runme is True:
         getDataFromWU()

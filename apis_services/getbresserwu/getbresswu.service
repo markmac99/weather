@@ -6,7 +6,7 @@ After=network.target
 User=pi
 Group=pi
 ExecStart=SRCDIR/getBresserData.sh
-ExecStop=/usr/bin/touch SRCDIR/stopwu
+ExecStop=/usr/bin/touch SRCDIR/stopgetwu
 Restart=always
 RestartSec=5
 

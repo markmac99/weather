@@ -1,8 +1,8 @@
 - hosts: weatherpi3 #ukmonhelper
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/getbresserwu
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/getbresserwu"
     wudir: "{{ ansible_env.HOME }}/source/getbresswu"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
