@@ -47,3 +47,8 @@
       path: '{{targdir}}/whToAws.py'
       regexp: "LOGNAME"
       replace: "{{ logname }}"
+  - name: restart service
+    shell: sudo systemctl restart whtoaws
+    args:
+      executable: /bin/bash
+
