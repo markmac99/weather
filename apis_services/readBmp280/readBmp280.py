@@ -16,7 +16,7 @@ from bme280 import bme280, bme280_i2c
 
 def writeLogEntry(logdir, msg):
     with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
-        nowdt = datetime.datetime.utcnow().isoformat()
+        nowdt = datetime.datetime.now(datetime.timezone.utc).isoformat()
         f.write(f'{nowdt}: {msg}')
 
 
@@ -35,19 +35,19 @@ def on_publish(client, userdata, result):
 
 
 def sendDataToMQTT(data, logdir):
-    writeLogEntry(logdir, 'reading mq details')
     broker, mqport, username, password = readConfig()
-    writeLogEntry(logdir,'got mq details')
     client = mqtt.Client('bmp280_fwd')
     client.on_connect = on_connect
     client.on_publish = on_publish
-    open('/tmp/info.log','w').write(f'{username} {password}\n')
     if username != '':
         client.username_pw_set(username, password)
     client.connect(broker, mqport, 60)
-    for ele in data:
-        topic = f'sensors/bmp280/{ele}'
-        ret = client.publish(topic, payload=data[ele], qos=0, retain=False)
+    try:
+        for ele in data:
+            topic = f'sensors/bmp280/{ele}'
+            ret = client.publish(topic, payload=data[ele], qos=0, retain=False)
+    except:
+        writeLogEntry(logdir, f'problem sending {ele} value {data[ele]}\n')
     writeLogEntry(logdir, f'sent {data}\n')
     return ret
 
@@ -91,6 +91,8 @@ if __name__ == '__main__':
     runme = True
     os.makedirs(outdir, exist_ok=True)
     os.makedirs(logdir, exist_ok=True)
+    if os.path.exists(stopfile):
+        os.remove(stopfile)
     outfname = os.path.join(outdir,'bmp280.json')
     bme280_i2c.set_default_i2c_address(0x76)
     bme280_i2c.set_default_bus(1)
@@ -110,4 +112,5 @@ if __name__ == '__main__':
                 runme = False
                 break
     except OSError:
-        print('unable to connect to bmp280, check wiring')
+        writeLogEntry(logdir, 'unable to connect to bmp280, check wiring\n')
+        print('unable to connect to bmp280, check wiring\n')
