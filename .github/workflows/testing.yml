@@ -18,9 +18,9 @@ jobs:
               mkdir $HOME/.ssh
               cd  $HOME/.ssh
               unzip /tmp/testdata.zip
+              cp testConfig.py ./apis_services/diskspacechecks/
               cd ${here}
               chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
-              cp testConfig.py ./apis_services/diskspacechecks/
             fi
         - name: install requirements
           run: |
