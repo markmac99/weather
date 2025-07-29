@@ -111,4 +111,3 @@ if __name__ == '__main__':
                 break
     except OSError:
         print('unable to connect to bmp280, check wiring')
-        
