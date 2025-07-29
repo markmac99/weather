@@ -61,7 +61,10 @@ def on_publish(client, userdata, result,x,y):
 
 
 def sendDataToMQTT(data, hn, logdir):
-    broker, mqport, user, passwd = readConfig()
+    test = False
+    if hn == 'test':
+        test = True
+    broker, mqport, user, passwd = readConfig(test=test)
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id='dschecks')
     client.on_connect = on_connect
     client.on_publish = on_publish

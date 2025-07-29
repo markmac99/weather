@@ -1,7 +1,7 @@
 name: testing 
 on:
     push:
-        branches: master
+        branches: [master]
 jobs:
     k8stest:
       name: k8stest
@@ -20,16 +20,13 @@ jobs:
               unzip /tmp/testdata.zip
               cd ${here}
               chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
-            fi 
+            fi
         - name: install requirements
           run: |
             pip install pytest pytest-cov
         - name: test diskspacechecks
           run: |
             cd ./apis_services/diskspacechecks
-            pytest -v .
-        - name: test diskspacechecks
-          run: |
-            cd ./apis_services/diskspacechecks
+            cp /tmp/testConfig.py .
             pytest . --cov=. --cov-report=term-missing
   

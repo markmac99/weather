@@ -23,8 +23,9 @@ def test_hostnames():
 
 
 def test_readConfig():
-    brok, por, us, pw = readConfig()
+    brok, por, us, pw = readConfig(test=True)
     assert por==1883
+    assert brok=='wxsatpi'
 
 
 def test_pub():
