@@ -160,7 +160,8 @@ def getDataFromWU():
 if __name__ == '__main__':
     writeLogEntry('========\nStarting...')
     os.makedirs(LOG_DIRECTORY, exist_ok=True)
-    os.remove(STOPFILE)
+    if os.path.isfile(STOPFILE):
+        os.remove(STOPFILE)
     runme = True
     while runme is True:
         getDataFromWU()
