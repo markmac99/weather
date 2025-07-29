@@ -19,15 +19,14 @@ def test_getDF():
 
 def test_hostnames():
     x = hostnames()
-    assert x[0]=='wordpresssite.'
+    assert x[0]=='wordpresssite'
 
 
 def test_readConfig():
-    brok, por = readConfig()
+    brok, por, us, pw = readConfig()
     assert por==1883
 
 
 def test_pub():
     res = sendDataToMQTT(45.345, 'test', '.')
-    os.remove('./dscheck.log')
     assert res
