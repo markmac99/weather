@@ -20,7 +20,8 @@ jobs:
               unzip /tmp/testdata.zip
               pwd
               ls -ltr *.py
-              cp testConfig.py ./apis_services/diskspacechecks/
+              ls -ltr /__w/weather/weather
+              # cp testConfig.py ./apis_services/diskspacechecks/
               cd ${here}
               chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi
