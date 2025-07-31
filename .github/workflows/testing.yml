@@ -18,10 +18,7 @@ jobs:
               mkdir $HOME/.ssh
               cd  $HOME/.ssh
               unzip /tmp/testdata.zip
-              pwd
-              ls -ltr *.py
-              ls -ltr /__w/weather/weather
-              # cp testConfig.py ./apis_services/diskspacechecks/
+              mv testConfig.py /__w/weather/weather/apis_services/diskspacechecks/
               cd ${here}
               chmod 0700 $HOME/.ssh && chmod 0600 $HOME/.ssh/*
             fi
