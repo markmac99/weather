@@ -10,6 +10,24 @@ import sys
 from influxdb import InfluxDBClient
 
 
+def getEnergyData(cfgfile):
+    host='ohserver'
+    port=8086
+    outdir = os.path.split(cfgfile)[0]
+    lis = open(cfgfile,'r').readlines()
+    startdt = datetime.datetime.strptime(lis[0].strip(), '%Y-%m-%dT%H:%M:%SZ')
+    enddt = datetime.datetime.strptime(lis[1].strip(), '%Y-%m-%dT%H:%M:%SZ')
+    client = InfluxDBClient(host=host, port=port)
+    client.switch_database('openhab')
+    res = client.query(f"select * from DailyHouseEnergy where time > '{startdt}' and time <= '{enddt}'")
+    dailyelecdf = pd.DataFrame(res.get_points()).bfill().ffill()
+    dailyelecdf.to_csv(os.path.join(outdir,'dailyelec.csv'), index=False)
+    res = client.query(f"select * from HouseElectricityPower where time > '{startdt}' and time <= '{enddt}'")
+    liveelecdf = pd.DataFrame(res.get_points()).bfill().ffill()
+    liveelecdf.to_csv(os.path.join(outdir, 'liveelec.csv'), index=False)
+    return 
+
+
 def getMostRecentInfluxData(cfgfile):
     host='ohserver'
     port=8086
