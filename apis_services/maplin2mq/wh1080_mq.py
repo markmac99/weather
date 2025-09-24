@@ -6,6 +6,7 @@ import os
 import json
 import sys
 from paho.mqtt import client as mqtt_client
+import datetime
 
 from mqConfig import readConfig
 from weatherCalcs import correctBadData, dewPoint, windChill, heatIndex
@@ -88,13 +89,16 @@ def on_message(client, userdata, msg):
     msgcount += 1
     if msgcount > 7 and jsonmsg['time'] != lasttime: 
         log.info(jsonmsg)
+        # save the raw data as JSON
         if os.path.isfile(os.path.join(datadir, 'weatherdata.json')):
-            currdata = open(os.path.join(datadir, 'weatherdata.json'), 'r').readlines()
+            currdata = json.loads(open(os.path.join(datadir, 'weatherdata.json')).read())
         else:
-            currdata = []
-        currdata = [x for x in currdata if len(x) > 1]
-        currdata.append(json.dumps(jsonmsg)+'\n')
-        open(os.path.join(datadir, 'weatherdata.json'), 'w').writelines(currdata)
+            currdata = {}
+        ts = datetime.datetime.strptime(jsonmsg['time'], '%Y-%m-%d %H:%M:%S').timestamp()
+        currdata[ts] = jsonmsg
+        with open(os.path.join(datadir, 'weatherdata.json'), 'w') as outf: 
+            json.dump(currdata, outf)
+        # now add extra data to MQ
         t = float(jsonmsg['temperature_C'])
         rh = float(jsonmsg['humidity'])
         v = float(jsonmsg['wind_avg_km_h'])
