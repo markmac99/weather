@@ -10,4 +10,5 @@ yday=$(date --date yesterday +%Y%m%d)
 if [ ! -f $datadir/weatherdata.json.${yday} ] ; then
     mv $datadir/weatherdata.json $datadir/weatherdata.json.${yday}
 fi
-/usr/local/bin/rtl_433 -R 32 -R 155 -F json::$datadir/weatherdata.json -M time:utc
+#/usr/local/bin/rtl_433 -R 32 -R 155 -F json::$datadir/weatherdata.json -M time:utc
+/usr/local/bin/rtl_433  -c /etc/rtl_433/rtl_433.conf

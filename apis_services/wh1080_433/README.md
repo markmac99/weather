@@ -3,10 +3,6 @@
 This code reads from a WH1080 / Maplin weatherstation and posts the results to MQTT
 
 The process makes use of *rtl_433* to read from the weatherstation's outdoor sensors. 
-*rtl_433* can natively write to MQ however i found that 
-this would not work on my Pi3 due to issues with SSL. Additionally i wanted to post 
-some derived data not available directly from the weatherstation such as dew point, wind chill and heat index.
-So it was easier to get *rtl_433* to write JSON to a file, then read this and post it to MQTT.
 
 ## Prerequisites
 You'll need to install *rtl-sdr* and its development libraries, plus development tools to build *rtl_433*. I 
@@ -74,11 +70,9 @@ This should install two services *rtl_433* which reads from the weatherstation s
 systemctl status rtl_433
 ```
 
-*rtl_433* writes data to a file *~/weather/maplinstn/weatherdata.json*. The service logfiles are written to *~/weather/logs*, and error messages may also be logged to syslog. 
+*rtl_433* writes data directly to MQ. A separate process `maplin2mq` reads from MQ and writes to file.
 
-Each time the service is restarted it will attempt to rename the JSON file and start a new one, and to delete any JSON and log files that are more than 14 days old. This ensures that space usage is not excessive. You should therefore either schedule your Pi to restart each day, or use cron to restart the service. 
-
-That's it. Your weatherstation data is now being written to MQTT to a topic named *sensors/wh1080*
+That's it. Your weatherstation data is now being written to MQTT to a topic named *rtl_433_2/*
 
 ``` bash
 $ mosquitto_sub -h someserver  -t sensors/# -i frobozz -d

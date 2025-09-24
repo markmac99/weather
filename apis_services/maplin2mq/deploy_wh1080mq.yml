@@ -1,9 +1,9 @@
 - hosts: weatherpi3
   gather_facts: false
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/maplin2mq
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/maplin2mq"
     targdir: ~/source/maplin2mq
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
@@ -16,6 +16,7 @@
     - {src: '{{srcdir}}/wh1080_mq.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/wh1080_mq.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/weatherCalcs.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/maplin2mq.service', dest: '{{targdir}}/', mode: '644', backup: yes }
 
