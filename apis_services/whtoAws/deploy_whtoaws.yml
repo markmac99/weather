@@ -1,8 +1,8 @@
 - hosts: weatherpi3
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/whtoAws
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/whtoAws"
     targdir:  "{{ ansible_env.HOME }}/source/whtoaws"
     weatherdir: "{{ ansible_env.HOME }}/weather"
     logname: "whtoaws"
