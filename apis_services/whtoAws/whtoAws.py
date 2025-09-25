@@ -36,9 +36,9 @@ def loadAndSave(whfile, bpfile, targfile):
             origdata.update(whdata)
 
     if os.path.isfile(bpfile):
-        lis = open(bpfile, 'r').readlines()
+        lis = json.loads(open(bpfile).read())
         if len(lis) > 0:
-            bpdata = json.loads(lis[-1])
+            bpdata = lis[max(lis.keys())]
             origdata.update(bpdata)
             
     if len(origdata) > 0:

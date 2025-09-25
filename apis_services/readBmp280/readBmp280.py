@@ -101,8 +101,14 @@ if __name__ == '__main__':
         bme280.setup()
         while runme is True:
             data = getTempPressHum(prvdata)
-            with open(outfname, 'a+') as outf:
-                outf.write(json.dumps(data) + '\n')
+            if os.path.isfile(outfname):
+                currdata = json.loads(open(outfname).read())
+            else:
+                currdata = {}
+            dtstamp  = datetime.datetime.strptime(data['time'], '%Y-%m-%dT%H:%M:%SZ').timestamp()
+            currdata[dtstamp] = data
+            with open(outfname, 'w') as outf:
+                json.dump(currdata, outf)
             sendDataToMQTT(data, logdir)
             prvdata = data
             time.sleep(60)
