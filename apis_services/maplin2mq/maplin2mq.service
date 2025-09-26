@@ -1,3 +1,5 @@
+# copyright Mark McIntyre, 2023
+
 [Unit]
 Description=Push data from WH1080 to MQTT
 After=network.target

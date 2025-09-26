@@ -1,6 +1,9 @@
 # calculate some weather specific data
 
+# copyright Mark McIntyre, 2024
+
 import math
+
 
 def windChill(t, v):
     # after https://www.calculator.net/wind-chill-calculator.html
@@ -55,5 +58,3 @@ def dewPoint(t, rh):
     Es = E0 * math.exp(lrv * (1/T0 - 1/(t + T0)))
     dewPoint = 1.0 / (-math.log(rh/100 * Es/E0)/lrv + 1/T0)-T0
     return round(dewPoint,4)
-
-

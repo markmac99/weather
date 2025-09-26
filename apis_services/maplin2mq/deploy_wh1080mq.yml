@@ -20,17 +20,17 @@
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/maplin2mq.service', dest: '{{targdir}}/', mode: '644', backup: yes }
 
-  - name: update broker rtl433
+  - name: update broker 
     ansible.builtin.replace:
       path: '{{targdir}}/mqConfig.py'
       regexp: "someserver.net"
       replace: "wxsatpi"
-  - name: update mquser bmp280
+  - name: update mquser 
     ansible.builtin.replace:
       path: '{{targdir}}/mqConfig.py'
       regexp: "someuser"
       replace: "sensors"
-  - name: update mqpasswd bmp280
+  - name: update mqpasswd 
     ansible.builtin.replace:
       path: '{{targdir}}/mqConfig.py'
       regexp: "changeme"

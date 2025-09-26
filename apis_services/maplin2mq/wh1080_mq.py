@@ -1,6 +1,7 @@
 # python code to read WH1080 data from MQ, write it to a  JSON file, then 
 # post some additional values back to MQ
 
+# copyright Mark McIntyre, 2024
 
 import os
 import json
@@ -9,7 +10,7 @@ from paho.mqtt import client as mqtt_client
 import datetime
 
 from mqConfig import readConfig
-from weatherCalcs import correctBadData, dewPoint, windChill, heatIndex
+from weatherCalcs import dewPoint, windChill, heatIndex
 import logging
 import logging.handlers
 
@@ -23,7 +24,7 @@ client_id = 'wh1080_aug'
 
 msgcount = 0
 
-jsonmsg = {'time' :None, 'model' : 'Fineoffset-WHx080', 'subtype' : 0, 'id' : 251,
+jsonmsg = {'time':None, 'model': 'Fineoffset-WHx080', 'subtype': 0, 'id': 251,
            'battery_ok':None,'temperature_C':None,'humidity':None,
            'wind_dir_deg':None,'wind_avg_km_h':None,'wind_max_km_h':None,'rain_mm':None,
            'mic':'CRC'}
@@ -37,7 +38,7 @@ def setupLogging(logpath):
     logdir = os.path.expanduser(logpath)
     os.makedirs(logdir, exist_ok=True)
 
-    logfilename = os.path.join(logdir, 'wh1080_mq.log')
+    logfilename = os.path.join(logdir, 'maplin2mq.log')
     handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
@@ -68,6 +69,7 @@ def connect_mqtt():
     client.username_pw_set(username, password)
     client.connect(broker, mqport)
     return client
+
 
 def on_publish(client, userdata, result):
     return 
@@ -102,7 +104,7 @@ def on_message(client, userdata, msg):
         t = float(jsonmsg['temperature_C'])
         rh = float(jsonmsg['humidity'])
         v = float(jsonmsg['wind_avg_km_h'])
-        ret = client.publish(f'{topicroot}/dew_point', payload=dewPoint(t, rh), qos=0, retain=False)
+        client.publish(f'{topicroot}/dew_point', payload=dewPoint(t, rh), qos=0, retain=True)
         wc = windChill(t, v)
         hi = heatIndex(t, rh)
         fl = t
@@ -110,7 +112,7 @@ def on_message(client, userdata, msg):
             fl = wc
         elif t > 26 and hi > t:
             fl = hi
-        ret = client.publish(f'{topicroot}/feals_like', payload=fl, qos=0, retain=False)
+        client.publish(f'{topicroot}/feals_like', payload=fl, qos=0, retain=True)
         msgcount = 0
         stopfile = os.path.join(datadir, 'stopwhfwd')
         if os.path.isfile(stopfile):
