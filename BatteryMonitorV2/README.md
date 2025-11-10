@@ -31,15 +31,18 @@ Using the Arduino IDE:
 * install the 8266 board as explained [here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html) 
 * Select board `Lolin(Wemos) D1 R2 and Mini`
 * Install the `PubSubClient` library by Nick O'Leary.
-* Rename `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. 
+* Copy `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. 
 This file stores your Wifi details, MQ server and topic details, and a scaling factor you will 
 adjust to get the voltage correct. For now, leave it at 24.4 which will be roughly right for 12V input.
+* The appllication will publish to an MQ topic "sensors/batteries/`topicname`/voltage" for example if you are monitoring a weatherstation you might set topicname to "weatherstation". 
 
-Now compile the sketch and deploy it to your Wemos D1 Mini.  
-The code will publish to a topic "sensors/batteries/`topicname`/voltage" so if you were monitoring say a weatherstation you might set topicname to "weatherstation". 
+* Now compile the sketch and deploy it to your Wemos D1 Mini. 
 
 ## Calibration
-Out of the box its likely the reported voltage will be initially incorrect. To calibrate it:
+Out of the box its likely the reported voltage will be initially incorrect. 
+
+To calibrate it:
+
 * Apply +12V to the input socket or pads (whichever you chose earlier)
 * Using a multimeter measure the exact input voltage.
 * Monitor MQ for the sensors/battery topic and note the reported voltage. 
