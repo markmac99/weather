@@ -18,14 +18,19 @@ To measure up to 20V:
 * Or
   * Solder a 2M resistor between the +ve back of the jack socket and A0 on the Mini.
 
-The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. Internally it contains a 220+100 Ohm resistor bridge so that natively it can measure up to 3.3V, but to measure more we need to increase the reistance of the first element. This can be done by adding a resistor from +ve in to A0. An additional at least 1.2M is required, but a 2M resistor will do fine. 
+The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. 
+Internally it contains a 220+100 Ohm resistor bridge so that natively it can measure up to 3.2V, but 
+to measure more we need to increase the reistance of the first element. This can be done by adding a resistor from +ve in to A0. 
+An additional at least 1.2M is required, but a 2M resistor will do fine. 
 
 ## Building the Code
 Using the Arduino IDE:
 * install the 8266 board as explained [here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html) 
 * Select board `Lolin(Wemos) D1 R2 and Mini`
 * Install the `PubSubClient` library by Nick O'Leary.
-* Rename `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. This file stores your Wifi details, MQ server, login and topic details, and a scaling factor you will adjust to get the voltage correct. For now, leave it at 4.2.
+* Rename `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. 
+This file stores your Wifi details, MQ server, login and topic details, and a scaling factor you will 
+adjust to get the voltage correct. For now, leave it at 4.2.
 
 Now compile the sketch and deploy it to your Wemos D1 Mini.  
 The code will publish to a topic "sensors/batteries/`topicname`/voltage" so if you were monitoring say a weatherstation you might set topicname to "weatherstation". 
