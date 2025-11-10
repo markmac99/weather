@@ -26,3 +26,4 @@ apis_services/retired/weatherapi/server.key
 BatteryMonitorV2/build/
 secrets.h
 apis_services/diskspacechecks/testConfig.py
+BatteryMonitorV2/sitespecific.h

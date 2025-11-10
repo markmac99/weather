@@ -1,0 +1,11 @@
+const float scalefactor = 4.2;
+
+const char ssid[] = "your ssid";
+const char password[] = "wifi passsord";
+
+const char mqtt_broker[]  = "your broker hostname";
+const int mqtt_port = 1883;
+const char mqtt_username[] = "MQ username";
+const char mqtt_password[] = "MQ password";
+
+const char topicname[] = "your topic name";
