@@ -1,13 +1,24 @@
 # Readme for Battery Monitor V2
 
-This repo provides code that can be run on an 8266-compatible Wemos D1 Mini with wifi board, to measure battery voltage and report it via MQ.
+This repo provides instructions for monitoring battery voltage over WiFi, for example if you want
+to monitor the voltage of a solar panel powered weatherstation or other off-grid device. 
+It uses an 8266-compatible Wemos D1 Mini board with Wifi.
 
 ## Hardware Required
 * Wemos D1 Mini with Wifi.
 * Wemos power shield for D1 Mini.
-* Assorted resistors.
+* Assorted resistors (see below).
 * A multimeter to calibrate the device. 
 * Soldering iron. 
+
+## Resistor selection
+The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. 
+Internally it contains a 220+100 Ohm resistor bridge so that natively it can measure up to 3.2V, but 
+to measure more we need to increase the reistance of the first element. This can be done by adding a resistor from +ve in to A0. 
+
+I used a 2.2M resistor which allows me to measure voltages up to about 25V with a step of 0.025V. This caters
+for typical 12V and 24V situations. The spreadsheet in the `docs` folder explains the maths and lets you 
+calculate your own requirements. 
 
 ## Hardware Build
 To measure up to 20V:
@@ -20,10 +31,6 @@ To measure up to 20V:
   * Solder a 2M resistor between the +ve back of the jack socket and A0 on the Mini.
   * And then use the input jack to feed the measured voltage to the device. 
 
-The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. 
-Internally it contains a 220+100 Ohm resistor bridge so that natively it can measure up to 3.2V, but 
-to measure more we need to increase the reistance of the first element. This can be done by adding a resistor from +ve in to A0. 
-An additional at least 1.2M is required to measure 12V, but a 2M resistor will do fine. 
 
 ## Building the Code
 Using the Arduino IDE:
