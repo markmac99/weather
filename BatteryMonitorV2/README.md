@@ -2,7 +2,7 @@
 
 This repo provides instructions for monitoring battery voltage over WiFi, for example if you want
 to monitor the voltage of a solar panel powered weatherstation or other off-grid device. 
-It uses an 8266-compatible Wemos D1 Mini board with Wifi.
+It uses an 8266-compatible Wemos D1 Mini board with Wifi and the voltage data are published to MQ. 
 
 ## Hardware Required
 * Wemos D1 Mini with Wifi.
@@ -10,6 +10,9 @@ It uses an 8266-compatible Wemos D1 Mini board with Wifi.
 * Assorted resistors (see below).
 * A multimeter to calibrate the device. 
 * Soldering iron. 
+
+You will obviously also need an MQ server to publish to. 
+You can use the free ones at [HiveMQ](https://console.hivemq.cloud) or [Mosquitto.org](https://test.mosquitto.org/) if you don't have your own. 
 
 ## Resistor selection
 The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. 
