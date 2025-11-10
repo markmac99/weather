@@ -27,12 +27,13 @@ An additional at least 1.2M is required to measure 12V, but a 2M resistor will d
 
 ## Building the Code
 Using the Arduino IDE:
+* Install the Wemos CH340 driver from [here](https://www.wemos.cc/en/latest/ch340_driver.html)
 * install the 8266 board as explained [here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html) 
 * Select board `Lolin(Wemos) D1 R2 and Mini`
 * Install the `PubSubClient` library by Nick O'Leary.
 * Rename `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. 
 This file stores your Wifi details, MQ server and topic details, and a scaling factor you will 
-adjust to get the voltage correct. For now, leave it at 4.2.
+adjust to get the voltage correct. For now, leave it at 24.4 which will be roughly right for 12V input.
 
 Now compile the sketch and deploy it to your Wemos D1 Mini.  
 The code will publish to a topic "sensors/batteries/`topicname`/voltage" so if you were monitoring say a weatherstation you might set topicname to "weatherstation". 

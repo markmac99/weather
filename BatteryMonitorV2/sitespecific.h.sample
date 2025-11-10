@@ -1,4 +1,4 @@
-const float scalefactor = 4.2;
+const float scalefactor = 24.4; 
 
 const char ssid[] = "your ssid";
 const char password[] = "wifi passsord";
