@@ -12,7 +12,8 @@ It uses an 8266-compatible Wemos D1 Mini board with Wifi and the voltage data ar
 * Soldering iron. 
 
 You will obviously also need an MQ server to publish to. 
-You can use the free ones at [HiveMQ](https://console.hivemq.cloud) or [Mosquitto.org](https://test.mosquitto.org/) if you don't have your own. 
+You can use the free one at [Mosquitto.org](https://test.mosquitto.org/) if you don't have your own. I don't 
+think it'll work with HiveMQ as that requires TLS which is not supported. 
 
 ## Resistor selection
 The resistor is required because the D1 Mini can only accept up to 1V on any of its analogue pins. 
@@ -40,7 +41,7 @@ Using the Arduino IDE:
 * Install the Wemos CH340 driver from [here](https://www.wemos.cc/en/latest/ch340_driver.html)
 * install the 8266 board as explained [here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html) 
 * Select board `Lolin(Wemos) D1 R2 and Mini`
-* Install the `PubSubClient` library by Nick O'Leary.
+* Install the `PubSubClient` library by Nick O'Leary (see [here](https://docs.arduino.cc/libraries/pubsubclient/)).
 * Copy `siteinfo.h.sample` to `siteinfo.h` and then update the file with your site-specific information. 
 This file stores your Wifi details, MQ server and topic details, and a scaling factor you will 
 adjust to get the voltage correct. For now, leave it at 24.4 which will be roughly right for 12V input.
