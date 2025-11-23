@@ -1,0 +1,12 @@
+[Unit]
+Description=Get Data from Bresser 5-in-1
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/rtl_433 -c WORKINGDIR/rtl_433.conf 
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
