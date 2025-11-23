@@ -27,3 +27,4 @@ BatteryMonitorV2/build/
 secrets.h
 apis_services/diskspacechecks/testConfig.py
 BatteryMonitorV2/sitespecific.h
+BatteryMonitorV2/sitespecific*.h

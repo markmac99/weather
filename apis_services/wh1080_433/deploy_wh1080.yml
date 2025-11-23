@@ -14,4 +14,5 @@
     - {src: '{{srcdir}}/stopwh1080_433.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/wh1080_rtl433.service', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/rtl-sdr.rules', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/rtl_433.conf', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
