@@ -8,33 +8,49 @@ The RTL433 and BME280 data are being published to MQ Series along with data from
 
 
 ## website
-An implementation of the dragontail weather website, consuming data initially from pywws, but later from other sources. 
+An implementation of the dragontail weather website. This initially consumed data from from pywws, but later i changed it to read data from files created by my own programme `mmwws`.
 
 ## mmwws
-A replacement for pywws (see retired section below). Instead of using the dummy usb driver, i decided to simply read the data directly and generate the javascript required by the dragontail website. 
+A replacement for pywws (see retired section below). I have an API that reads data from MQ and writes it to a SQL database running on my webserver. From there `mmwws` generates the javascript required by the dragontail website. 
+
+## BatteryMonitorV2
+This is an app that runs on a Wemos D1 Mini with Wifi to read the battery voltage of the solar array powering the Maplin station. Theres a full explanation in the folder's readme. 
 
 ## apis_services
 Various APIs and services to manage weather data
 
-### getbresser
-Retrieve my bresser data from Weather Underground. Data can't be directly retrieved from the Bresser so i run this service on one of my Raspberry Pis to retrive data from Weather Underground and publish it to my MQ server on a topic sensors/bresser_wu
+### wh1080_433
+An instance of RTL433 runs on my raspberry Pi3 named weatherpi to retrieve the WH1080 outdoor sensor data at 433 MHz, publishing to a second topic on MQ, `sensors/rtl_433_2/P32/C0`. 
 
-In addition, I'm running a vanilla instance of RTL433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic sensors/rtl_433/P172/C0. The config file for this is in this folder. I use both routes because WU can acess some of the internal sensor data not available over the air. 
-
-### readBmp280
-This service runs on a Pi3 and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic sensors/bmp280 and saved to file. 
-
-### rtl433ToMQ
-A second instance of RTL433 runs on the same Pi3 as the BME280 to retrieve the WH1080 outdoor sensor data at 433 MHz. For some reason this insance isn't able to directly publish to MQ, so i have a second process that reads the data from file and publishes it to MQ in topic sensors/wh1080. I need to revisit this klunky process. 
+### maplin2mq
+This service reads the Maplin station data from MQ and calculates then publishes additional values `feels_like` and `dew_point` to MQ in topic `sensors/rtl_433_2/P32/C0`. 
 
 ### whotoAws 
-This reads the data created by the bmp280 and rtl433 and saves it as a file. The file can be consumed by the dummy USB driver for pywws, but is now pushed to AWS for  use in mmwws. 
+This reads the data created by `bmp280` (see below) and `wh1080_433` and saves it as a file that is then copied to my AWS website for use in mmwws. 
+### setupdb
+creates the SQL database on the webserver. 
 
 ### getDataAws
-Reads data from whtoAws and adds it to a datafile on my AWS server. The data are then consumed by mmwws. 
+Reads data from the file pushed by whtoAws and adds it to a SQL database on my AWS server. The data are then consumed by mmwws. 
+
+### bresser rtl433
+I'm running a vanilla instance of RTL433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic `sensors/rtl_433/P172/C0`. The config file for this is in this folder.
+
+### getbresser
+Retrieve additional bresser data from Weather Underground. Some data can't be directly retrieved from the Bresser but is available from Wunderground somehow. So i run this service on one of my Raspberry Pis to retrive data from Weather Underground and publish it to my MQ server on a topic `sensors/bresser_wu`
+
+### getbressrain
+This simple script reads bresser rain data from MQ and calculates hourly rainfall stats. This isn't available from the station directly. 
+
+### readBmp280
+This service runs on the Pi3 and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic `sensors/bmp280` and saved to file. 
+
+### mqtoMastodon
+Attempts to post weather data to Mastodon, but i tink this is borked. 
 
 # pibackup
 a backup of the installation on the Pi, in case i need to refer to it. 
+
 
 ## Retired APIs 
 ### subswh1080
