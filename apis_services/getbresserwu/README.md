@@ -6,11 +6,6 @@ However, you can configure the station to publish to Weather Underground.
 ## Indoor sensors
 This programme collects the *indoor* sensors data from Weather Underground via their API and publishes it to MQTT. These data are not otherwise published by the unit.
 
-## Outdoor sensors
-You can also intercept the data via *rtl_433*, which can read the *outdoor* sensors and publish 
-their values to MQTT. So i have *rtl_433* running on a Pi to publish the external data, and 
-this programme listening to Weather Underground to read back the other data and publish it. 
-
 ## Openhab
 The programme also publishes some data to my OpenHAB installation, via OpenHAB's cloud API gateway. 
 

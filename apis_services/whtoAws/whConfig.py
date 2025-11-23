@@ -14,13 +14,12 @@ def loadConfig():
 
     weatherdir = os.path.expanduser('WEATHERDIR')
     localdir = os.path.join(weatherdir, 'maplinstn')
-    remotedir = 'wordpresssite:weather/upload/'
     intvl = 1 # minutes
 
     whfile = os.path.join(localdir, whfile)
     bpfile = os.path.join(localdir, bpfile)
     targfile = os.path.join(weatherdir, targfile)
-    return whfile, bpfile, targfile, remotedir, weatherdir, intvl
+    return whfile, bpfile, targfile, weatherdir, intvl
 
 
 def loadSQLconfig(bkp=False):

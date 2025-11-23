@@ -8,8 +8,6 @@
 # The locations of the source files and target file are defined in whConfig
 
 import json 
-import paramiko
-from scp import SCPClient
 import os
 import time
 import logging
@@ -51,27 +49,8 @@ def loadAndSave(whfile, bpfile, targfile):
     return
 
 
-def uploadFile(fname, remotedir):
-    hn, pth = remotedir.split(':')
-    config=paramiko.config.SSHConfig.from_path(os.path.expanduser('~/.ssh/config'))
-    sitecfg = config.lookup(hn)
-    c = paramiko.SSHClient()
-    c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    pkey = paramiko.RSAKey.from_private_key_file(os.path.expanduser(sitecfg['identityfile'][0])) 
-    for ret in range(10):
-        try:
-            c.connect(sitecfg['hostname'], username=sitecfg['user'], pkey=pkey, look_for_keys=False)
-            scpcli = SCPClient(c.get_transport())
-            scpcli.put(fname, os.path.join(pth, os.path.split(fname)[1]))
-            scpcli.close()
-            c.close()
-        except:
-            print('connection failed, retrying')
-    return
-
-
 if __name__ == '__main__':
-    whfile, bpfile, targfile, remotedir, localdir, intvl = loadConfig()
+    whfile, bpfile, targfile, localdir, intvl = loadConfig()
 
     log.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
@@ -91,7 +70,6 @@ if __name__ == '__main__':
     while runme is True:
         loadAndSave(whfile, bpfile, targfile)
         if len(targfile) > 5:
-            #uploadFile(targfile, remotedir)
             try:
                 postToMySQL(targfile)
                 log.info('saved to primary database')

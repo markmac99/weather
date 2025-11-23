@@ -2,9 +2,13 @@
 
 Various weatherstation and weather related stuff
 
-I run two weatherstations, a maplin WH1080 compatible unit and a Bresser 5-in-1 unit. I also have a BMP280 chip providing pressure and temperature data. This is normally pluggs into an Arduino, but able to be read by a Raspberry Pi via GPIO/
-The RTL433 and BME280 data are being published to MQ Series along with data from my Bresser weatherstation (see below). 
+I run two weatherstations, a maplin WH1080 compatible unit and a Bresser 5-in-1 unit. 
 
+I also have a BMP280 chip providing pressure and temperature data. This is normally pluggs into an Arduino, but able to be read by a Raspberry Pi via GPIO. 
+
+The Weatherstation and BME280 data are being published to MQ Series along with other data that i'm calculating from the available data. The APIs and Maplin data collection are running on a Pi3, imaginatively named `weatherpi3`. The Bresser data collection runs on a second Pi3 named `wxsatpi`. 
+
+Once collected, the data are pushed to a SQL database running on webserver hosted on AWS.
 
 
 ## website
@@ -20,23 +24,21 @@ This is an app that runs on a Wemos D1 Mini with Wifi to read the battery voltag
 Various APIs and services to manage weather data
 
 ### wh1080_433
-An instance of RTL433 runs on my raspberry Pi3 named weatherpi to retrieve the WH1080 outdoor sensor data at 433 MHz, publishing to a second topic on MQ, `sensors/rtl_433_2/P32/C0`. 
+I'm running a vanilla instance of RTL433 tuned to 433MHz to retrieve data from the WH1080 outdoor sensor data, publishing to a topic on MQ, `sensors/rtl_433_2/P32/C0`. 
 
 ### maplin2mq
-This service reads the Maplin station data from MQ and calculates then publishes additional values `feels_like` and `dew_point` to MQ in topic `sensors/rtl_433_2/P32/C0`. 
+This service reads the Maplin station data from MQ then calculates and publishes additional values `feels_like` and `dew_point` to MQ in topic `sensors/rtl_433_2/P32/C0`. 
 
 ### whotoAws 
-This reads the data created by `bmp280` (see below) and `wh1080_433` and saves it as a file that is then copied to my AWS website for use in mmwws. 
+This reads the data created by `wh1080_433` and `bmp280` (see below) and saves to the SQL database running on  my AWS webserver, for use in `mmwws`. 
+
 ### setupdb
 creates the SQL database on the webserver. 
 
-### getDataAws
-Reads data from the file pushed by whtoAws and adds it to a SQL database on my AWS server. The data are then consumed by mmwws. 
-
-### bresser rtl433
+### bresser_rtl433
 I'm running a vanilla instance of RTL433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic `sensors/rtl_433/P172/C0`. The config file for this is in this folder.
 
-### getbresser
+### getbresserwu
 Retrieve additional bresser data from Weather Underground. Some data can't be directly retrieved from the Bresser but is available from Wunderground somehow. So i run this service on one of my Raspberry Pis to retrive data from Weather Underground and publish it to my MQ server on a topic `sensors/bresser_wu`
 
 ### getbressrain
@@ -71,4 +73,7 @@ data from the WH1080. However over time the unit developed a problem with its US
 
 ## dummyusb
 When the USB port on the WH1080 malfunctioned, i realised i can read data from the outside sensors using an RTL-433 dongle. To replace the indoor sensors i am using a BME280 breakbout board in a Raspberry pi.  So i wrote some software to capture the data to file (see services below), and then created a dummy USB driver for pywws that reads the file and feeds the data to pywws. 
+
+### getDataAws
+Read data from the file pushed by whtoAws and added it to a SQL database on my AWS server. The data are then consumed by mmwws. 
 
