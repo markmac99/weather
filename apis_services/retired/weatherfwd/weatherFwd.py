@@ -7,8 +7,9 @@ from openhab import OpenHAB
 # ATTENTION: don't use f-strings to maintain Python 3.5 compatability
 
 
-openhab_URL = 'http://wxsatpi:8080/rest'
+openhab_URL = 'http://ohserver:8080/rest'
 weather_URL = 'http://weatherpi:5000'
+
 
 class WeatherFwd(threading.Thread):
 

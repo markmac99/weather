@@ -128,7 +128,7 @@ def getDataFromWU():
         else:
             writeLogEntry('problem connecting to openhab')
     except:
-            writeLogEntry('problem connecting to openhab')
+        writeLogEntry('problem connecting to openhab')
 
     sendDataToMQTT(['outsideTemp', temp])
     sendDataToMQTT(['feels_like', feels_like])

@@ -1,4 +1,4 @@
-- hosts: wxsatpi
+- hosts: metsatpi
   gather_facts: false
   vars:
     srcdir: /mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/bresser_rtl433
