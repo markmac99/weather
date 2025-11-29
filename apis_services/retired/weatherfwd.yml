@@ -1,4 +1,4 @@
-- hosts: thelinux # wxsatpi
+- hosts: thelinux # metsatpi
   vars:
     srcdir: /mnt/e/dev/weather/weatherstnapi/weatherfwd
   environment: 

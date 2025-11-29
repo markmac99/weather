@@ -23,7 +23,7 @@
     ansible.builtin.replace:
       path: '{{targdir}}/mqConfig.py'
       regexp: "someserver.net"
-      replace: "wxsatpi"
+      replace: "metsatpi"
   - name: update mquser bmp280
     ansible.builtin.replace:
       path: '{{targdir}}/mqConfig.py'
