@@ -13,10 +13,10 @@
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
-    - {src: '{{srcdir}}/wh1080_mq.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+    - {src: '{{srcdir}}/maplin2mq.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/whConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
-    - {src: '{{srcdir}}/wh1080_mq.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/maplintomq.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/weatherCalcs.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/maplin2mq.service', dest: '{{targdir}}/', mode: '644', backup: yes }

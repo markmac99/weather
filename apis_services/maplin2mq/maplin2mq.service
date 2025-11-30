@@ -5,7 +5,7 @@ Description=Push data from WH1080 to MQTT and MySQL
 After=network.target
 
 [Service]
-ExecStart=/home/pi/source/maplin2mq/wh1080_mq.sh
+ExecStart=/home/pi/source/maplin2mq/maplin2mq.sh
 ExecStop=/usr/bin/touch /home/pi/weather/stopwhfwd
 Restart=always
 RestartSec=5
