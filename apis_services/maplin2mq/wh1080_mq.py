@@ -65,7 +65,6 @@ def postToMySQL(whdata, usebkp=False):
     conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
     cur = conn.cursor()
     evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
-    whdata['time'] = evtdt.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # get previous rain and work out change
     result = cur.execute('select rain_mm, temperature_C, press_rel, apressure, wind_avg_km_h, wind_max_km_h from wh1080data where temperature_C is not null order by time desc limit 1')
@@ -99,7 +98,7 @@ def postToMySQL(whdata, usebkp=False):
         "timestamp, rainchg, year, month, day) "\
         "VALUES (%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s, %s, %s,%s, %s,%s, %s)"
 
-    vals = (whdata['time'], whdata['model'], whdata['subtype'], whdata['id'], whdata['battery_ok'], whdata['temperature_C'], whdata['humidity'],
+    vals = (evtdt.strftime('%Y-%m-%dT%H:%M:%SZ'), whdata['model'], whdata['subtype'], whdata['id'], whdata['battery_ok'], whdata['temperature_C'], whdata['humidity'],
         whdata['wind_dir_deg'], whdata['wind_avg_km_h'], whdata['wind_max_km_h'], whdata['rain_mm'], whdata['mic'],
         evtdt.strftime('%Y-%m-%d %H:%M:%S'), whdata['rainchg'], evtdt.year, evtdt.month, evtdt.day)
 
@@ -157,11 +156,13 @@ def on_message(client, userdata, msg):
         currdata[ts] = jsonmsg
 
         postToMySQL(jsonmsg)
-        postToMySQL(jsonmsg, bkp=True)
+        postToMySQL(jsonmsg, usebkp=True)
 
+        log.info('saving back to file')
         with open(os.path.join(datadir, 'weatherdata.json'), 'w') as outf: 
             json.dump(currdata, outf)
         # now add extra data to MQ
+        log.info('calculating the additional data')
         t = float(jsonmsg['temperature_C'])
         rh = float(jsonmsg['humidity'])
         v = float(jsonmsg['wind_avg_km_h'])
