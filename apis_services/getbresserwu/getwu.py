@@ -9,6 +9,9 @@ import datetime
 from openhab import OpenHAB
 import os
 import paho.mqtt.client as mqtt
+import logging
+import sys
+import logging.handlers
 
 from mqConfig import readConfig
 from wuconfig import stationid, getWUkey, getOpenhabURL
@@ -18,6 +21,35 @@ LOG_DIRECTORY = os.getenv('LOGDIR', default=os.path.expanduser('~/logs'))
 STOPFILE = './stopgetwu'
 MAX_RETRIES = 20
 SLEEP_TIME = 60 # wunderground limits you to 1500 requests per day = 1 per min
+
+
+log = logging.getLogger()
+log.setLevel(logging.INFO)
+
+
+def setupLogging(logpath):
+    print('about to initialise logger')
+    logdir = os.path.expanduser(logpath)
+    os.makedirs(logdir, exist_ok=True)
+
+    logfilename = os.path.join(logdir, 'getbresswu.log')
+    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
+        datefmt='%Y/%m/%d %H:%M:%S')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
+        datefmt='%Y/%m/%d %H:%M:%S')
+    ch.setFormatter(formatter)
+    log.addHandler(ch)
+    log.setLevel(logging.INFO)
+
+    log.info('logging initialised')
+    return 
 
 
 # The MQTT callback function. It will be triggered when trying to connect to the MQTT broker
@@ -60,11 +92,6 @@ def sendAllDataToMQTTParent(data):
     return ret
 
 
-def writeLogEntry(msg):
-    with open(LOG_DIRECTORY+"/getwu.log", mode='a+', encoding='utf-8') as f:
-        f.write(msg + '\n')
-
-
 def correctForAltitude(press, temp, alti):
     denom = temp + 273.15 + 0.0065 * alti
     val = (1 - (0.0065 * alti)/denom)
@@ -79,7 +106,7 @@ def getDataFromWU():
     r = requests.get(url)
     if r.status_code != 200:
         # Not successful. Assume Authentication Error
-        writeLogEntry(f'Request Status Error: {str(r.status_code)}')
+        log.info(f'Request Status Error: {str(r.status_code)}')
         return False
     data_dict = json.loads(r.text)['observations'][0]
     dtutc = data_dict['obsTimeUtc']
@@ -112,7 +139,7 @@ def getDataFromWU():
     else:
         feels_like = temp
 
-    writeLogEntry(f'{evt_time},{temp}, {feels_like}, {pressure}, {windSpeed}, {windGust},' 
+    log.info(f'{evt_time},{temp}, {feels_like}, {pressure}, {windSpeed}, {windGust},' 
         f'{windir}, {humid}, {uvidx}, {solrad}, {dewpt}, {precipRate},{precipTotal}')
 
     # update openhab
@@ -126,9 +153,9 @@ def getDataFromWU():
             FeelsLike.state = feels_like
             RelPressure.state = pressure
         else:
-            writeLogEntry('problem connecting to openhab')
+            log.info('problem connecting to openhab')
     except:
-        writeLogEntry('problem connecting to openhab')
+        log.info('problem connecting to openhab')
 
     sendDataToMQTT(['outsideTemp', temp])
     sendDataToMQTT(['feels_like', feels_like])
@@ -151,14 +178,16 @@ def getDataFromWU():
     alldata = {"outsideTemp": temp, "feels_like": feels_like, "pressure": pressure, "precipTotal": precipTotal,
                 "precipRate": precipRate, "windGust": windGust, "windSpeed": windSpeed, "windDir": windir,
                 "dewPoint": dewpt, "humidity": humid, "UVIdx": uvidx, "solarRadiation": solrad, "obsTimeUtc": dtutc}
-    writeLogEntry('sending all data')
+    log.info('sending all data')
     sendAllDataToMQTTParent(json.dumps(alldata))
 
     return True
 
 
 if __name__ == '__main__':
-    writeLogEntry('========\nStarting...')
+    setupLogging(LOG_DIRECTORY)
+    log.info('===========')
+    log.info('Starting...')
     os.makedirs(LOG_DIRECTORY, exist_ok=True)
     if os.path.isfile(STOPFILE):
         os.remove(STOPFILE)
@@ -167,7 +196,7 @@ if __name__ == '__main__':
         getDataFromWU()
         time.sleep(SLEEP_TIME)
         if os.path.isfile(STOPFILE):
-            writeLogEntry('Exiting...')
+            log.info('Exiting...')
             os.remove(STOPFILE)
             runme = False
             break

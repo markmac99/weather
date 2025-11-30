@@ -9,6 +9,8 @@ import sys
 import json
 import paho.mqtt.client as mqtt
 import pymysql
+import logging
+import logging.handlers
 
 from whConfig import loadSQLconfig
 from mqConfig import readConfig, stationAltitude
@@ -16,10 +18,33 @@ from mqConfig import readConfig, stationAltitude
 from bme280 import bme280, bme280_i2c
 
 
-def writeLogEntry(logdir, msg):
-    with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
-        nowdt = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        f.write(f'{nowdt}: {msg}')
+log = logging.getLogger()
+log.setLevel(logging.INFO)
+
+
+def setupLogging(logpath):
+    print('about to initialise logger')
+    logdir = os.path.expanduser(logpath)
+    os.makedirs(logdir, exist_ok=True)
+
+    logfilename = os.path.join(logdir, 'bmp280.log')
+    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
+        datefmt='%Y/%m/%d %H:%M:%S')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
+        datefmt='%Y/%m/%d %H:%M:%S')
+    ch.setFormatter(formatter)
+    log.addHandler(ch)
+    log.setLevel(logging.INFO)
+
+    log.info('logging initialised')
+    return 
 
 
 def postToMySQL(bmpdata, logdir, bkp=False):
@@ -47,9 +72,9 @@ def postToMySQL(bmpdata, logdir, bkp=False):
     result = cur.execute(sql, vals)
 
     if result != 1:
-        writeLogEntry(logdir, 'unable to write to mysql table\n')
+        log.info('unable to write to mysql table')
     else:
-        writeLogEntry(logdir, f'wrote {bmpdata} to {sqlserver}\n')
+        log.info(f'wrote {bmpdata} to {sqlserver}')
         
     conn.commit()
     conn.close()
@@ -83,8 +108,8 @@ def sendDataToMQTT(data, logdir):
             topic = f'sensors/bmp280/{ele}'
             ret = client.publish(topic, payload=data[ele], qos=0, retain=False)
     except:
-        writeLogEntry(logdir, f'problem sending {ele} value {data[ele]}\n')
-    writeLogEntry(logdir, f'sent {data}\n')
+        log.info(f'problem sending {ele} value {data[ele]}')
+    log.info(f'sent {data}')
     return ret
 
 
@@ -99,7 +124,7 @@ def getTempPressHum(prvdata = None):
         pressure = prvdata['press_rel']
     if prvdata:
         if abs(cTemp - prvdata['temp_c_in']) > 5:
-            writeLogEntry(logdir, f'temp diff too big - {cTemp} to {prvdata["temp_c_in"]}')
+            log.info(f'temp diff too big - {cTemp} to {prvdata["temp_c_in"]}')
             cTemp = prvdata['temp_c_in']
     cpressure = correctForAltitude(pressure, cTemp, stationAltitude())
     now = datetime.datetime.utcnow().isoformat()[:19]+'Z'
@@ -124,6 +149,7 @@ if __name__ == '__main__':
         outdir = os.path.join(sys.argv[1], 'maplinstn')
         logdir = os.path.join(sys.argv[1], 'logs')
         stopfile = os.path.join(sys.argv[1], 'stopbmp280')
+    setupLogging(logdir)        
     runme = True
     os.makedirs(outdir, exist_ok=True)
     os.makedirs(logdir, exist_ok=True)
@@ -151,10 +177,10 @@ if __name__ == '__main__':
             prvdata = data
             time.sleep(60)
             if os.path.isfile(stopfile):
-                writeLogEntry(logdir, 'Exiting...\n==========\n')
+                log.info('Exiting...')
                 os.remove(stopfile)
                 runme = False
                 break
     except OSError:
-        writeLogEntry(logdir, 'unable to connect to bmp280, check wiring\n')
+        log.error('unable to connect to bmp280, check wiring')
         print('unable to connect to bmp280, check wiring\n')
