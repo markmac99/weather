@@ -16,11 +16,11 @@ def loadDfFromDB(days=None, startdt=None, enddt=None):
         refdt = datetime.datetime.now() + datetime.timedelta(days = -(days+1))
         df = pd.read_sql("select time,timestamp,temperature_C,humidity,rain_mm," 
                         "press_rel,wind_max_km_h,wind_avg_km_h,temp_c_in,wind_dir_deg,humidity_in," 
-                        f"rainchg,apressure from wh1080data where time > '{refdt}'", cnx)
+                        f"rainchg,apressure from wh1080data where time > '{refdt}' and temperature_C is not null", cnx)
     elif startdt and enddt:
         df = pd.read_sql("select time,timestamp,temperature_C,humidity,rain_mm," 
                         "press_rel,wind_max_km_h,wind_avg_km_h,temp_c_in,wind_dir_deg,humidity_in," 
-                        f"rainchg,apressure from wh1080data where time >= '{startdt}' and time <'{enddt}'", cnx)
+                        f"rainchg,apressure from wh1080data where time >= '{startdt}' and time <'{enddt}' and temperature_C is not null", cnx)
     else:
         return None
     # convert time column properly    
