@@ -8,7 +8,9 @@ import os
 import sys
 import json
 import paho.mqtt.client as mqtt
+import pymysql
 
+from whConfig import loadSQLconfig
 from mqConfig import readConfig, stationAltitude
 
 from bme280 import bme280, bme280_i2c
@@ -18,6 +20,40 @@ def writeLogEntry(logdir, msg):
     with open(os.path.join(logdir, "bmp280.log"), mode='a+', encoding='utf-8') as f:
         nowdt = datetime.datetime.now(datetime.timezone.utc).isoformat()
         f.write(f'{nowdt}: {msg}')
+
+
+def postToMySQL(bmpdata, logdir, bkp=False):
+    sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=bkp)
+    conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
+    cur = conn.cursor()
+    evtdt = datetime.datetime.strptime(bmpdata['time'], '%Y-%m-%dT%H:%M:%SZ')
+
+    result = cur.execute('select press_rel, apressure from wh1080data where press_rel is not null order by time desc limit 1')
+    lastdata = cur.fetchone()
+    if lastdata:
+        # TODO - check for unrealistic wind and pressure changes. 
+        # pressure change > 10 hPa is very implausible, as is a value outside the range 950-1080
+        prevpress = lastdata[0]
+        prevapress = lastdata[1]
+        pressdiff = abs(bmpdata['press_rel'] - prevpress)
+        if bmpdata['press_rel'] < 900 or bmpdata['press_rel'] > 1100 or pressdiff > 10:
+            bmpdata['press_rel'] = prevpress
+            bmpdata['apressure'] = prevapress
+
+    sql = "INSERT INTO wh1080data (time, timestamp, humidity_in, temp_c_in, press_rel, apressure, year, month, day) "\
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    vals = (bmpdata['time'], evtdt.strftime('%Y-%m-%d %H:%M:%S'), bmpdata['humidity_in'], bmpdata['temp_c_in'],
+            bmpdata['press_rel'], bmpdata['apressure'], evtdt.year, evtdt.month, evtdt.day)
+    result = cur.execute(sql, vals)
+
+    if result != 1:
+        writeLogEntry(logdir, 'unable to write to mysql table\n')
+    else:
+        writeLogEntry(logdir, f'wrote {bmpdata} to {sqlserver}\n')
+        
+    conn.commit()
+    conn.close()
+    return
 
 
 # The MQTT callback function. It will be triggered when trying to connect to the MQTT broker
@@ -105,11 +141,13 @@ if __name__ == '__main__':
                 currdata = json.loads(open(outfname).read())
             else:
                 currdata = {}
-            dtstamp  = datetime.datetime.strptime(data['time'], '%Y-%m-%dT%H:%M:%SZ').timestamp()
+            dtstamp = datetime.datetime.strptime(data['time'], '%Y-%m-%dT%H:%M:%SZ').timestamp()
             currdata[dtstamp] = data
             with open(outfname, 'w') as outf:
                 json.dump(currdata, outf)
             sendDataToMQTT(data, logdir)
+            postToMySQL(data, logdir)
+            postToMySQL(data, logdir, bkp=True)
             prvdata = data
             time.sleep(60)
             if os.path.isfile(stopfile):

@@ -15,6 +15,7 @@
     - {src: '{{srcdir}}/bmp280.service', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/bmp280.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+    - {src: '{{srcdir}}/whConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/readBmp280.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
@@ -41,13 +42,29 @@
       regexp: "SRCDIR"
       replace: " {{ targdir }}"
 
-  - name: update WEATHERDIR
+  - name: update WEATHERDIR in service file
     ansible.builtin.replace:
       path: '{{targdir}}/bmp280.service'
       regexp: "WEATHERDIR"
       replace: "{{ weatherdir }}"
-  - name: update WEATHERDIR 2
+  - name: update WEATHERDIR in shell script
     ansible.builtin.replace:
       path: '{{targdir}}/bmp280.sh'
       regexp: "WEATHERDIR"
       replace: "{{ weatherdir }}"
+
+  - name: update SQL password
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "redacted"
+      replace: "{{ wh1080dbpassword }}"
+  - name: update primary DB
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "PRIMARYDB"
+      replace: "batchserver.markmcintyreastro.co.uk"
+  - name: update backup DB
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "BACKUPDB"
+      replace: "localhost"
