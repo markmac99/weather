@@ -8,11 +8,13 @@ import json
 import sys
 from paho.mqtt import client as mqtt_client
 import datetime
-
-from mqConfig import readConfig
-from weatherCalcs import dewPoint, windChill, heatIndex
+import pymysql
 import logging
 import logging.handlers
+
+from whConfig import loadSQLconfig
+from mqConfig import readConfig
+from weatherCalcs import dewPoint, windChill, heatIndex
 
 broker, mqport, username, password = readConfig()
 
@@ -58,6 +60,61 @@ def setupLogging(logpath):
     return 
 
 
+def postToMySQL(whdata, usebkp=False):
+    sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=usebkp)
+    conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
+    cur = conn.cursor()
+    evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
+    whdata['time'] = evtdt.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    # get previous rain and work out change
+    result = cur.execute('select rain_mm, temperature_C, press_rel, apressure, wind_avg_km_h, wind_max_km_h from wh1080data where temperature_C is not null order by time desc limit 1')
+    lastdata = cur.fetchone()
+    if lastdata:
+        prevrain = lastdata[0]
+        rainchg = whdata['rain_mm'] - prevrain
+
+        # ignore unrealistic changes
+        if rainchg > -0.31 and rainchg < 50:
+            whdata['rainchg'] = rainchg
+
+        # check for unrealistic temperature movements    
+        prevtempc = lastdata[1]
+        if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 10:
+            whdata['temperature_C'] = prevtempc
+
+        # wind speed change of > 10 kmh is unrealistic
+        prevwind = lastdata[4]
+        prevgust = lastdata[5]
+        winddiff = abs(whdata['wind_avg_km_h'] - prevwind)
+        if whdata['wind_avg_km_h'] > 120 or winddiff > 50:
+            whdata['wind_avg_km_h'] = prevwind
+        if whdata['wind_max_km_h'] > 170:
+            whdata['wind_max_km_h'] = prevgust
+    else:
+        whdata['rainchg'] = 0
+
+    sql = " INSERT INTO wh1080data (time, model, subtype, id, battery_ok, temperature_C, humidity,"\
+        "wind_dir_deg, wind_avg_km_h, wind_max_km_h, rain_mm, mic,"\
+        "timestamp, rainchg, year, month, day) "\
+        "VALUES (%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s, %s, %s,%s, %s,%s, %s)"
+
+    vals = (whdata['time'], whdata['model'], whdata['subtype'], whdata['id'], whdata['battery_ok'], whdata['temperature_C'], whdata['humidity'],
+        whdata['wind_dir_deg'], whdata['wind_avg_km_h'], whdata['wind_max_km_h'], whdata['rain_mm'], whdata['mic'],
+        evtdt.strftime('%Y-%m-%d %H:%M:%S'), whdata['rainchg'], evtdt.year, evtdt.month, evtdt.day)
+
+    result = cur.execute(sql, vals)
+
+    if result != 1:
+        log.info('unable to write to mysql table')
+    else:
+        log.info(f'wrote {whdata} to {sqlserver}')
+        
+    conn.commit()
+    conn.close()
+    return
+
+
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
@@ -98,6 +155,10 @@ def on_message(client, userdata, msg):
             currdata = {}
         ts = datetime.datetime.strptime(jsonmsg['time'], '%Y-%m-%d %H:%M:%S').timestamp()
         currdata[ts] = jsonmsg
+
+        postToMySQL(jsonmsg)
+        postToMySQL(jsonmsg, bkp=True)
+
         with open(os.path.join(datadir, 'weatherdata.json'), 'w') as outf: 
             json.dump(currdata, outf)
         # now add extra data to MQ

@@ -15,6 +15,7 @@
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/wh1080_mq.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/whConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/wh1080_mq.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/weatherCalcs.py', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
@@ -35,3 +36,19 @@
       path: '{{targdir}}/mqConfig.py'
       regexp: "changeme"
       replace: "{{ mqsenspassword }}"
+
+  - name: update SQL password
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "redacted"
+      replace: "{{ wh1080dbpassword }}"
+  - name: update primary DB
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "PRIMARYDB"
+      replace: "batchserver.markmcintyreastro.co.uk"
+  - name: update backup DB
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "BACKUPDB"
+      replace: "localhost"

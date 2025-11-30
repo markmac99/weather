@@ -1,7 +1,7 @@
 # copyright Mark McIntyre, 2023
 
 [Unit]
-Description=Push data from WH1080 to MQTT
+Description=Push data from WH1080 to MQTT and MySQL
 After=network.target
 
 [Service]
