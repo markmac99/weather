@@ -4,7 +4,6 @@
 # copyright Mark McIntyre, 2024
 
 import os
-import json
 import sys
 from paho.mqtt import client as mqtt_client
 import datetime
@@ -16,9 +15,6 @@ from whConfig import loadSQLconfig
 from mqConfig import readConfig
 from weatherCalcs import dewPoint, windChill, heatIndex
 
-broker, mqport, username, password = readConfig()
-
-datadir = '/home/pi/weather/maplinstn'
 
 topicroot = 'sensors/rtl_433_2/P32/C0'
 topics = ['time','battery_ok','temperature_C','humidity','wind_dir_deg','wind_avg_km_h','wind_max_km_h','rain_mm']
@@ -62,73 +58,69 @@ def setupLogging(logpath):
 
 def postToMySQL(whdata, usebkp=False):
     sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=usebkp)
-    conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
-    cur = conn.cursor()
-    evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
+    try:
+        conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
+        cur = conn.cursor()
+        evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
 
-    # get previous rain and work out change
-    result = cur.execute('select rain_mm, temperature_C, press_rel, apressure, wind_avg_km_h, wind_max_km_h from wh1080data where temperature_C is not null order by time desc limit 1')
-    lastdata = cur.fetchone()
-    if lastdata:
-        prevrain = lastdata[0]
-        rainchg = whdata['rain_mm'] - prevrain
+        # get previous rain and work out change
+        result = cur.execute('select rain_mm, temperature_C, press_rel, apressure, wind_avg_km_h, wind_max_km_h from wh1080data where temperature_C is not null order by time desc limit 1')
+        lastdata = cur.fetchone()
+        if 'rainchg' not in whdata:
+            whdata['rainchg'] = 0
+        if lastdata:
+            prevrain = lastdata[0]
+            rainchg = whdata['rain_mm'] - prevrain
 
-        # ignore unrealistic changes
-        if rainchg > -0.31 and rainchg < 50:
-            whdata['rainchg'] = rainchg
+            # ignore unrealistic changes
+            if rainchg > -0.31 and rainchg < 50:
+                whdata['rainchg'] = rainchg
 
-        # check for unrealistic temperature movements    
-        prevtempc = lastdata[1]
-        if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 10:
-            whdata['temperature_C'] = prevtempc
+            # check for unrealistic temperature movements    
+            prevtempc = lastdata[1]
+            if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 10:
+                whdata['temperature_C'] = prevtempc
 
-        # wind speed change of > 10 kmh is unrealistic
-        prevwind = lastdata[4]
-        prevgust = lastdata[5]
-        winddiff = abs(whdata['wind_avg_km_h'] - prevwind)
-        if whdata['wind_avg_km_h'] > 120 or winddiff > 50:
-            whdata['wind_avg_km_h'] = prevwind
-        if whdata['wind_max_km_h'] > 170:
-            whdata['wind_max_km_h'] = prevgust
-    else:
-        whdata['rainchg'] = 0
+            # wind speed change of > 10 kmh is unrealistic
+            prevwind = lastdata[4]
+            prevgust = lastdata[5]
+            winddiff = abs(whdata['wind_avg_km_h'] - prevwind)
+            if whdata['wind_avg_km_h'] > 120 or winddiff > 50:
+                whdata['wind_avg_km_h'] = prevwind
+            if whdata['wind_max_km_h'] > 170:
+                whdata['wind_max_km_h'] = prevgust
 
-    sql = " INSERT INTO wh1080data (time, model, subtype, id, battery_ok, temperature_C, humidity,"\
-        "wind_dir_deg, wind_avg_km_h, wind_max_km_h, rain_mm, mic,"\
-        "timestamp, rainchg, year, month, day) "\
-        "VALUES (%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s, %s, %s,%s, %s,%s, %s)"
+        sql = " INSERT INTO wh1080data (time, model, subtype, id, battery_ok, temperature_C, humidity,"\
+            "wind_dir_deg, wind_avg_km_h, wind_max_km_h, rain_mm, mic,"\
+            "timestamp, rainchg, year, month, day) "\
+            "VALUES (%s, %s, %s,%s, %s,%s, %s,%s, %s,%s, %s, %s, %s,%s, %s,%s, %s)"
 
-    vals = (evtdt.strftime('%Y-%m-%dT%H:%M:%SZ'), whdata['model'], whdata['subtype'], whdata['id'], whdata['battery_ok'], whdata['temperature_C'], whdata['humidity'],
-        whdata['wind_dir_deg'], whdata['wind_avg_km_h'], whdata['wind_max_km_h'], whdata['rain_mm'], whdata['mic'],
-        evtdt.strftime('%Y-%m-%d %H:%M:%S'), whdata['rainchg'], evtdt.year, evtdt.month, evtdt.day)
+        vals = (evtdt.strftime('%Y-%m-%dT%H:%M:%SZ'), whdata['model'], whdata['subtype'], whdata['id'], whdata['battery_ok'], whdata['temperature_C'], whdata['humidity'],
+            whdata['wind_dir_deg'], whdata['wind_avg_km_h'], whdata['wind_max_km_h'], whdata['rain_mm'], whdata['mic'],
+            evtdt.strftime('%Y-%m-%d %H:%M:%S'), whdata['rainchg'], evtdt.year, evtdt.month, evtdt.day)
 
-    result = cur.execute(sql, vals)
+        result = cur.execute(sql, vals)
 
-    if result != 1:
-        log.info('unable to write to mysql table')
-    else:
-        log.info(f'wrote {whdata} to {sqlserver}')
-        
-    conn.commit()
-    conn.close()
+        if result != 1:
+            log.info('unable to write to mysql table')
+        else:
+            log.info(f'wrote {whdata} to {sqlserver}')
+            
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        log.warning(f'unable to connect to SQLserver {e}')
     return
 
 
-def connect_mqtt():
-    def on_connect(client, userdata, flags, rc):
-        if rc == 0:
-            log.info("Connected to MQTT Broker!")
-        else:
-            log.error("Failed to connect, return code %d\n", rc)
-    client = mqtt_client.Client(client_id)
-    client.on_connect = on_connect
-    client.username_pw_set(username, password)
-    client.connect(broker, mqport)
-    return client
-
-
-def on_publish(client, userdata, result):
-    return 
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        log.info("Connected to MQTT Broker!")
+        for topic in topics:
+            log.info(f'subscribing to {topicroot}/{topic}')
+            client.subscribe(f'{topicroot}/{topic}')
+    else:
+        log.error("Failed to connect, return code %d\n", rc)
 
 
 def on_message(client, userdata, msg):
@@ -143,24 +135,13 @@ def on_message(client, userdata, msg):
         jsonmsg[thistopic] = int(msg.payload.decode())
     else:
         jsonmsg[thistopic] = msg.payload.decode()
-    
+    log.info(f'received {jsonmsg[thistopic]}')
     msgcount += 1
     if msgcount > 7 and jsonmsg['time'] != lasttime: 
-        log.info(jsonmsg)
-        # save the raw data as JSON
-        if os.path.isfile(os.path.join(datadir, 'weatherdata.json')):
-            currdata = json.loads(open(os.path.join(datadir, 'weatherdata.json')).read())
-        else:
-            currdata = {}
-        ts = datetime.datetime.strptime(jsonmsg['time'], '%Y-%m-%d %H:%M:%S').timestamp()
-        currdata[ts] = jsonmsg
-
+        log.info(f'processing {jsonmsg}')
         postToMySQL(jsonmsg)
         postToMySQL(jsonmsg, usebkp=True)
 
-        log.info('saving back to file')
-        with open(os.path.join(datadir, 'weatherdata.json'), 'w') as outf: 
-            json.dump(currdata, outf)
         # now add extra data to MQ
         log.info('calculating the additional data')
         t = float(jsonmsg['temperature_C'])
@@ -176,31 +157,29 @@ def on_message(client, userdata, msg):
             fl = hi
         client.publish(f'{topicroot}/feals_like', payload=fl, qos=0, retain=True)
         msgcount = 0
-        stopfile = os.path.join(datadir, 'stopwhfwd')
+        stopfile = os.path.join(os.getenv('TMP', default='/tmp'), 'stopwhfwd')
         if os.path.isfile(stopfile):
             log.info('stopping')
             os.remove(stopfile)
             exit(0)
 
 
-def subscribe(client: mqtt_client):
-    for topic in topics:
-        client.subscribe(f'{topicroot}/{topic}')
-    client.on_message = on_message
-    client.on_publish = on_publish
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        logdir = './logs'
+    else:
+        logdir = os.path.join(sys.argv[1], 'logs')
+    os.makedirs(logdir, exist_ok=True)
 
+    setupLogging(logdir)
 
-def run(dd):
-    global datadir
-    datadir = dd
     log.info('connecting to MQ')
-    client = connect_mqtt()
-    log.info('subscribing')
-    subscribe(client)
+    client = mqtt_client.Client(client_id)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    broker, mqport, username, password = readConfig()
+    client.username_pw_set(username, password)
+    client.connect(broker, mqport)
+
     log.info('looping')
     client.loop_forever()
-
-
-if __name__ == '__main__':
-    setupLogging(sys.argv[2])
-    run(sys.argv[1])

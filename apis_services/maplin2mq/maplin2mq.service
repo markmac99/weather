@@ -6,7 +6,7 @@ After=network.target
 
 [Service]
 ExecStart=/home/pi/source/maplin2mq/maplin2mq.sh
-ExecStop=/usr/bin/touch /home/pi/weather/stopwhfwd
+ExecStop=/usr/bin/touch /tmp/stopwhfwd
 Restart=always
 RestartSec=5
 
