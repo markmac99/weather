@@ -1,7 +1,9 @@
 - hosts: weatherpi3
   gather_facts: false
+  vars_files: 
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/apis_services/wh1080_433
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/wh1080_433"
     targdir: ~/source/wh1080_rtl433
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
