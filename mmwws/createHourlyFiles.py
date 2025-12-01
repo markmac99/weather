@@ -48,10 +48,6 @@ if __name__ == '__main__':
     logger.info('creating tables')
     recentTable(df, outdir, period=24*31) # last 31 days
 
-    logger.info('creating pressure graphs')
-    periodTemps(df, outdir, period=24*7, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
-    periodTemps(df, outdir, period=24*28, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
-
     logger.info('creating wind graphs')
     minmaxWind(df, outdir, period=24*7)
     minmaxWind(df, outdir, period=24*28)
@@ -64,6 +60,11 @@ if __name__ == '__main__':
     logger.info('creating wind roses')
     makeRose(df, outdir, 1)
     makeRose(df, outdir, 7)
+
+    logger.info('creating pressure graphs')
+    df = loadDfFromDB(days=32, pressdata=True)
+    periodTemps(df, outdir, period=24*7, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
+    periodTemps(df, outdir, period=24*28, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
     logger.info('updating monthly tables')
     currdt = datetime.datetime.now()

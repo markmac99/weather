@@ -48,9 +48,6 @@ if __name__ == '__main__':
     recentTable(df, outdir, period=6) # last six hours
     recentTable(df, outdir, period=24) # last day
 
-    logger.info('creating pressure graphs')
-    periodTemps(df, outdir, period=24, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
-
     logger.info('creating wind graphs')
     recentWind(df, outdir)
     minmaxWind(df, outdir, period=24)
@@ -58,5 +55,9 @@ if __name__ == '__main__':
     logger.info('creating rainfall graphs')
     recentRain(df, outdir)
     last24hRain(df, outdir)
+
+    logger.info('creating pressure graphs')
+    df = loadDfFromDB(days=2, pressdata=True)
+    periodTemps(df, outdir, period=24, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
     logger.info('done')

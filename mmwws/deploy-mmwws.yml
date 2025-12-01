@@ -1,8 +1,8 @@
 - hosts: batchserver
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/weather/weatherstation/mmwws
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/mmwws"
     targdir: ~/src/mmwws
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
