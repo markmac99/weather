@@ -6,7 +6,6 @@ import time
 import datetime
 import os
 import sys
-import json
 import paho.mqtt.client as mqtt
 import pymysql
 import logging
@@ -142,20 +141,15 @@ def correctForAltitude(press, temp, alti):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        outdir = './maplinstn'
         logdir = './logs'
-        stopfile = './stopbmp280' # to allow a clean stop from systemd
     else:
-        outdir = os.path.join(sys.argv[1], 'maplinstn')
         logdir = os.path.join(sys.argv[1], 'logs')
-        stopfile = os.path.join(sys.argv[1], 'stopbmp280')
+    stopfile = os.path.join(os.getenv('TMP',default='/tmp'), 'stopbmp280')
     setupLogging(logdir)        
     runme = True
-    os.makedirs(outdir, exist_ok=True)
     os.makedirs(logdir, exist_ok=True)
     if os.path.exists(stopfile):
         os.remove(stopfile)
-    outfname = os.path.join(outdir,'bmp280.json')
     bme280_i2c.set_default_i2c_address(0x76)
     bme280_i2c.set_default_bus(1)
     prvdata = None
@@ -163,14 +157,7 @@ if __name__ == '__main__':
         bme280.setup()
         while runme is True:
             data = getTempPressHum(prvdata)
-            if os.path.isfile(outfname):
-                currdata = json.loads(open(outfname).read())
-            else:
-                currdata = {}
             dtstamp = datetime.datetime.strptime(data['time'], '%Y-%m-%dT%H:%M:%SZ').timestamp()
-            currdata[dtstamp] = data
-            with open(outfname, 'w') as outf:
-                json.dump(currdata, outf)
             sendDataToMQTT(data, logdir)
             postToMySQL(data, logdir)
             postToMySQL(data, logdir, bkp=True)

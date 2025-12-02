@@ -42,11 +42,6 @@
       regexp: "SRCDIR"
       replace: " {{ targdir }}"
 
-  - name: update WEATHERDIR in service file
-    ansible.builtin.replace:
-      path: '{{targdir}}/bmp280.service'
-      regexp: "WEATHERDIR"
-      replace: "{{ weatherdir }}"
   - name: update WEATHERDIR in shell script
     ansible.builtin.replace:
       path: '{{targdir}}/bmp280.sh'

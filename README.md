@@ -2,20 +2,17 @@
 
 Various weatherstation and weather related stuff
 
-I run two weatherstations, a maplin WH1080 compatible unit and a Bresser 5-in-1 unit. 
+I run two weatherstations, a maplin WH1080 compatible unit from Maplin and a Bresser 5-in-1 unit. 
 
-I also have a BMP280 chip providing pressure and temperature data. This is normally pluggs into an Arduino, but able to be read by a Raspberry Pi via GPIO. 
+I also have a bmp280 chip providing pressure and temperature data. This is normally plugs into an Arduino, but can also be read by a Raspberry Pi via GPIO. 
 
-The Weatherstation and BME280 data are being published to MQ Series along with other data that i'm calculating from the available data. The APIs and Maplin data collection are running on a Pi3, imaginatively named `weatherpi3`. The Bresser data collection runs on a second Pi3 named `wxsatpi`. 
-
-Once collected, the data are pushed to a SQL database running on webserver hosted on AWS.
-
+The Weatherstation and bmp280 data are being published to MQ Series along with other data that i'm calculating such as wind chill, heat index and dew point. The APIs and Maplin data collection are running on a Pi3, imaginatively named `weatherpi3`. The Bresser data collection runs on a second Pi3 named `metsatpi`. Once collected, the Maplin and bmp280 data are pushed to a SQL database running on webserver hosted on AWS with a backup database on `weatherpi3`.
 
 ## website
-An implementation of the dragontail weather website. This initially consumed data from from pywws, but later i changed it to read data from files created by my own programme `mmwws`.
+An implementation of the dragontail weather website. This initially consumed data from from pywws, but later i changed it to read data from files created by my own programme `mmwws`. 
 
 ## mmwws
-A replacement for pywws (see retired section below). I have an API that reads data from MQ and writes it to a SQL database running on my webserver. From there `mmwws` generates the javascript required by the dragontail website. 
+A replacement for pywws (see retired section below). The application reads from the SQL database created above and generates the javascript required by the dragontail website which are then pushed to my website. 
 
 ## BatteryMonitorV2
 This is an app that runs on a Wemos D1 Mini with Wifi to read the battery voltage of the solar array powering the Maplin station. Theres a full explanation in the folder's readme. 
@@ -27,10 +24,8 @@ Various APIs and services to manage weather data
 I'm running a vanilla instance of RTL433 tuned to 433MHz to retrieve data from the WH1080 outdoor sensor data, publishing to a topic on MQ, `sensors/rtl_433_2/P32/C0`. 
 
 ### maplin2mq
-This service reads the Maplin station data from MQ then calculates and publishes additional values `feels_like` and `dew_point` to MQ in topic `sensors/rtl_433_2/P32/C0`. 
-
-### whotoAws 
-This reads the data created by `wh1080_433` and `bmp280` (see below) and saves to the SQL database running on  my AWS webserver, for use in `mmwws`. 
+This service reads the Maplin station data from MQ and pushes it to the SQL databases. 
+It also calculates and publishes additional values `feels_like` and `dew_point` to MQ in topic `sensors/rtl_433_2/P32/C0`. 
 
 ### setupdb
 creates the SQL database on the webserver. 
@@ -45,7 +40,7 @@ Retrieve additional bresser data from Weather Underground. Some data can't be di
 This simple script reads bresser rain data from MQ and calculates hourly rainfall stats. This isn't available from the station directly. 
 
 ### readBmp280
-This service runs on the Pi3 and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic `sensors/bmp280` and saved to file. 
+This service runs on the Pi3 and reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic `sensors/bmp280`, sent to SQL and saved to file. 
 
 ### mqtoMastodon
 Attempts to post weather data to Mastodon, but i tink this is borked. 
@@ -76,4 +71,7 @@ When the USB port on the WH1080 malfunctioned, i realised i can read data from t
 
 ### getDataAws
 Read data from the file pushed by whtoAws and added it to a SQL database on my AWS server. The data are then consumed by mmwws. 
+
+### whotoAws 
+This reads the data created by `wh1080_433` and `bmp280` (see below) and pushes it to the SQL databases. 
 

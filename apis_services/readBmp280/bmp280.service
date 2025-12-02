@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=SRCDIR/bmp280.sh
-ExecStop=/usr/bin/touch WEATHERDIR/stopbmp280
+ExecStop=/usr/bin/touch /tmp/stopbmp280
 Restart=always
 RestartSec=5
 

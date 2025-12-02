@@ -8,9 +8,5 @@ cd $here
 weatherdir=WEATHERDIR
 
 source /home/pi/venvs/pywws/bin/activate
-rm -f $weatherdir/stopbmp280
-yday=$(date --date yesterday +%Y%m%d)
-if [ ! -f $weatherdir/maplinstn/bmp280.json.${yday} ] ; then
-    mv $weatherdir/maplinstn/bmp280.json $weatherdir/maplinstn/bmp280.json.${yday}
-fi
+rm -f /tmp/stopbmp280
 python $here/readBmp280.py $weatherdir
