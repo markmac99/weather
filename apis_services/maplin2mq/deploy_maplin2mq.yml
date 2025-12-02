@@ -1,10 +1,10 @@
 - hosts: weatherpi3
-  gather_facts: false
   vars_files: 
     - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
     srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/maplin2mq"
-    targdir: ~/source/maplin2mq
+    targdir: "{{ ansible_env.HOME }}/source/maplin2mq"
+    logdir: "{{ ansible_env.HOME }}/weather/logs"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
@@ -36,6 +36,12 @@
       path: '{{targdir}}/mqConfig.py'
       regexp: "changeme"
       replace: "{{ mqsenspassword }}"
+
+  - name: update logdir
+    ansible.builtin.replace:
+      path: '{{targdir}}/whConfig.py'
+      regexp: "~/weather/logs"
+      replace: "{{ logdir }}"
 
   - name: update SQL password
     ansible.builtin.replace:

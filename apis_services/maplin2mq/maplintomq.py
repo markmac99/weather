@@ -11,7 +11,7 @@ import pymysql
 import logging
 import logging.handlers
 
-from whConfig import loadSQLconfig
+from whConfig import loadSQLconfig, getLogDir
 from mqConfig import readConfig
 from weatherCalcs import dewPoint, windChill, heatIndex
 
@@ -31,13 +31,13 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
-def setupLogging(logpath):
+def setupLogging():
     print('about to initialise logger')
-    logdir = os.path.expanduser(logpath)
+    logdir = os.path.expanduser(getLogDir())
     os.makedirs(logdir, exist_ok=True)
 
     logfilename = os.path.join(logdir, 'maplin2mq.log')
-    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
+    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='midnight', interval=1) 
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
         datefmt='%Y/%m/%d %H:%M:%S')
@@ -165,14 +165,7 @@ def on_message(client, userdata, msg):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        logdir = './logs'
-    else:
-        logdir = os.path.join(sys.argv[1], 'logs')
-    os.makedirs(logdir, exist_ok=True)
-
-    setupLogging(logdir)
-
+    setupLogging()
     log.info('connecting to MQ')
     client = mqtt_client.Client(client_id)
     client.on_connect = on_connect

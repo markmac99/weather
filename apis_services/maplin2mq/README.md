@@ -1,23 +1,26 @@
-# README for rtl433ToMQ
+# README for maplin2mq
 
-This code reads WH1080 / Maplin weatherstation data from MQTT and saves it to a file.
+This code reads WH1080 / Maplin weatherstation data from MQTT and posts it to my SQL database.
 It also augments it by adding feels_like and dewpoint values. 
 
 ## Prerequisites
-You'll need to install `wh1080_433` from this repo to grab data from the weatherstation and post it to MQ. 
+You must have a WH1080-compatible weatherstation such as the Maplin unit i have.
+You must have installed [rtl_433](https://github.com/merbanan/rtl_433.git) and configured it to publish data to MQTT. 
 
-# Install the Service
-Clone this repo to `$HOME/source` and then edit `mqConfig.py` to reflect your MQ server details. 
+See [wh1080_433](https://github.com/markmac99/weather/tree/master/apis_services/wh1080_433) in this repository for how to do that. 
 
-Create a virtual environment named `pywws` and install the requirements in it with 
+# Install the Software
+Clone this repo to a location of your choice such as `$HOME/source`.
+Create a python virtual environment named `pywws` and install the requirements: 
 ``` bash
 python3 -m venv ~/venvs/pywws
 source ~/venvs/pywws/bin/activate
 pip install -r $HOME/source/requirements.txt
 ```
+Update *mqConfig.py* with the details of your MQTT server. 
+Update *whconfig.py* with the details of your primary and backup SQL databases. 
 
-You may need to edit the bash scripts to reflect your user's homedir. Mine was `/home/pi` but yours may be different
-
+# Install the Service
 Now you can install and start the services.  
 ``` bash
 ./installservice.sh
@@ -27,6 +30,6 @@ Test that the service is running as follows:
 systemctl status maplin2mq
 ```
 
-This process will add two new topics to MQ for the feels_like and dewepoint values, and will also write the raw data to `~/weather/maplinstn/weatherdata.json`. 
+# Logging Output
+The programme logs into `~/weather/logs`. You can change this by updating *whConfig.py* and then restarting the service. 
 
-Logs are written to `~/weather/logs/wh1080_mq.log`

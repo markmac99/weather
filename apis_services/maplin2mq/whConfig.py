@@ -13,3 +13,7 @@ def loadSQLconfig(bkp=False):
     else:
         sqlserver = 'PRIMARYDB'
     return sqldb, sqluser, sqlpass, sqlserver
+
+
+def getLogDir():
+    return '~/weather/logs'
