@@ -4,7 +4,7 @@
   vars:
     srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/readBmp280"
     targdir:  "{{ ansible_env.HOME }}/source/readbmp280"
-    weatherdir: "{{ ansible_env.HOME }}/weather"
+    logdir: "{{ ansible_env.HOME }}/weather/logs"
   environment: 
     LD_LIBRARY_PATH: /usr/local/lib
   tasks:
@@ -42,11 +42,11 @@
       regexp: "SRCDIR"
       replace: " {{ targdir }}"
 
-  - name: update WEATHERDIR in shell script
+  - name: update logdir
     ansible.builtin.replace:
-      path: '{{targdir}}/bmp280.sh'
-      regexp: "WEATHERDIR"
-      replace: "{{ weatherdir }}"
+      path: '{{targdir}}/whConfig.py'
+      regexp: "~/weather/logs"
+      replace: "{{ logdir }}"
 
   - name: update SQL password
     ansible.builtin.replace:

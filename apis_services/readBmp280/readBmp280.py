@@ -11,8 +11,8 @@ import pymysql
 import logging
 import logging.handlers
 
-from whConfig import loadSQLconfig
-from mqConfig import readConfig, stationAltitude
+from whConfig import loadSQLconfig, getLogDir, stationAltitude
+from mqConfig import readConfig
 
 from bme280 import bme280, bme280_i2c
 
@@ -21,13 +21,13 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
-def setupLogging(logpath):
+def setupLogging():
     print('about to initialise logger')
-    logdir = os.path.expanduser(logpath)
+    logdir = os.path.expanduser(getLogDir())
     os.makedirs(logdir, exist_ok=True)
 
     logfilename = os.path.join(logdir, 'bmp280.log')
-    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
+    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='midnight', interval=1) 
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
         datefmt='%Y/%m/%d %H:%M:%S')
@@ -46,7 +46,7 @@ def setupLogging(logpath):
     return 
 
 
-def postToMySQL(bmpdata, logdir, bkp=False):
+def postToMySQL(bmpdata, bkp=False):
     sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=bkp)
     conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
     cur = conn.cursor()
@@ -94,7 +94,7 @@ def on_publish(client, userdata, result):
     return
 
 
-def sendDataToMQTT(data, logdir):
+def sendDataToMQTT(data):
     broker, mqport, username, password = readConfig()
     client = mqtt.Client('bmp280_fwd')
     client.on_connect = on_connect
@@ -140,14 +140,9 @@ def correctForAltitude(press, temp, alti):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        logdir = './logs'
-    else:
-        logdir = os.path.join(sys.argv[1], 'logs')
     stopfile = os.path.join(os.getenv('TMP',default='/tmp'), 'stopbmp280')
-    setupLogging(logdir)        
+    setupLogging()
     runme = True
-    os.makedirs(logdir, exist_ok=True)
     if os.path.exists(stopfile):
         os.remove(stopfile)
     bme280_i2c.set_default_i2c_address(0x76)
@@ -158,9 +153,9 @@ if __name__ == '__main__':
         while runme is True:
             data = getTempPressHum(prvdata)
             dtstamp = datetime.datetime.strptime(data['time'], '%Y-%m-%dT%H:%M:%SZ').timestamp()
-            sendDataToMQTT(data, logdir)
-            postToMySQL(data, logdir)
-            postToMySQL(data, logdir, bkp=True)
+            sendDataToMQTT(data)
+            postToMySQL(data)
+            postToMySQL(data, bkp=True)
             prvdata = data
             time.sleep(60)
             if os.path.isfile(stopfile):
