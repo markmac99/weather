@@ -3,8 +3,7 @@ Description=Get WH1080 data from Rtl433
 After=network.target
 
 [Service]
-ExecStart=/home/pi/source/wh1080_rtl433/runwh1080_433.sh
-ExecStop=/home/pi/source/wh1080_rtl433/stopwh1080_433.sh
+ExecStart=/usr/local/bin/rtl_433  -c WORKINGDIR/rtl_433.conf 
 Restart=always
 RestartSec=5
 

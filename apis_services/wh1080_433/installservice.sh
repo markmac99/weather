@@ -10,6 +10,6 @@ cd $here
 
 sudo cp wh1080_rtl433.service /etc/systemd/system/
 sudo cp rtl-sdr.rules /etc/udev/rules.d/
-sudo systemctl enable wh1080_rtl433
 sudo systemctl daemon-reload
+sudo systemctl enable wh1080_rtl433
 sudo systemctl start wh1080_rtl433

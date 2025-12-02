@@ -1,41 +1,28 @@
-# README for rtl433ToMQ
+# README for wh1080_rtl433
 
-This code reads from a WH1080 / Maplin weatherstation and posts the results to MQTT
-
-The process makes use of *rtl_433* to read from the weatherstation's outdoor sensors. 
+This code reads from a WH1080 / Maplin weatherstation and posts the results to MQTT. The process makes use of *rtl_433* to read from the weatherstation's outdoor sensors which broadcast at 433MHz. 
 
 ## Prerequisites
-You'll need to install *rtl-sdr* and its development libraries, plus development tools to build *rtl_433*. I 
-also strongly recommend you install into a python virtual environment to avoid corrupting your Pi's standard 
-python environment used by apt and othe system tools.
-``` bash
-sudo apt-get install rtl-sdr librtlsdr-dev
-sudo apt-get install libtool libusb-1.0-0-dev build-essential cmake pkg-config
-sudo apt-get install python3-venv
-```
-## Building rtl_433
-Download the code from [github](https://github.com/merbanan/rtl_433), then build and install it:
-``` bash
-mkdir -p  ~/source 
-cd ~/source
-git clone https://github.com/merbanan/rtl_433.git
-cd rtl_433
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
-```
-This will install *rtl_433* into */usr/local/bin*
+Clone the git repo [rtl_433](https://github.com/merbanan/rtl_433.git), and build it. 
+Follow the CMake instructions in that repository's documentation (`docs/BUILDING.md). 
 
-## Testing rtl_433, and a possible gotcha
+This will install the application into `/usr/local/bin/rtl_433` with a default config file in `/etc/rtl_433.conf`. We are not using the default file so you can ignore it. 
+
+## Update the config file in this repo
+Open *rtl_433.conf* in a text editor and fine the line starting with:
+``` bash
+output mqtt://
+```
+Update the hostname, port, user and password to reflect your own MQTT server details.
+You can also alter the topic string if you want. 
+
+## Testing rtl_433
 Test *rtl_433* by plugging in your RTL-SDR dongle, and running 
 ```bash
-rtl_433
+/usr/local/bin/rtl_433 -c ./rtl_433.conf
 ```
 You should get some initialisation messages, and then after a short while you should start getting data
-from any 433 MHz sensors in your area. This could include thermostats, garage door openers, tyre pressure monitors,
-and other household devices as well as your weatherstation! 
+from any 433 MHz sensors in your area published to your MQ server. This could include thermostats, garage door openers, tyre pressure monitors, and other household devices as well as your weatherstation!  Press Ctrl-C to end data capture. 
 
 If you get an error that permissions are wrong, copy the UDEV rules file in this repository to the location
 shown below and restart the pi:
@@ -45,48 +32,35 @@ sudo reboot
 ```
 You should now be able to run *rtl_433* without error.
 
-# Install the Services
-Make a folder in the pi user's home directory called *~/weather* and copy all files from this repo into this location. 
+# Install the Service
+Once you're happy its working you can install the service:
 ``` bash
-mkdir -p ~/source/wh1080_433
-cp *.sh *.py *.service  ~/source/wh1080_433
-mkdir -p ~/venvs
-```
-Next, create a python virtual environment, activate it and install the python libraries. 
-``` bash
-python3 -m venv ~/venvs/pywws
-source ~/venvs/pywws/bin/activate
-pip install -r ~/source/wh1080_433/requirements.txt
-```
-
-Edit the config file *mqConfig.py* to reference your MQTT broker and port, then you can install and start the services.  
-``` bash
-cd ~/source/wh1080_433
 ./installservice.sh
 ```
-This should install two services *rtl_433* which reads from the weatherstation sensors. Test as follows:
 
+Check the service' status as follows
 ```bash
 systemctl status rtl_433
 ```
 
-*rtl_433* writes data directly to MQ. A separate process `maplin2mq` reads from MQ and writes to file.
+That's it. Your weatherstation data is now being written to MQTT to a topic named *sensors/rtl_433_2/P32/C0*
 
-That's it. Your weatherstation data is now being written to MQTT to a topic named *rtl_433_2/*
+You can check this using any MQTT client. I use both `mosquitto` at the commandline and `MQTT-Explorer` for Windows. Here's some typical output from `mosquitto_sub`. 
 
 ``` bash
-$ mosquitto_sub -h someserver  -t sensors/# -i frobozz -d
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/time', (19 bytes)) 2023-11-25 10:34:35
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/model', (17 bytes)) Fineoffset-WHx080
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/subtype', (1 bytes)) 0
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/id', (2 bytes)) 86
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/battery_ok', ... (1 bytes)) 1
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/temperature_C', ... (3 bytes)) 5.0
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/humidity', ... (2 bytes)) 34
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/wind_dir_deg', ... (3 bytes)) 293
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/wind_avg_km_h', ... (5 bytes)) 4.896
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/wind_max_km_h', ... (5 bytes)) 7.344
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/rain_mm', ... (3 bytes)) 0.3
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/mic', ... (3 bytes)) CRC
-Client frobozz received PUBLISH (d0, q0, r0, m0, 'sensors/wh1080/feels_like', ... (4 bytes)) 4.12
+mosquitto_sub -h metsatpi  -t 'sensors/rtl_433_2/#' -i frobozz 
+(pywws) pi@weatherpi3:~/weather/logs $ mosquitto_sub -h metsatpi  -t 'sensors/rtl_433_2/#' -i frobozz
+6.8315
+12.3
+6.8315
+12.3
+2025-12-02T12:57:51
+91
+140
+2
+0
+62.2
+59
+CRC
+...
 ```

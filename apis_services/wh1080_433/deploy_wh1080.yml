@@ -12,9 +12,24 @@
   - name: Copy files
     copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
     with_items:
-    - {src: '{{srcdir}}/runwh1080_433.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
-    - {src: '{{srcdir}}/stopwh1080_433.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
     - {src: '{{srcdir}}/wh1080_rtl433.service', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/rtl-sdr.rules', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/rtl_433.conf', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
+
+  - name: Run whoami without become.
+    command: whoami
+    changed_when: false
+    become: false
+    register: whoami
+
+  - name: Set a fact with the user name.
+    set_fact:
+      login_user: "{{ whoami.stdout }}"
+
+  - name: update conf dir
+    ansible.builtin.replace:
+      path: '{{targdir}}/wh1080_rtl433.service'
+      regexp: "WORKINGDIR"
+      replace: "/home/{{ login_user }}/source/wh1080_rtl433"
+    
