@@ -19,3 +19,7 @@ def getOpenhabURL():
     
     ohurl = 'https://{}:{}@myopenhab.org/rest'.format(username, passwd)
     return ohurl
+
+
+def getLogDir():
+    return '~/weather/logs'

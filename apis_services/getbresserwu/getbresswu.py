@@ -14,11 +14,10 @@ import sys
 import logging.handlers
 
 from mqConfig import readConfig
-from wuconfig import stationid, getWUkey, getOpenhabURL
+from wuconfig import stationid, getWUkey, getOpenhabURL, getLogDir
 
 
-LOG_DIRECTORY = os.getenv('LOGDIR', default=os.path.expanduser('~/logs'))
-STOPFILE = './stopgetwu'
+
 MAX_RETRIES = 20
 SLEEP_TIME = 60 # wunderground limits you to 1500 requests per day = 1 per min
 
@@ -27,13 +26,13 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
-def setupLogging(logpath):
+def setupLogging():
     print('about to initialise logger')
-    logdir = os.path.expanduser(logpath)
+    logdir = os.path.expanduser(getLogDir())
     os.makedirs(logdir, exist_ok=True)
 
     logfilename = os.path.join(logdir, 'getbresswu.log')
-    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='D', interval=1) 
+    handler = logging.handlers.TimedRotatingFileHandler(logfilename, when='midnight', interval=1) 
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(fmt='%(asctime)s-%(levelname)s-%(module)s-line:%(lineno)d - %(message)s', 
         datefmt='%Y/%m/%d %H:%M:%S')
@@ -185,18 +184,18 @@ def getDataFromWU():
 
 
 if __name__ == '__main__':
-    setupLogging(LOG_DIRECTORY)
+    stopfile = '/tmp/stopgetwu'
+    setupLogging()
     log.info('===========')
     log.info('Starting...')
-    os.makedirs(LOG_DIRECTORY, exist_ok=True)
-    if os.path.isfile(STOPFILE):
-        os.remove(STOPFILE)
+    if os.path.isfile(stopfile):
+        os.remove(stopfile)
     runme = True
     while runme is True:
         getDataFromWU()
         time.sleep(SLEEP_TIME)
-        if os.path.isfile(STOPFILE):
+        if os.path.isfile(stopfile):
             log.info('Exiting...')
-            os.remove(STOPFILE)
+            os.remove(stopfile)
             runme = False
             break

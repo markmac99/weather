@@ -1,0 +1,63 @@
+- hosts: weatherpi3 
+  vars_files: 
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
+  vars:
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/apis_services/getbresserwu"
+    targdir: "{{ ansible_env.HOME }}/source/getbresswu"
+    logdir: "{{ ansible_env.HOME }}/weather/logs"
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/getbresswu.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/wuconfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/mqConfig.py', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/getBresserData.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/installGetWu.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/getbresswu.service', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+
+  - name: update broker
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "someserver.net"
+      replace: "metsatpi"
+
+  - name: update mquser
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "mquser"
+      replace: "sensors"
+
+  - name: update mqpass
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "mqpass"
+      replace: "{{ mqsenspassword }}"
+
+  - name: update mqport 
+    ansible.builtin.replace:
+      path: '{{targdir}}/mqConfig.py'
+      regexp: "1883"
+      replace: "1883"
+
+  - name: update SRCDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/getbresswu.service'
+      regexp: "SRCDIR"
+      replace: "{{ targdir }}"
+
+  - name: update HOMEDIR
+    ansible.builtin.replace:
+      path: '{{targdir}}/getBresserData.sh'
+      regexp: "HOMEDIR"
+      replace: "{{ ansible_env.HOME }}"
+
+  - name: update logdir
+    ansible.builtin.replace:
+      path: '{{targdir}}/wuconfig.py'
+      regexp: "~/weather/logs"
+      replace: "{{ logdir }}"
+
