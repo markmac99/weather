@@ -14,19 +14,9 @@
     - {src: '{{srcdir}}/rtl_433.conf', dest: '{{targdir}}/', mode: '644', backup: yes }
     - {src: '{{srcdir}}/installservice.sh', dest: '{{targdir}}/', mode: '744', backup: yes }
 
-  - name: Run whoami without become.
-    command: whoami
-    changed_when: false
-    become: false
-    register: whoami
-
-  - name: Set a fact with the user name.
-    set_fact:
-      login_user: "{{ whoami.stdout }}"
-
   - name: update conf dir
     ansible.builtin.replace:
       path: '{{targdir}}/bresser_rtl433.service'
       regexp: "WORKINGDIR"
-      replace: "/home/{{ login_user }}/source/bresser"
+      replace: "{{ ansible_env.HOME }}/source/bresser"
 
