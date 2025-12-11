@@ -1,0 +1,6 @@
+# requests file for pushtoaws
+# copyright mark mcintyre 2025
+
+requests
+boto3 
+
