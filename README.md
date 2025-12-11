@@ -6,7 +6,7 @@ I run two weatherstations, a WH1080 compatible unit from Maplin and a Bresser 5-
 
 The Weatherstations and bmp280 data are being published to MQ Series along with other data that i'm calculating such as wind chill, heat index and dew point. The APIs and Maplin data collection are running on a Pi3, imaginatively named `weatherpi3`. The Bresser data collection runs on a second Pi3 named `metsatpi` which is also running Raspberry NOAA v2 (hence the name!). 
 
-Once collected, the Maplin and bmp280 data are pushed to a SQL database running on webserver hosted on AWS with a backup database on `weatherpi3`.
+Once collected, the Maplin and bmp280 data are pushed to a MySQL / MariaDB database running on webserver hosted on AWS with a backup database on `weatherpi3`. This minimises the chance of data loss. 
 
 ## website
 An implementation of the dragontail weather website. This initially consumed data from from pywws, but later i changed it to read data from files created by my own programme `mmwws`. 

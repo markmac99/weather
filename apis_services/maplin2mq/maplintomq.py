@@ -58,6 +58,9 @@ def setupLogging():
 
 def postToMySQL(whdata, usebkp=False):
     sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=usebkp)
+    # don't do anything if the SQLserver isn't configured
+    if sqlserver == 'NONE':
+        return 
     try:
         conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
         cur = conn.cursor()

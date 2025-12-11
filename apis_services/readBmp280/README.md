@@ -18,7 +18,8 @@ Requirements are *paho-mqtt*, *smbus* and *bme280* and can be installed with pip
 ## Configuration
 Update *mqConfig.py* with your MQ broker details.
 
-Update *whConfig.py* with your SQL database details and your station's altitude above sea level. This is used to calibrate the pressure readings.  You can also change the logging location from the default of `~/weather/logs`.
+Update *whConfig.py* with your mySQL or MariaDB database details. The code is designed to post to both a primary and backup database but if you don't have a backup, set the backup database to 'NONE'.
+Update *whConfig.py* with your station's altitude above sea level in metres. This is used to calibrate the pressure readings.  You can also change the logging location from the default of `~/weather/logs`.
 
 Update `SRCDIR` in *bmp280.service* to reflect the location in which you've installed the script.
 

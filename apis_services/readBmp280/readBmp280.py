@@ -48,6 +48,9 @@ def setupLogging():
 
 def postToMySQL(bmpdata, bkp=False):
     sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=bkp)
+    # don't do anything if the SQLserver isn't configured
+    if sqlserver == 'NONE':
+        return 
     conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
     cur = conn.cursor()
     evtdt = datetime.datetime.strptime(bmpdata['time'], '%Y-%m-%dT%H:%M:%SZ')

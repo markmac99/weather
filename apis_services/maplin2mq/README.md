@@ -1,7 +1,7 @@
 # README for maplin2mq
 
-This code reads WH1080 / Maplin weatherstation data from MQTT and posts it to my SQL database.
-It also augments it by adding feels_like and dewpoint values. 
+This code reads WH1080 / Maplin weatherstation data from MQTT and posts it to a mySQL or MariaDB database.
+It also augments the data by adding feels_like and dewpoint values. 
 
 ## Prerequisites
 You must have a WH1080-compatible weatherstation such as the Maplin unit i have.
@@ -18,7 +18,7 @@ source ~/venvs/pywws/bin/activate
 pip install -r $HOME/source/requirements.txt
 ```
 Update *mqConfig.py* with the details of your MQTT server. 
-Update *whconfig.py* with the details of your primary and backup SQL databases. 
+Update *whconfig.py* with the details of your primary and backup SQL databases. if you don't have a backup server, set the backup database name to 'NONE'. 
 
 # Install the Service
 Now you can install and start the services.  
