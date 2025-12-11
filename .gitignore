@@ -28,3 +28,4 @@ secrets.h
 apis_services/diskspacechecks/testConfig.py
 BatteryMonitorV2/sitespecific.h
 BatteryMonitorV2/sitespecific*.h
+raspberry-noaa-tweaks/post_to_twitter.py

@@ -2,10 +2,7 @@
 
 source ~/vAWS/bin/activate
 
-echo $1
-echo $2
-
-echo creating index file
+logger -s -t pushtoaws creating index file
 baseurl=https://d3jdcxriig76vh.cloudfront.net/satdata
 
 idxfile=/tmp/satindex.js
@@ -43,10 +40,10 @@ echo "var outer_div = document.getElementById(\"img-list\");"   >> $idxfile
 echo "outer_div.appendChild(table);"  >> $idxfile
 echo "})"  >> $idxfile
 
-echo copying to server
+logger -s -t pushtoaws copying to server
 scp -i ~/.ssh/markskey.pem /tmp/satindex.js bitnami@wordpresssite:data/mjmm-data/satdata/
-echo done
+logger -s -t pushtoaws done
 
-echo syncing files to AWS
+logger -s -t pushtoaws syncing files to AWS
 aws s3 sync /srv/images s3://mjmm-data/satdata/
-echo done
+logger -s -t pushtoaws done

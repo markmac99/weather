@@ -45,5 +45,6 @@ class Client():
         trimloc = text.find('\n\n#NOAA')
         text = text[:trimloc]
         cmd = f'/home/mark/source/pushtoaws/pushaws.sh "{text}" "{media_ids}"'
+        print('command is ', cmd)
         os.system(cmd)
         return True
