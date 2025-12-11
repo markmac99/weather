@@ -1,0 +1,19 @@
+- hosts: metsatpi
+  vars_files: 
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
+  vars:
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/raspberry-noaa-tweaks"
+    targdir:  "{{ ansible_env.HOME }}/source/pushtoaws"
+    pylibdir:  "{{ ansible_env.HOME }}/.local/lib/python3.11/site-packages/"
+    logdir: "{{ ansible_env.HOME }}/logs"
+  environment: 
+    LD_LIBRARY_PATH: /usr/local/lib
+  tasks:
+
+  - name: Copy files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/tweepy.py', dest: '{{pylibdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/pushaws.sh', dest: '{{targdir}}/', mode: '754', backup: yes }
+    - {src: '{{srcdir}}/requirements.txt', dest: '{{targdir}}/', mode: '644', backup: yes }
+    - {src: '{{srcdir}}/test_dummy_tweepy.py', dest: '{{targdir}}/', mode: '644', backup: yes }
