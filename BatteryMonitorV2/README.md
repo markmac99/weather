@@ -33,8 +33,9 @@ To measure up to 20V:
   * Solder a 2M resistor between +ve input pad and A0 on the Mini. 
 * Or
   * Solder a 2M resistor between the +ve back of the jack socket and A0 on the Mini.
-  * And then use the input jack to feed the measured voltage to the device. 
-
+  * And then use the input jack to feed the measured voltage to the device.
+ 
+Additionally, if you want the Mini to be able to go into deep sleep mode, connect RST to D0. 
 
 ## Building the Code
 Using the Arduino IDE:
