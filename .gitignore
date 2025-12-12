@@ -23,9 +23,9 @@ testingcontainer/ssh/*
 */terraform.tfstate*
 apis_services/retired/weatherapi/server.crt
 apis_services/retired/weatherapi/server.key
-BatteryMonitorV2/build/
+batterymonitor/build/
 secrets.h
 apis_services/diskspacechecks/testConfig.py
-BatteryMonitorV2/sitespecific.h
-BatteryMonitorV2/sitespecific*.h
+batterymonitor/sitespecific.h
+batterymonitor/sitespecific*.h
 raspberry-noaa-tweaks/post_to_twitter.py

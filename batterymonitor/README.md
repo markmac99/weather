@@ -28,14 +28,16 @@ calculate your own requirements.
 To measure up to 20V:
 
 * Solder the +3.3V, +5V, Gnd and A0 pins on the Mini to the corresponding pins on the shield.
+* solder D0 to RST on the mini. This allows the device to wake from deep sleep (powersaving mode). 
+
 * Then either:
-  * Solder input leads to the two solder input pads. 
   * Solder a 2M resistor between +ve input pad and A0 on the Mini. 
+  * Solder input leads to the two solder input pads. 
+
 * Or
   * Solder a 2M resistor between the +ve back of the jack socket and A0 on the Mini.
   * And then use the input jack to feed the measured voltage to the device.
- 
-Additionally, if you want the Mini to be able to go into deep sleep mode, connect RST to D0. 
+
 
 ## Building the Code
 Using the Arduino IDE:

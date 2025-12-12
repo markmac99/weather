@@ -17,7 +17,7 @@
 
 unsigned int raw = 0;
 float volt = 0.0;
-const int SLEEPSECS = 60;
+const int SLEEPSECS = 10;
 
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);
@@ -35,8 +35,10 @@ void connectToWiFi() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
+        digitalWrite(0, LOW); // Red on-board LED on
     }
     Serial.println("\nConnected to the WiFi network");
+    digitalWrite(0, HIGH); // Red on-board LED on
 }
 
 void connectToMQTTBroker() {
@@ -71,6 +73,7 @@ void loop() {
 
     connectToMQTTBroker();
 
+    digitalWrite(0, LOW); 
     String topic = mqtt_topic + topicname + "/voltage";
     if (mqtt_client.publish(topic.c_str(), payload.c_str(), true))
         Serial.println("Message published ["+String(topic)+"]: "+payload);
@@ -83,11 +86,13 @@ void loop() {
         Serial.println("Message published ["+String(topic)+"]: "+payload);
     else
       Serial.println("Problem publishing ["+String(topic)+"]: "+payload);
+    digitalWrite(0, HIGH); 
   }
   else
   {
       Serial.println("simulated publish");
   }
   Serial.println("sleeping...");
-  delay(SLEEPSECS*1000);
+  ESP.deepSleep(SLEEPSECS*1e6);
+  //delay(SLEEPSECS*1000);
 }
