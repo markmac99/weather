@@ -45,5 +45,5 @@ scp -i ~/.ssh/markskey.pem /tmp/satindex.js bitnami@wordpresssite:data/mjmm-data
 logger -s -t pushtoaws done
 
 logger -s -t pushtoaws syncing files to AWS
-aws s3 sync /srv/images s3://mjmm-data/satdata/
+/usr/local/bin/aws s3 sync /srv/images s3://mjmm-data/satdata/
 logger -s -t pushtoaws done
