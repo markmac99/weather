@@ -28,6 +28,10 @@ ls /srv/images/thumb/*web* -1t | head -20 | while read img ; do
         targfile=${baseurl}/${nameroot}equidistant_67_composite.jpg
     elif compgen -G "/srv/images/${nameroot}spread_67.jpg" > /dev/null ; then 
         targfile=${baseurl}/${nameroot}spread_67.jpg
+    elif compgen -G "/srv/images/${nameroot}spread_321.jpg" > /dev/null ; then 
+        targfile=${baseurl}/${nameroot}spread_321.jpg
+    elif compgen -G "/srv/images/${nameroot}spread_221.jpg" > /dev/null ; then 
+        targfile=${baseurl}/${nameroot}spread_221.jpg
     else
         targfile=${baseurl}/${nameroot}equidistant_67.jpg
     fi
