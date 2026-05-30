@@ -10,7 +10,18 @@ sqluser = 'wh1080'
 sqlserver = 'localhost'
 
 
-def loadDfFromDB(days=None, startdt=None, enddt=None, pressdata=False):
+def loadDfFromDB(days=None, startdt=None, enddt=None):
+    maindf = _loadDfFromDB_parts(days, startdt, enddt)
+    pressdf = _loadDfFromDB_parts(days, startdt, enddt, True)
+    df = pd.merge(maindf, pressdf, left_index=True, right_index=True, how='left')
+    df.ffill(inplace=True)
+    df.bfill(inplace=True)
+    df.drop(columns=['apressure_x','press_rel_x','timestamp_y'], inplace=True)
+    df.rename(columns={'timestamp_x':'timestamp','press_rel_y':'press_rel','apressure_y':'apressure'}, inplace=True)
+    return df
+
+
+def _loadDfFromDB_parts(days=None, startdt=None, enddt=None, pressdata=False):    
     cnx = sqlalchemy.create_engine(f'mysql+pymysql://{sqluser}:redacted@{sqlserver}:3306/{sqldb}')
     if not pressdata:
         if days:

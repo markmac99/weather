@@ -57,7 +57,6 @@ if __name__ == '__main__':
     last24hRain(df, outdir)
 
     logger.info('creating pressure graphs')
-    df = loadDfFromDB(days=2, pressdata=True)
     periodTemps(df, outdir, period=24, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
     logger.info('done')

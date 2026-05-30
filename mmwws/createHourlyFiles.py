@@ -62,7 +62,6 @@ if __name__ == '__main__':
     makeRose(df, outdir, 7)
 
     logger.info('creating pressure graphs')
-    df = loadDfFromDB(days=32, pressdata=True)
     periodTemps(df, outdir, period=24*7, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
     periodTemps(df, outdir, period=24*28, datafield='pressure', fieldname='pressure', fnamefrag='pressure', units='hPa')
 
