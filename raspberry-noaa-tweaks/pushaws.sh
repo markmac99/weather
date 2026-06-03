@@ -15,7 +15,7 @@ echo "header.className = \"h4\"; " >> $idxfile
 
 echo "var row = table.insertRow(-1);" >> $idxfile
 i=0
-ls /srv/images/thumb/*web* -1t | head -20 | while read img ; do
+ls /srv/images/thumb/*spread_221* -1t | head -20 | while read img ; do
     if [ $i -eq 5 ] ; then
         echo "var row = table.insertRow(-1);" >> $idxfile
         i=0
