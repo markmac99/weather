@@ -62,7 +62,7 @@ def postToMySQL(whdata, usebkp=False):
     if sqlserver == 'NONE':
         return 
     try:
-        conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, db=sqldb)
+        conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, database=sqldb, read__timeout=60, write_timeout=60)
         cur = conn.cursor()
         evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
 
