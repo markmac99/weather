@@ -149,10 +149,19 @@
                     <div class="panel panel-default">
 						<div class="panel-body">
 						    <h3>Tackley Weather Station</h3>
-						    This data is generated using a Maplin Wireless Weatherstation, connected
-						    via USB to a Raspberry Pi. The Pi is running pywws which is capturing data every
-						    ten minutes and transferring the formatted results to our website.<br>
-						    For more information on how to set this up, see <a href="http://dragontail.co.uk/index.html">here</a>
+						    This data is generated using a Maplin Wireless WH1080-compatible weatherstation. The weatherstation's external sensors
+                            transmit data on 433 MHz and I'm using a Raspberry Pi3 with an RTL-SDR dongle and the <b>rtl_433</b> software
+                            to collect the data and publish on my internal MQTT service. From there it is augmented and pushed into a MariaDB database running
+                            on our webserver. Some custom software (mmwws) takes the data from the database and creates the JavaScript
+                            tables and charts displayed here.<br>
+						    For more information on how this all works, see <a href="https://github.com/markmac99/weather">here</a><br>
+                            <p>
+                                Aside: Originally, I used <a href="http://pywws.readthedocs.io/en/latest/"> pywws</a> and the Dragontail 
+                                weather website software to collect data directly from the Weatherstation's USB port on
+                                its internal display/sensor unit. However, over time the USB port failed and the internal sensors stopped
+                                working, so instead I switched to directly collecting data over wireless. Meanwhile it seems Dragontail has 
+                                shut down, though pywws is still working. 
+                            </p>
 						</div>
 		    		    <div> <img src="images/ourstation.jpg" width=800 /></div>
 					    <div><img src="images/weatherstation.JPG" width=800 /></div>

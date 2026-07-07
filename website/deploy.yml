@@ -1,7 +1,7 @@
 ---
 - hosts: www.markmcintyreastro.co.uk
   vars:
-    srcdir: /mnt/e/dev/weather/website
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/weather/website"
     destdir: /home/bitnami/weather
   tasks:
   - name: Copy files
