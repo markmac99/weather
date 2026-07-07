@@ -1,4 +1,3 @@
-# python code to read WH1080 data from MQ, write it to a  JSON file, then 
 # post some additional values back to MQ
 
 # copyright Mark McIntyre, 2024
@@ -62,7 +61,7 @@ def postToMySQL(whdata, usebkp=False):
     if sqlserver == 'NONE':
         return 
     try:
-        conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, database=sqldb, read__timeout=60, write_timeout=60)
+        conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, database=sqldb, read_timeout=60, write_timeout=60)
         cur = conn.cursor()
         evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
 
@@ -81,7 +80,7 @@ def postToMySQL(whdata, usebkp=False):
 
             # check for unrealistic temperature movements    
             prevtempc = lastdata[1]
-            if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 10:
+            if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 15:
                 whdata['temperature_C'] = prevtempc
 
             # wind speed change of > 10 kmh is unrealistic
