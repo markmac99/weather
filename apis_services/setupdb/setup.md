@@ -1,16 +1,26 @@
 # Setting up a MYSQL database
 
-## Create user, database and table
+## Create user, database and table 
+Replace 'wh1080pwd' with the real password wherever it appears. 
 ``` bash
 create user 'wh1080'@'%' identified by 'wh1080pwd';
 create user 'wh1080'@'127.0.0.1' identified by 'wh1080pwd';
 create user 'wh1080'@'localhost' identified by 'wh1080pwd';
 create schema weather;
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'%';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, CREATE VIEW ON weather.* TO 'wh1080'@'localhost';
 ```
 
+## migrating to a new DB:
+- create the new DB
+- login to the DB as root and run the above commands
+- run mysqldump on the old server: `mysqldump weather > weather.sql`
+- copy the file to the new server 
+- edit the file to add 'use weather' before the first drop statement, save and import it: `mysql < weather.sql`
+
+
+## Using it
 * install sqlalchemy 
 * install pymysql 
 
