@@ -26,7 +26,7 @@ calculate your own requirements.
 To measure up to 20V:
 
 * Solder the +3.3V, +5V, Gnd and A0 pins on the Mini to the corresponding pins on the shield.
-* solder D0 to RST on the mini. This allows the device to wake from deep sleep (powersaving mode). 
+* solder D0 to RST on the mini. This allows the device to wake from deep sleep (powersaving mode - but see note below). 
 
 * Then either:
   * Solder a 2M resistor between +ve input pad and A0 on the Mini. 
@@ -61,3 +61,11 @@ To calibrate it:
 * Adjust `scalefactor` as needed and redeploy the code. 
 
 Note: At present, only unencrypted connections to MQ are supported.
+
+## Powersaving Mode
+In normal peration the D1 Mini consumes about 40mA while idling, rising to 180-200mA when operating the wifi antenna. This is enough to flatten a 6Ah battery in under a week. Add to this the load you're trying to power, and battery life becomes problematic. I found that even with a 5Wp solar panel attached, my 6Ah battery was flattened in only a few days during the winter. 
+
+However the unit has an deep-sleep mode in which it consumes only 0.15mA. The device can be put into this mode and a timer set to automatically wake. This sounds excellent, and would be - except that  some D1 Minis simply won't enter deep sleep. It appears to be a random manufacturing issue, and there's no way to know in advance if you'll get a 'bad' one or a 'good' one. 
+
+You'll have to take pot luck! 
+
