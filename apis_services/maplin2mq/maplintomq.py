@@ -9,6 +9,7 @@ import datetime
 import pymysql
 import logging
 import logging.handlers
+from time import sleep
 
 from whConfig import loadSQLconfig, getLogDir
 from mqConfig import readConfig
@@ -51,6 +52,8 @@ def setupLogging():
     log.addHandler(ch)
     log.setLevel(logging.INFO)
 
+    log.info('===============================================')
+    log.info('application startup')
     log.info('logging initialised')
     return 
 
@@ -58,40 +61,55 @@ def setupLogging():
 def postToMySQL(whdata, usebkp=False):
     sqldb, sqluser, sqlpass, sqlserver = loadSQLconfig(bkp=usebkp)
     # don't do anything if the SQLserver isn't configured
+    retval = False
     if sqlserver == 'NONE':
-        return 
+        return False
     try:
         conn = pymysql.connect(host=sqlserver, user=sqluser, password=sqlpass, database=sqldb, read_timeout=60, write_timeout=60)
         cur = conn.cursor()
-        evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
+    except Exception as e:
+        log.warning(f'unable to connect to sql server {sqlserver}')
+        log.warning(f'reason: {e}')
+        return False
 
+    evtdt = datetime.datetime.strptime(whdata['time'], '%Y-%m-%d %H:%M:%S')
+
+    try:
         # get previous rain and work out change
         result = cur.execute('select rain_mm, temperature_C, press_rel, apressure, wind_avg_km_h, wind_max_km_h from wh1080data where temperature_C is not null order by time desc limit 1')
         lastdata = cur.fetchone()
-        if 'rainchg' not in whdata:
-            whdata['rainchg'] = 0
-        if lastdata:
-            prevrain = lastdata[0]
-            rainchg = whdata['rain_mm'] - prevrain
+    except Exception as e:
+        log.warning(f'unable to get previous data from sql server {sqlserver}')
+        log.warning(f'reason: {e}')
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return False
+    
+    if 'rainchg' not in whdata:
+        whdata['rainchg'] = 0
+    if lastdata:
+        prevrain = lastdata[0]
+        rainchg = whdata['rain_mm'] - prevrain
 
-            # ignore unrealistic changes
-            if rainchg > -0.31 and rainchg < 50:
-                whdata['rainchg'] = rainchg
+        # ignore unrealistic changes
+        if rainchg > -0.31 and rainchg < 50:
+            whdata['rainchg'] = rainchg
 
-            # check for unrealistic temperature movements    
-            prevtempc = lastdata[1]
-            if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 15:
-                whdata['temperature_C'] = prevtempc
+        # check for unrealistic temperature movements    
+        prevtempc = lastdata[1]
+        if whdata['temperature_C'] > 55 or whdata['temperature_C'] < -30 or abs(prevtempc - whdata['temperature_C']) > 15:
+            whdata['temperature_C'] = prevtempc
 
-            # wind speed change of > 10 kmh is unrealistic
-            prevwind = lastdata[4]
-            prevgust = lastdata[5]
-            winddiff = abs(whdata['wind_avg_km_h'] - prevwind)
-            if whdata['wind_avg_km_h'] > 120 or winddiff > 50:
-                whdata['wind_avg_km_h'] = prevwind
-            if whdata['wind_max_km_h'] > 170:
-                whdata['wind_max_km_h'] = prevgust
-
+        # wind speed change of > 10 kmh is unrealistic
+        prevwind = lastdata[4]
+        prevgust = lastdata[5]
+        winddiff = abs(whdata['wind_avg_km_h'] - prevwind)
+        if whdata['wind_avg_km_h'] > 120 or winddiff > 50:
+            whdata['wind_avg_km_h'] = prevwind
+        if whdata['wind_max_km_h'] > 170:
+            whdata['wind_max_km_h'] = prevgust
         sql = " INSERT INTO wh1080data (time, model, subtype, id, battery_ok, temperature_C, humidity,"\
             "wind_dir_deg, wind_avg_km_h, wind_max_km_h, rain_mm, mic,"\
             "timestamp, rainchg, year, month, day) "\
@@ -101,18 +119,22 @@ def postToMySQL(whdata, usebkp=False):
             whdata['wind_dir_deg'], whdata['wind_avg_km_h'], whdata['wind_max_km_h'], whdata['rain_mm'], whdata['mic'],
             evtdt.strftime('%Y-%m-%d %H:%M:%S'), whdata['rainchg'], evtdt.year, evtdt.month, evtdt.day)
 
-        result = cur.execute(sql, vals)
-
-        if result != 1:
-            log.info('unable to write to mysql table')
-        else:
-            log.info(f'wrote {whdata} to {sqlserver}')
+        try:
+            result = cur.execute(sql, vals)
+            if result != 1:
+                log.info('unable to write to mysql table')
+                retval = False
+            else:
+                log.info(f'wrote {whdata} to {sqlserver}')
+                retval = True
+        except Exception as e:
+            log.warning(f'unable to post to sql server {sqlserver}')
+            log.warning(f'reason: {e}')
+            retval = False
             
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        log.warning(f'unable to connect to SQLserver {e}')
-    return
+    conn.commit()
+    conn.close()
+    return True
 
 
 def on_connect(client, userdata, flags, rc):
@@ -141,9 +163,17 @@ def on_message(client, userdata, msg):
     msgcount += 1
     if msgcount > 7 and jsonmsg['time'] != lasttime: 
         log.info(f'processing {jsonmsg}')
-        postToMySQL(jsonmsg)
-        postToMySQL(jsonmsg, usebkp=True)
-
+        for retry in range(10):
+            if postToMySQL(jsonmsg):
+                break
+            log.info(f'retrying to write to primary, attempt {retry+1}/10')
+            sleep(1)
+        for retry in range(10):
+            if postToMySQL(jsonmsg, usebkp=True):
+                break
+            sleep(1)
+            log.info(f'retrying to write to backup, attempt {retry+1}/10')
+    
         # now add extra data to MQ
         log.info('calculating the additional data')
         t = float(jsonmsg['temperature_C'])
