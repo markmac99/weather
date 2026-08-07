@@ -27,7 +27,7 @@ A vanilla instance of RTL_433 tuned to 433MHz to retrieve data from the WH1080 o
 A vanilla instance of RTL_433 tuned to 833MHz to retrieve data from the Bresser's outside sensors and post it to MQ in a topic `sensors/rtl_433/P172/C0`. The config file for this is in this folder.
 
 ### maplin2mq
-This service reads the Maplin data from MQ, posts the data to the SQL databases and then augments it with additional values `feels_like` and `dew_point` which are pubilshed back to MQ, . 
+This service reads the Maplin data from MQ, posts the data to the SQL databases and then augments it with additional values `feels_like` and `dew_point` which are pubilshed back to MQ. Its called maplin2mq because originally it read data directly from the weatherstation, before i got rtl433 working properly for it. Now, it reads from MQ, augments and writes to SQL. I should really rename it...
 
 ### readBmp280
 This service reads data from a BMP/BME280 temperature, humidity and pressure sensor to provide indoor readings. The data are published to MQ in a topic `sensors/bmp280` and posted to SQL. 
