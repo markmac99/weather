@@ -2,7 +2,7 @@
 
 Various weatherstation and weather related stuff
 
-I run two weatherstations, a WH1080 compatible unit from Maplin and a Bresser 5-in-1 unit. I also have a bmp280 chip providing pressure and indoor temperature and is being read by a Raspberry Pi via GPIO. 
+I run two weatherstations, a WH1080 compatible unit from Maplin and a Bresser 5-in-1 unit. I also have a bmp280 chip connected to a Raspberry Pi, providing pressure and indoor temperature. 
 
 The Weatherstations and bmp280 data are being published to MQ Series along with other data that i'm calculating such as wind chill, heat index and dew point. The APIs and Maplin data collection are running on a Pi3, imaginatively named `weatherpi3`. The Bresser data collection runs on a second Pi3 named `metsatpi` which is also running Raspberry NOAA v2 (hence the name!). 
 
