@@ -16,10 +16,7 @@ import logging.handlers
 from mqConfig import readConfig
 from wuconfig import stationid, getWUkey, getOpenhabURL, getLogDir
 
-
-
 MAX_RETRIES = 20
-SLEEP_TIME = 60 # wunderground limits you to 1500 requests per day = 1 per min
 
 
 log = logging.getLogger()
@@ -193,9 +190,14 @@ if __name__ == '__main__':
     runme = True
     while runme is True:
         getDataFromWU()
-        time.sleep(SLEEP_TIME)
         if os.path.isfile(stopfile):
             log.info('Exiting...')
             os.remove(stopfile)
             runme = False
             break
+        timenext = datetime.datetime.now(tz=datetime.timezone.utc).timestamp() + 61
+        timenow = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+        while timenow < timenext:
+            log.info(f'waiting {timenext - timenow:.0f} seconds')
+            time.sleep(5)
+            timenow = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
